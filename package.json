@@ -1,0 +1,31 @@
+{
+  "name": "bergquist",
+  "main": "server.js",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "out": "next build && next export",
+    "deploy": "firebase deploy --only functions,hosting"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.6.0",
+    "@emotion/styled": "^11.6.0",
+    "@mui/icons-material": "^5.2.5",
+    "@mui/material": "^5.2.3",
+    "@perawallet/connect": "^0.2.0",
+    "@randlabs/myalgo-connect": "^1.2.0",
+    "algosdk": "^1.17.0",
+    "firebase": "^9.6.7",
+    "firebase-admin": "^9.9.0",
+    "firebase-functions": "^3.15.5",
+    "framer-motion": "^4.1.17",
+    "micro": "^9.3.4",
+    "next": "^12.1.0",
+    "nextjs-cors": "^2.1.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}

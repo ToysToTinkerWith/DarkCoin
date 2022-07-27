@@ -10,7 +10,19 @@ import { Button, Typography } from "@mui/material"
 
 export default function AlgoConnect(props) {
 
-  
+    useEffect(() => {
+        // Reconnect to the session when the component is mounted
+        peraWallet.reconnectSession().then((accounts) => {
+          // Setup the disconnect event listener
+          peraWallet.connector?.on("disconnect", disconnect);
+    
+          if (accounts.length) {
+            props.setActiveAddress(accounts[0])
+            props.setWalletType("pera")
+          }
+        });
+      }, []);
+
     const myAlgoWallet = new MyAlgo()
 
     const connectToMyAlgo = async() => {
@@ -21,6 +33,7 @@ export default function AlgoConnect(props) {
         const addresses = accounts.map(account => account.address);
 
         props.setActiveAddress(addresses[0])
+        props.setWalletType("myalgo")
         
         
         } catch (err) {
@@ -31,11 +44,13 @@ export default function AlgoConnect(props) {
 
     function handleConnectWalletClick() {
 
+
       
         peraWallet
         .connect()
         .then((newAccounts) => {
             props.setActiveAddress(newAccounts[0]);
+            props.setWalletType("pera")
         })
         .catch((error) => {
             // You MUST handle the reject because once the user closes the modal, peraWallet.connect() promise will be rejected.
@@ -57,13 +72,13 @@ export default function AlgoConnect(props) {
             <br />
             {props.activeAddress ? 
             <>
-            <Typography align="center" variant="h6" style={{fontFamily: "Chango", color: "#FFFFFF"}}> {props.activeAddress.slice(0, 10)} </Typography>
+            <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {props.activeAddress.slice(0, 10)} </Typography>
             <br />
             <Button 
                 style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}}
                 onClick={() => disconnect()}
             > 
-            <Typography variant="h6" style={{fontFamily: "Chango", color: "#000000"}}> Disconnect </Typography>
+            <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Disconnect </Typography>
             </Button>
             </>
             :

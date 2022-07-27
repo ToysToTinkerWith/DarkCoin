@@ -5,6 +5,8 @@ import Head from "next/head"
 import algosdk from "algosdk"
 
 import DisplayNft from "./DisplayNft"
+import Propose from "./Propose.js"
+import Contract from "./Contract.js"
 
 
 
@@ -58,10 +60,6 @@ export default class ActiveWallet extends React.Component {
                   })
             }
           
-         
-    
-          
-          
       })().catch(e => {
           console.log(e);
           console.trace();
@@ -71,7 +69,6 @@ export default class ActiveWallet extends React.Component {
         let acct = this.props.activeAddress;
         let accountInfo = await indexerClient.lookupAccountAssets(acct).do();
         accountInfo.assets.forEach(async (asset) => {
-          console.log(asset)
           if (asset["asset-id"] == 601894079) {
             this.setState({
                 darkCoin: asset.amount
@@ -82,14 +79,7 @@ export default class ActiveWallet extends React.Component {
                 ownedNfts: [...prevState.ownedNfts, asset["asset-id"]]
               }))
           }
-
     
-              
-          
-          
-      
-          
-          
           })
   
         
@@ -135,7 +125,8 @@ export default class ActiveWallet extends React.Component {
                     </Grid>
 
                 </Grid>
-                
+
+                <Contract activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
                
 
                 

@@ -8,6 +8,8 @@ const AlgoConnect = dynamic(() => import("../components/AlgoConnect"), {ssr: fal
 
 import ActiveWallet from "../components/ActiveWallet"
 
+import DarkCoin from "../components/DarkCoin"
+
 import Socials from "../components/Socials"
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
@@ -17,7 +19,8 @@ export default class Index extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            activeAddress: null
+            activeAddress: null,
+            walletType: ""
         };
         
     }
@@ -25,8 +28,6 @@ export default class Index extends React.Component {
    
 
     render() {
-
-        console.log(this.state.activeAddress)
         return (
             <div>
                 <Head>
@@ -45,11 +46,6 @@ export default class Index extends React.Component {
                     Dark Coin
                 </Typography>
                 <img src="./DarkCoinLogo.svg" style={{display: "flex", margin: "auto", padding: 30, width: "100%", maxWidth: 350}}/>
-                
-                <Typography align="center" variant="h2" style={{color: "#FFFFFF", fontFamily: "JacquesShadow", padding: 30}}>
-                To the dark side of the moon
-                
-                </Typography>
 
                 <div style={{border: "3px solid white", borderRadius: 15, margin: 30}}>
                     <Grid container alignItems="center">
@@ -66,18 +62,20 @@ export default class Index extends React.Component {
                         
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                            <AlgoConnect activeAddress={this.state.activeAddress} setActiveAddress={(account) => this.setState({activeAddress: account})} />
+                            <AlgoConnect activeAddress={this.state.activeAddress} setActiveAddress={(account) => this.setState({activeAddress: account})} setWalletType={(wallet) => this.setState({walletType: wallet})} />
                         </Grid>
 
                     </Grid>
 
                     {this.state.activeAddress ? 
-                        <ActiveWallet activeAddress={this.state.activeAddress} />
+                        <ActiveWallet activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
                         :
                         null
                     }
 
                 </div>
+
+                <DarkCoin />
 
                 <Socials />
 

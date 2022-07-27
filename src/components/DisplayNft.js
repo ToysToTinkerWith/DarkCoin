@@ -2,6 +2,8 @@ import React from "react"
 
 import Head from "next/head"
 
+import { db } from "../../Firebase"
+
 import algosdk from "algosdk"
 
 
@@ -13,6 +15,7 @@ export default class DisplayNft extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            nft: null,
             nftUrl: null
             
         };
@@ -26,9 +29,12 @@ export default class DisplayNft extends React.Component {
 
             let assetInfo = await indexerClient.searchForAssets()
             .index(this.props.nftId).do();
+
+            console.log(assetInfo)
             
             this.setState({
-                nftUrl: "https://ipfs.io/ipfs/" + assetInfo.assets[0].params.url.slice(7)
+                nft: assetInfo.assets[0].params,
+                nftUrl: "https://ipfs.dark-coin.io/ipfs/" + assetInfo.assets[0].params.url.slice(7)
             })
           
 
@@ -46,14 +52,28 @@ export default class DisplayNft extends React.Component {
     render() {
 
         console.log(this.state)
-       
-        return (
-            <div>
-                <img src={this.state.nftUrl} style={{width: "95%"}} />
-               
-            </div>
 
-        )
+        if (this.state.nft) {
+            return (
+                <div>
+                    <Button href={this.state.nftUrl} style={{display: "block"}}>
+                        <Typography align="center" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 10}}> {this.state.nft.name} </Typography>
+                        <img src={this.state.nftUrl} style={{width: "95%"}} />
+                    </Button>
+                </div>
+    
+            )
+        }
+
+        else {
+            return (
+                <div>                   
+                </div>
+    
+            )
+        }
+       
+        
     }
     
 }

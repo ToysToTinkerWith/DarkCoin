@@ -16,7 +16,8 @@ export default class DisplayNft extends React.Component {
         super(props);
         this.state = {
             nft: null,
-            nftUrl: null
+            nftUrl: null,
+            pinataNftMeta: null,
             
         };
         
@@ -30,12 +31,29 @@ export default class DisplayNft extends React.Component {
             let assetInfo = await indexerClient.searchForAssets()
             .index(this.props.nftId).do();
 
-            console.log(assetInfo)
             
             this.setState({
                 nft: assetInfo.assets[0].params,
                 nftUrl: "https://ipfs.dark-coin.io/ipfs/" + assetInfo.assets[0].params.url.slice(7)
             })
+
+            // let nftHash = String(assetInfo.assets[0].params.url.slice(7))
+
+            // const response = await fetch('/api/readNft', {
+            //     method: "POST",
+            //     headers: {
+            //       "Content-Type": "application/json",
+            //     },
+            //     body: JSON.stringify({
+            //         hash: nftHash,
+            //       }),
+
+                  
+            //   });
+            
+            //   const session = await response.json()
+
+            //   this.setState({pinataNftMeta: session.status.rows[0].metadata})
           
 
           
@@ -43,6 +61,8 @@ export default class DisplayNft extends React.Component {
             console.log(e);
             console.trace();
         });
+
+
     
     
       }
@@ -51,14 +71,12 @@ export default class DisplayNft extends React.Component {
 
     render() {
 
-        console.log(this.state)
-
         if (this.state.nft) {
             return (
                 <div>
-                    <Button href={this.state.nftUrl} style={{display: "block"}}>
-                        <Typography align="center" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 10}}> {this.state.nft.name} </Typography>
-                        <img src={this.state.nftUrl} style={{width: "95%"}} />
+                    <Button onClick={() => this.props.setActiveNft([this.props.nftId, this.state.nft])} >
+                        <Typography align="left" variant="caption" style={{color: "#FFFFFF", fontFamily: "Jacques", fontWeight: "800", padding: 20, position: "absolute", top: 0, left: 0, width: 100}}> {this.state.nft.name} </Typography>
+                        <img src={this.state.nftUrl} style={{width: "100%"}} />
                     </Button>
                 </div>
     

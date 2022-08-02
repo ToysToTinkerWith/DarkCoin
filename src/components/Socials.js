@@ -19,7 +19,6 @@ export default class Index extends React.Component {
 
     render() {
 
-        console.log(this.state.activeAddress)
         return (
             <div style={{}}>
 

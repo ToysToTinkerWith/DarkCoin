@@ -30,7 +30,6 @@ export default class DarkCoin extends React.Component {
 
 
             let assetInfo = await indexerClient.lookupAssetBalances(assetIndex).currencyGreaterThan(1).do();
-            console.log(assetInfo)
             this.setState({
                 holders: assetInfo.balances
             })

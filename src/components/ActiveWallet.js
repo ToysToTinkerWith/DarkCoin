@@ -7,6 +7,7 @@ import algosdk from "algosdk"
 import DisplayNft from "./DisplayNft"
 import Propose from "./Propose.js"
 import Contract from "./Contract.js"
+import NftVote from "./NftVote.js"
 
 
 
@@ -19,7 +20,8 @@ export default class ActiveWallet extends React.Component {
         this.state = {
             nftIds: [],
             ownedNfts: [],
-            darkCoin: 0
+            darkCoin: 0,
+            activeNft: null
             
         };
         
@@ -34,7 +36,6 @@ export default class ActiveWallet extends React.Component {
             let nextToken = ""
 
             let accountInfo = await indexerClient.lookupAccountCreatedAssets(acct).limit(1000).do();
-            console.log(accountInfo)
             numAssets = numAssets + accountInfo.assets.length
             nextToken = accountInfo["next-token"]
             
@@ -48,7 +49,6 @@ export default class ActiveWallet extends React.Component {
 
             while (numAssets < 2000) {
                 accountInfo = await indexerClient.lookupAccountCreatedAssets(acct).nextToken(nextToken).limit(1000).do();
-                console.log(accountInfo)
                 numAssets = numAssets + accountInfo.assets.length
                 nextToken = accountInfo["next-token"]
                 accountInfo.assets.forEach(async (asset) => {
@@ -96,40 +96,53 @@ export default class ActiveWallet extends React.Component {
 
     render() {
 
-        console.log(this.state)
-
         const govNfts = this.state.nftIds.filter(value => this.state.ownedNfts.includes(value));
-
-        console.log(govNfts)
-       
+        
         return (
             <div>
-                <Grid container alignItems="center" wrap="wrap-reverse">
-                    <Grid item xs={12} sm={12} md={6} style={{display: "flex", padding: "5%"}}>
-                    {govNfts.length > 0 ?
-            
-                    govNfts.map((nft) => {
-                        return (
-                            <DisplayNft nftId={nft} />
-                        )
-                    })
-                    :
-                    null
-                    }
-                    
-                    </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
+                <Grid container alignItems="center" >
+                    <Grid item xs={12} sm={12} md={12}>
                         <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", margin: 30}}> Dark Coin </Typography>
                         <img src="./DarkCoinLogo.svg" style={{display: "flex", margin: "auto", width: "10%", marginBottom: 30}}/>
                         <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", margin: 30}}> {this.state.darkCoin} </Typography>
                     </Grid>
 
+
+
+                    {this.state.activeNft ?
+                    <Grid item xs={12} sm={12} md={12}>
+                        <Button style={{display: "block", margin: "auto"}} onClick={() => this.setState({activeNft: null})} >
+                            <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", fontWeight: "800", padding: 20}}> {this.state.activeNft[1].name} </Typography>
+                            <img src={"https://ipfs.dark-coin.io/ipfs/" + this.state.activeNft[1].url.slice(7)} style={{display: "flex", margin: "auto", width: "100%"}} />
+                        </Button>
+                    </Grid>
+                    :
+                    govNfts.length > 0 ?
+            
+                    govNfts.map((nft, index) => {
+                        return (
+                            <Grid item xs={6} sm={6} md={4} lg={3} key={index} style={{display: "flex", padding: "5%"}}>
+                                <DisplayNft nftId={nft} setActiveNft={(nft) => this.setState({activeNft: nft})} />
+                            </Grid>
+                        )
+                    })
+                    :
+                    null
+                    
+                    }
+                    
+                    
+                    
+                    
+                    
+
                 </Grid>
 
-                <Contract activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
-               
-
-                
+                {this.state.activeNft ?
+                    <Contract activeNft={this.state.activeNft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
+                    :
+                    null
+                }
 
             </div>
 

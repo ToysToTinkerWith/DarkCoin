@@ -38,14 +38,19 @@ export default class Contract extends React.Component {
         (async () => {
             let address = this.props.activeAddress;
             let response = await indexerClient.lookupAccountAppLocalStates(address).do();
-            response["apps-local-states"].forEach((app) => {
-                console.log(app)
-                if (app.id == 818428331) {
+            response["apps-local-states"].forEach((app) => {                
+                if (app.id == 826032354) {
                     let localProposal = ""
                     if (app["key-value"]) {
-                        localProposal = atob(app["key-value"][0].value.bytes)
+                      app["key-value"].forEach((keyvalue) => {
+                        if (atob(keyvalue.key) == String(this.props.activeNft[0])) {
+                          localProposal = atob(keyvalue.value.bytes)
+                          this.setState({localProposal: localProposal})
+                        }
+                      })
                     }
-                    this.setState({optedIn: true, localProposal: localProposal})
+
+                    this.setState({optedIn: true})
                 }
             })
         })().catch(e => {
@@ -54,6 +59,7 @@ export default class Contract extends React.Component {
         })
 
       }
+     
 
       async Optin (sender, index) {
         try{
@@ -65,13 +71,11 @@ export default class Contract extends React.Component {
           params.flatFee = true;      
           
           let txn = algosdk.makeApplicationOptInTxn(sender, params, index);
-          console.log(txn)
           const singleTxnGroups = [{txn: txn, signers: [this.props.activeAddress]}]
 
           if (this.props.wallet == "pera") {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
-            console.log(signedTxn)
             let txId = await client.sendRawTransaction(signedTxn).do();
 
             this.setState({optedIn: true})
@@ -80,8 +84,6 @@ export default class Contract extends React.Component {
             const myAlgoWallet = new MyAlgo()
 
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
-
-            console.log(signedTxn)
 
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
 
@@ -112,7 +114,6 @@ export default class Contract extends React.Component {
           if (this.props.wallet == "pera") {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
-            console.log(signedTxn)
             let txId = await client.sendRawTransaction(signedTxn).do();
 
             this.setState({optedIn: false})
@@ -122,11 +123,9 @@ export default class Contract extends React.Component {
 
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
-            console.log(signedTxn)
-
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
 
-            this.setState({optedIn: false})
+            this.setState({optedIn: false, localProposal: ""})
           }
  
 
@@ -150,6 +149,7 @@ export default class Contract extends React.Component {
           const appArgs = []
             appArgs.push(
                 new Uint8Array(Buffer.from("vote")),
+                new Uint8Array(Buffer.from(this.props.activeNft[0].toString())),
                 new Uint8Array(Buffer.from(this.state.proposal)),
             )
           
@@ -159,7 +159,6 @@ export default class Contract extends React.Component {
           if (this.props.wallet == "pera") {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
-            console.log(signedTxn)
             let txId = await client.sendRawTransaction(signedTxn).do();
 
             this.setState({localProposal: this.state.proposal})
@@ -168,8 +167,6 @@ export default class Contract extends React.Component {
             const myAlgoWallet = new MyAlgo()
 
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
-
-            console.log(signedTxn)
 
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
 
@@ -197,19 +194,10 @@ export default class Contract extends React.Component {
 
     render() {
 
-       
         return (
             <div style={{margin: 30}}>
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/818428331")}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
-                </Button>
-                <br />
-                {this.state.optedIn == false ? 
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, 818428331)}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
-                </Button>
-                :
-                <>
+                
+            
                 {this.state.localProposal ? 
                 <>
                 <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
@@ -220,36 +208,47 @@ export default class Contract extends React.Component {
                 </Typography>
                 </>
                 :
-                <>
-                <TextField
-                    color="primary"
-                    variant="outlined"
-                    multiline
-                    rows={5}
-                    value={this.state.proposal}
-                    type="text"
-                    label={<Typography variant="body1" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Proposal </Typography>}
-                    name={"proposal"}
-                    inputProps={{ style: { color: "white", fontFamily: "Jacques" }}}
+                null
+                }
+                <br />
 
-                    sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
-                    style={{width: "80%", display: "flex", margin: "auto"}}
-                    onChange={this.handleChange}
-                />
-                <br />
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote(this.props.activeAddress, 818428331)}>
-                    <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Vote </Typography>
+               
+                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/826032354")}>
+                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
                 </Button>
+                <br />
+                {this.state.optedIn == false ? 
+                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, 826032354)}>
+                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
+                </Button>
+                :
+                <>
+                  <TextField
+                      color="primary"
+                      variant="outlined"
+                      multiline
+                      rows={5}
+                      value={this.state.proposal}
+                      type="text"
+                      label={<Typography variant="body1" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Proposal </Typography>}
+                      name={"proposal"}
+                      inputProps={{ style: { color: "white", fontFamily: "Jacques" }}}
+
+                      sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
+                      style={{width: "80%", display: "flex", margin: "auto"}}
+                      onChange={this.handleChange}
+                  />
+                  <br />
+                  <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote(this.props.activeAddress, 826032354)}>
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Vote </Typography>
+                  </Button>
+                  <br />
+                  <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, 826032354)}>
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
+                  </Button>
                 </>
                 }
                 
-                <br />
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, 818428331)}>
-                    <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
-                </Button>
-                
-                </>
-                }
                 
             </div>
         )

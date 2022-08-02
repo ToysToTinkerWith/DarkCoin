@@ -6,9 +6,9 @@ const algosdk = require('algosdk');
 //SMART CONTRACT DEPLOYMENT
   // declare application state storage (immutable)
   const localInts = 0;
-  const localBytes = 1;
-  const globalInts = 24; //# 4 for setup + 20 for choices. Use a larger number for more choices.
-  const globalBytes = 1;
+  const localBytes = 16;
+  const globalInts = 0; 
+  const globalBytes = 10;
 
   // get accounts from mnemonic
   const creatorMnemonic = "replace bleak better dignity furnace rib network grab pretty copy warm soon stay blouse abandon cable witness toddler model anger fringe habit chapter absent unaware"
@@ -20,11 +20,11 @@ const algosdk = require('algosdk');
   const sender = userAccout.addr
 
   //Generate Account
-  const account = algosdk.generateAccount()
-  const secrekey = account.sk
-  const mnemonic = algosdk.secretKeyToMnemonic(secrekey)
-  console.log("mnemonic " + mnemonic )
-  console.log("address " + account.addr )
+  //const account = algosdk.generateAccount()
+  //const secrekey = account.sk
+  // const mnemonic = algosdk.secretKeyToMnemonic(secrekey)
+  // console.log("mnemonic " + mnemonic )
+  // console.log("address " + account.addr )
 
   console.log()
   // Connect your client
@@ -33,7 +33,7 @@ const algosdk = require('algosdk');
   const port = "";
   const headers ={"X-API-Key": ""}  
     
-  console.log(process.env) 
+  //console.log(process.env) 
   let client = new algosdk.Algodv2(algodToken, baseServer, port, headers)
 
   // Read Teal File
@@ -43,8 +43,8 @@ const algosdk = require('algosdk');
   try {
     approvalProgram = fs.readFileSync('../contract/vote_approval.teal', 'utf8')
     clear_state_program = fs.readFileSync('../contract/vote_clear_state.teal', 'utf8')
-    console.log(approvalProgram)
-    console.log(clear_state_program)
+    //console.log(approvalProgram)
+    //console.log(clear_state_program)
   } catch (err) {
     console.error(err)
   }
@@ -111,7 +111,7 @@ const createApp = async (sender,
             let appId = transactionResponse['application-index'];
             console.log("Created new app-id: ",appId);
       }catch(err){
-      console.log(err)
+      console.log("error: " + err)
     }
 }
 
@@ -366,36 +366,18 @@ const approval_program = await compileProgram(client, approvalProgram)
 const clear_program = await  compileProgram(client,clear_state_program )
 
 // configure registration and voting period
-let status = await client.status().do()
-console.log("Client Status: " + status)
-let RegBegin =  status['last-round'] + 10
-// let regBegin =  status['time-since-last-round'] + 60
-let RegEnd = RegBegin + 10
-let VoteBegin = RegEnd + 10
-let VoteEnd = VoteBegin + 10
-
-const regTime = `Registration rounds: ${RegBegin} to ${RegEnd}`
-const voteTime = `Vote rounds: ${VoteBegin} to ${VoteEnd}`
-//localStorage.setItem('start', regTime)
-//localStorage.setItem('end',voteTime )
-
-console.log(`Registration rounds: ${RegBegin} to ${RegEnd}`)
-console.log(`Vote rounds: ${VoteBegin} to ${VoteEnd}`)
+//let status = await client.status().do()
 
 
 // create list of bytes for app args
 let appArgs = [];
 
-console.log(appArgs.push(
-  new Uint8Array(Buffer.from(intToBytes(RegBegin))),
-  new Uint8Array(Buffer.from(intToBytes(RegEnd))),
-  new Uint8Array(Buffer.from(intToBytes(VoteBegin))),
-  new Uint8Array(Buffer.from(intToBytes(VoteEnd))),
- ))
- 
+
 // create new application
-const appId =  await createApp(creatorAddress, approval_program, clear_program , localInts, localBytes, globalInts, globalBytes, appArgs)
-console.log("App ID: " + appId)
+//const appId =  await createApp(creatorAddress, approval_program, clear_program , localInts, localBytes, globalInts, globalBytes, appArgs)
+//console.log("App ID: " + appId)
+
+const updateId = await update(sender, 826032354, approval_program, clear_program)
 
 // App  id 76296212
 // # wait for registration period to start
@@ -414,35 +396,36 @@ console.log("App ID: " + appId)
 
 // waitForRound(client, voteEnd)
 
-const gloablState = await readGlobalState(818428331)
-console.log(gloablState)
+//const gloablState = await readGlobalState(818428331)
+//console.log(gloablState)
 
 //Converting to base64
 // var encodedString = btoa(string)
 
-const args = [
-  btoa("RegBegin"),
-  btoa("RegEnd"),
-  btoa("VoteBegin"),
-  btoa("VoteEnd"),
-  btoa("Creator"),
-  // btoa("choiceA"),
-]
+// const args = [
+//   btoa("RegBegin"),
+//   btoa("RegEnd"),
+//   btoa("VoteBegin"),
+//   btoa("VoteEnd"),
+//   btoa("Creator"),
+//   // btoa("choiceA"),
+// ]
 
-let filteredItems = []
-gloablState.forEach(item => {
-  if (!args.includes(item.key)) {
-    filteredItems.push(item)
-  }
-})
-// const xx = Math.max.apply(Math, filteredItems.map(function(o) { return o.value.uint; }))
-let maxVote = filteredItems.reduce((max, item) => max.value.uint > item.value.uint ? max.key : item);
-console.log(atob(maxVote))
+// let filteredItems = []
+// gloablState.forEach(item => {
+//   if (!args.includes(item.key)) {
+//     filteredItems.push(item)
+//   }
+// })
+// // const xx = Math.max.apply(Math, filteredItems.map(function(o) { return o.value.uint; }))
+// let maxVote = filteredItems.reduce((max, item) => max.value.uint > item.value.uint ? max.key : item);
+// console.log(atob(maxVote))
 
-// closeOut(sender, 76641532)
-// deleteApp(creatorAddress, 76296212)
-// clearState(sender, 76641532)
+// // closeOut(sender, 76641532)
+// // deleteApp(creatorAddress, 76296212)
+// // clearState(sender, 76641532)
 }
-console.log(main())
+// console.log(main())
 // return(<div>hello</div>)
 
+main()

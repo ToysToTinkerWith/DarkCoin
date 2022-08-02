@@ -5,55 +5,24 @@ def approval_program():
     on_creation = Seq(
         [
             App.globalPut(Bytes("Creator"), Txn.sender()),
-            Assert(Txn.application_args.length() == Int(4)),
-            App.globalPut(Bytes("RegBegin"), Btoi(Txn.application_args[0])),
-            App.globalPut(Bytes("RegEnd"), Btoi(Txn.application_args[1])),
-            App.globalPut(Bytes("VoteBegin"), Btoi(Txn.application_args[2])),
-            App.globalPut(Bytes("VoteEnd"), Btoi(Txn.application_args[3])),
+            Assert(Txn.application_args.length() == Int(0)),
             Return(Int(1)),
         ]
     )
 
     is_creator = Txn.sender() == App.globalGet(Bytes("Creator"))
 
-    get_vote_of_sender = App.localGetEx(Int(0), App.id(), Bytes("voted"))
+    on_closeout = Return(Int(1))
+        
+    on_register = Return(Int(1))
 
-    on_closeout = Seq(
-        [
-            get_vote_of_sender,
-            If(
-                And(
-                    Global.round() <= App.globalGet(Bytes("VoteEnd")),
-                    get_vote_of_sender.hasValue(),
-                ),
-                App.globalPut(
-                    get_vote_of_sender.value(),
-                    App.globalGet(get_vote_of_sender.value()) - Int(1),
-                ),
-            ),
-            Return(Int(1)),
-        ]
-    )
-    on_register = Return(
-        And(Global.round() <= App.globalGet(Bytes("RegBegin")),
-            Global.round() <= App.globalGet(Bytes("RegEnd")),
-         ),
-    )
+    nft = Txn.application_args[1]
 
-    choice = Txn.application_args[1]
-    choice_tally = App.globalGet(choice)
+    choice = Txn.application_args[2]
+    
     on_vote = Seq(
         [
-            Assert(
-                And(
-                    Global.round() <= App.globalGet(Bytes("VoteBegin")),
-                    Global.round() <= App.globalGet(Bytes("VoteEnd")),
-                )
-            ),
-            get_vote_of_sender,
-            If(get_vote_of_sender.hasValue(), Return(Int(0))),
-            App.globalPut(choice, choice_tally + Int(1)),
-            App.localPut(Int(0), Bytes("voted"), choice),
+            App.localPut(Txn.sender(), nft, choice),
             Return(Int(1)),
         ]
     )
@@ -71,23 +40,7 @@ def approval_program():
 
 
 def clear_state_program():
-    get_vote_of_sender = App.localGetEx(Int(0), App.id(), Bytes("voted"))
-    program = Seq(
-        [
-            get_vote_of_sender,
-            If(
-                And(
-                    Global.round() <= App.globalGet(Bytes("VoteEnd")),
-                    get_vote_of_sender.hasValue(),
-                ),
-                App.globalPut(
-                    get_vote_of_sender.value(),
-                    App.globalGet(get_vote_of_sender.value()) - Int(1),
-                ),
-            ),
-        Return(Int(1)),
-        ]
-    )
+    program = Return(Int(1))
 
     return program
 

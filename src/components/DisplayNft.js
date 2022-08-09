@@ -36,24 +36,6 @@ export default class DisplayNft extends React.Component {
                 nft: assetInfo.assets[0].params,
                 nftUrl: "https://ipfs.dark-coin.io/ipfs/" + assetInfo.assets[0].params.url.slice(7)
             })
-
-            // let nftHash = String(assetInfo.assets[0].params.url.slice(7))
-
-            // const response = await fetch('/api/readNft', {
-            //     method: "POST",
-            //     headers: {
-            //       "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify({
-            //         hash: nftHash,
-            //       }),
-
-                  
-            //   });
-            
-            //   const session = await response.json()
-
-            //   this.setState({pinataNftMeta: session.status.rows[0].metadata})
           
 
           

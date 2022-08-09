@@ -16,7 +16,6 @@ async function govVote(req, res) {
 
    // Rest of the API logic
    const algod = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "");
-console.log(req.body)
    // Setting up Transactions
    const suggestedParams = await algod.getTransactionParams().do();
    const optInTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
@@ -28,7 +27,6 @@ console.log(req.body)
    });
 
    const singleTxnGroups = [{txn: optInTxn, signers: [req.body.activeAddress]}];
-      console.log(singleTxnGroups)
    res.json({ txn: singleTxnGroups });
   
 

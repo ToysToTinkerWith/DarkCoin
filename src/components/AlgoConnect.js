@@ -69,7 +69,6 @@ export default function AlgoConnect(props) {
 
     return (
         <div >
-            <br />
             {props.activeAddress ? 
             <>
             <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {props.activeAddress.slice(0, 10)} </Typography>

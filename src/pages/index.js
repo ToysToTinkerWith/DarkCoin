@@ -4,14 +4,19 @@ import Head from "next/head"
 
 import dynamic from "next/dynamic"
 
+import algosdk from "algosdk"
+
 const AlgoConnect = dynamic(() => import("../components/AlgoConnect"), {ssr: false})
 
 import ActiveWallet from "../components/ActiveWallet"
-import DarkCoin from "../components/DarkCoin"
+const Votes = dynamic(() => import("../components/Votes"), {ssr: false})
+const DarkCoin = dynamic(() => import("../components/DarkCoin"), {ssr: false})
+
+
 
 import Socials from "../components/Socials"
 
-import { Grid, Card, Modal, Typography, Button } from "@mui/material"
+import { Grid, Typography, Button } from "@mui/material"
 
 export default class Index extends React.Component { 
 
@@ -19,9 +24,49 @@ export default class Index extends React.Component {
         super(props);
         this.state = {
             activeAddress: null,
-            walletType: ""
+            walletType: "",
+            govNfts: []
         };
         
+    }
+
+    componentDidMount() {
+        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+        (async () => {
+
+            let numAssets = 0
+            let acct = "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE";
+            let nextToken = ""
+
+            let accountInfo = await indexerClient.lookupAccountCreatedAssets(acct).limit(1000).do();
+            numAssets = numAssets + accountInfo.assets.length
+            nextToken = accountInfo["next-token"]
+            
+            accountInfo.assets.forEach(async (asset) => {
+            
+              this.setState(prevState => ({
+                govNfts: [...prevState.govNfts, asset.index]
+              }))
+           
+            })
+
+            while (numAssets < 2001) {
+                accountInfo = await indexerClient.lookupAccountCreatedAssets(acct).nextToken(nextToken).limit(1000).do();
+                numAssets = numAssets + accountInfo.assets.length
+                nextToken = accountInfo["next-token"]
+                accountInfo.assets.forEach(async (asset) => {
+                
+                  this.setState(prevState => ({
+                    govNfts: [...prevState.govNfts, asset.index]
+                  }))
+               
+                  })
+            }
+          
+      })().catch(e => {
+          console.log(e);
+          console.trace();
+      });
     }
 
    
@@ -46,6 +91,13 @@ export default class Index extends React.Component {
                 </Typography>
                 <img src="./DarkCoinLogo.svg" style={{display: "flex", margin: "auto", padding: 30, width: "100%", maxWidth: 350}}/>
 
+                <Button style={{display: "flex", margin: "auto", textTransform: "none"}} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>
+                    <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                        Dark Paper
+                    </Typography>
+                    <img src="./DarkPaper.svg" style={{width: "10%", maxWidth: 100}}/>
+                </Button>
+
                 <div style={{border: "3px solid white", borderRadius: 15, margin: 30}}>
                     <Grid container alignItems="center">
                         <Grid item xs={12} sm={12} md={6}>
@@ -69,12 +121,20 @@ export default class Index extends React.Component {
                     </Grid>
 
                     {this.state.activeAddress ? 
-                        <ActiveWallet activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
+                        <ActiveWallet govNfts={this.state.govNfts} activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
                         :
                         null
                     }
 
                 </div>
+
+                {this.state.govNfts.length > 2000 ?
+                    <Votes govNfts={this.state.govNfts.slice(1, 2000)} />
+                    :
+                    null
+                }
+                
+                
 
                 <DarkCoin />
 

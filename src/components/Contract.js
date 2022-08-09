@@ -144,7 +144,7 @@ export default class Contract extends React.Component {
         
           let params = await client.getTransactionParams().do()
           params.fee = 1000;
-          params.flatFee = true;     
+          params.flatFee = true;  
           
           const appArgs = []
             appArgs.push(
@@ -152,8 +152,13 @@ export default class Contract extends React.Component {
                 new Uint8Array(Buffer.from(this.props.activeNft[0].toString())),
                 new Uint8Array(Buffer.from(this.state.proposal)),
             )
+
+          const accounts = [this.props.activeAddress]
+          const foreignApps = undefined
+            
+          const foreignAssets = [this.props.activeNft[0]]
           
-          let txn = algosdk.makeApplicationNoOpTxn(sender, params, index, appArgs);
+          let txn = algosdk.makeApplicationNoOpTxn(sender, params, index, appArgs, accounts, foreignApps, foreignAssets);
           const singleTxnGroups = [{txn: txn, signers: [this.props.activeAddress]}]
 
           if (this.props.wallet == "pera") {
@@ -193,6 +198,7 @@ export default class Contract extends React.Component {
    
 
     render() {
+
 
         return (
             <div style={{margin: 30}}>

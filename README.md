@@ -1,4 +1,4 @@
-# DarkCoin
+# Dark Coin
 Dark Coin is a community built upon the Algorand Blockchain. 
 
 # Dark Paper

@@ -37,10 +37,13 @@ export default class Votes extends React.Component {
 
         session.transactions.forEach((trans) => {
             if (trans["local-state-delta"]) {
-                let key = atob(trans["local-state-delta"][0].delta[0].key)
-                if (this.props.govNfts.includes(Number(key))) {
+                let key = trans["local-state-delta"][0].delta[0].key
+                const buffer = Buffer.from(key, 'base64');
+                const bufString = buffer.toString('hex');
+                let fKey = parseInt(bufString, 16)
+                if (this.props.govNfts.includes(fKey)) {
                     let value = atob(trans["local-state-delta"][0].delta[0].value.bytes)
-                    this.setState({[key]: value})
+                    this.setState({[fKey]: value})
                 }
                 
             }
@@ -70,12 +73,15 @@ export default class Votes extends React.Component {
     
             session.transactions.forEach((trans) => {
                 if (trans["local-state-delta"]) {
-                    let key = atob(trans["local-state-delta"][0].delta[0].key)
-                    if (this.props.govNfts.includes(Number(key))) {
-                        
+                    let key = trans["local-state-delta"][0].delta[0].key
+                    const buffer = Buffer.from(key, 'base64');
+                    const bufString = buffer.toString('hex');
+                    let fKey = parseInt(bufString, 16)
+                    if (this.props.govNfts.includes(fKey)) {
                         let value = atob(trans["local-state-delta"][0].delta[0].value.bytes)
-                        this.setState({[key]: value})
+                        this.setState({[fKey]: value})
                     }
+                    
                 }
                 
             })

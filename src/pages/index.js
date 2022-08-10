@@ -91,12 +91,32 @@ export default class Index extends React.Component {
                 </Typography>
                 <img src="./DarkCoinLogo.svg" style={{display: "flex", margin: "auto", padding: 30, width: "100%", maxWidth: 350}}/>
 
-                <Button style={{display: "flex", margin: "auto", textTransform: "none"}} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>
-                    <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
-                        Dark Paper
-                    </Typography>
-                    <img src="./DarkPaper.svg" style={{width: "10%", maxWidth: 100}}/>
-                </Button>
+                <br />
+                <Grid container alignItems="center">
+                        <Grid item xs={12} sm={12} md={6}>
+                            
+                        <Button style={{display: "flex", margin: "auto", textTransform: "none", border: "1px solid white", borderRadius: 15}} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>
+                            <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 10}}>
+                                Dark Paper
+                            </Typography>
+                            <img src="./DarkPaper.svg" style={{width: "10%", maxWidth: 100}}/>
+                        </Button>
+                        <br />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={6}>
+                        <Button style={{display: "flex", margin: "auto", textTransform: "none", border: "1px solid white", borderRadius: 15}} onClick={() => window.open("https://github.com/ToysToTinkerWith/DarkCoin")}>
+                            <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 10}}>
+                                Dark Repo
+                            </Typography>
+                            <img src="./DarkRepo.svg" style={{width: "20%", maxWidth: 100}}/>
+                        </Button>
+                        <br />
+                        </Grid>
+
+                    </Grid>
+                
+
+                
 
                 <div style={{border: "3px solid white", borderRadius: 15, margin: 30}}>
                     <Grid container alignItems="center">

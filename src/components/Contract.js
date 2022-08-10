@@ -12,7 +12,7 @@ const peraWallet = new PeraWalletConnect();
 import algosdk from "algosdk"
 
 
-import { Grid, Card, Modal, Typography, Button, TextField } from "@mui/material"
+import { Grid, Card, Modal, Typography, Button, TextField, Select } from "@mui/material"
 
 export default class Contract extends React.Component { 
 
@@ -42,9 +42,13 @@ export default class Contract extends React.Component {
                 if (app.id == 826032354) {
                     let localProposal = ""
                     if (app["key-value"]) {
-                      app["key-value"].forEach((keyvalue) => {
-                        if (atob(keyvalue.key) == String(this.props.activeNft[0])) {
-                          localProposal = atob(keyvalue.value.bytes)
+                      app["key-value"].forEach((key) => {
+                        const buffer = Buffer.from(key.key, 'base64');
+                        const bufString = buffer.toString('hex');
+                        let fKey = parseInt(bufString, 16)
+                        console.log(fKey)
+                        if (fKey == String(this.props.activeNft[0])) {
+                          localProposal = atob(key.value.bytes)
                           this.setState({localProposal: localProposal})
                         }
                       })
@@ -149,7 +153,6 @@ export default class Contract extends React.Component {
           const appArgs = []
             appArgs.push(
                 new Uint8Array(Buffer.from("vote")),
-                new Uint8Array(Buffer.from(this.props.activeNft[0].toString())),
                 new Uint8Array(Buffer.from(this.state.proposal)),
             )
 
@@ -202,26 +205,15 @@ export default class Contract extends React.Component {
 
         return (
             <div style={{margin: 30}}>
+              <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                    Measure 1
+              </Typography>
+              <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Dark Coin is spending $3 a day on AlgoStake to keep a pool open for DC/ALGO LP holders to stake their tokens for extra Dark Coin. The Dark Coin team is looking to save on the expenses of AlgoStake, and is offering alternatives to the AlgoStake platform.    </Typography>
+
                 
             
-                {this.state.localProposal ? 
-                <>
-                <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
-                    Proposal
-                </Typography>
-                <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
-                    {this.state.localProposal}
-                </Typography>
-                </>
-                :
-                null
-                }
-                <br />
-
                
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/826032354")}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
-                </Button>
+                
                 <br />
                 {this.state.optedIn == false ? 
                 <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, 826032354)}>
@@ -229,22 +221,23 @@ export default class Contract extends React.Component {
                 </Button>
                 :
                 <>
-                  <TextField
-                      color="primary"
-                      variant="outlined"
-                      multiline
-                      rows={5}
-                      value={this.state.proposal}
-                      type="text"
-                      label={<Typography variant="body1" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Proposal </Typography>}
-                      name={"proposal"}
-                      inputProps={{ style: { color: "white", fontFamily: "Jacques" }}}
-
-                      sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
-                      style={{width: "80%", display: "flex", margin: "auto"}}
-                      onChange={this.handleChange}
-                  />
+                <Grid container alignItems="center">
+                        <Grid item xs={12} sm={12} md={6}>
+                            
+                        <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, textTransform: "none", border: "1px solid white", backgroundColor: this.state.proposal == "A" ? "#FFFFFF" : "#000000"}} onClick={() => this.setState({proposal: "A"})}>
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal == "A" ? "#000000" : "#FFFFFF"}}> Option A <hr />  Keep the AlgoStake LP pool online </Typography>
+                  </Button>
                   <br />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={6}>
+                        <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, textTransform: "none", border: "1px solid white", backgroundColor: this.state.proposal == "B" ? "#FFFFFF" : "#000000"}} onClick={() => this.setState({proposal: "B"})}>
+                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal == "B" ? "#000000" : "#FFFFFF"}}> Option B <hr /> Move off AlgoStake and look to AlgoFaucet </Typography>
+                        </Button>
+                        <br />
+                        </Grid>
+                      </Grid>
+                  
+                 
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote(this.props.activeAddress, 826032354)}>
                       <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Vote </Typography>
                   </Button>
@@ -253,6 +246,19 @@ export default class Contract extends React.Component {
                       <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
                   </Button>
                 </>
+                }
+                <br />
+
+              <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/826032354")}>
+                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
+              </Button>
+
+              {this.state.localProposal ? 
+                <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                    Voted: {this.state.localProposal}
+                </Typography>
+                :
+                null
                 }
                 
                 

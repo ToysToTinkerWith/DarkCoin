@@ -8,7 +8,7 @@ https://discord.com/invite/xdZ6V5ybmq
 https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md
 
 # Dark Website
-https://dark-coin.com/
+https://dark-coin.com
 
 # src
 Folder containing all the web components used to process and render the application. 

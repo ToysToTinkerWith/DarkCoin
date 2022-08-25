@@ -1,16 +1,21 @@
 # Dark Coin
+
 Dark Coin is a community built upon the Algorand Blockchain.
 
 For questions about Dark Coin, please visit our Discord Channel to learn about the past, present, and future of the project.
+
 https://discord.com/invite/xdZ6V5ybmq
 
 # Dark Paper
+
 https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md
 
 # Dark DApp
+
 https://dark-coin.com
 
 # src
+
 Folder containing all the web components used to process and render the application. 
 
 Developed under the Next.js framework, the logic of the appication can be understood through the sequential rendering of the components contained in this folder. A user can see what APIs/SDKs are being used, and how the data from the Algorand Blockchain is processed to create the Dark Coin Application. The goal for this project is to be as open as possible, in ensuring trust, and creating transparency within the community.

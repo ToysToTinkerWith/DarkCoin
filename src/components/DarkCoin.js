@@ -23,7 +23,12 @@ export default class DarkCoin extends React.Component {
     }
 
     componentDidMount() {
-        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+        const token = {
+            'X-API-Key': process.env.indexerKey
+        }
+    
+        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        
         (async () => {
 
             let assetIndex = 601894079
@@ -42,6 +47,29 @@ export default class DarkCoin extends React.Component {
     
       }
 
+      renderTooltip = (props) => {
+        const { active, payload } = props;
+
+        if (active && payload && payload.length) {
+        const data = payload[0] && payload[0].payload;
+        return (
+            <div
+            style={{
+                backgroundColor: '#fff',
+                border: '1px solid #999',
+                margin: 0,
+                padding: 10,
+            }}
+            >
+            
+            {data.amount}
+            </div>
+        );
+        }
+
+        return null;
+    };
+
    
 
     render() {
@@ -54,18 +82,20 @@ export default class DarkCoin extends React.Component {
                 <ResponsiveContainer width="100%" height={300} >
                 <BarChart data={sortedHolders}>
                 <XAxis 
-                stroke="#FFFFFF"
+                hide={true}
                 />
                 <YAxis 
                 dataKey="amount" 
                 hide="true"
        
                 />
-                <Tooltip />
+                <Tooltip content={this.renderTooltip} />
                 <Bar dataKey="address" fill="#000000"/>
                 <Bar dataKey="amount" fill="#000000" stroke="#FFFFFF"/>
                 </BarChart>
                 </ResponsiveContainer>
+                <Typography color="secondary" style={{display: "flex", float: "left"}}> 1 </Typography>
+                <Typography color="secondary" style={{display: "flex", float: "right"}}> {sortedHolders.length} </Typography>
             </div>
         )
     }

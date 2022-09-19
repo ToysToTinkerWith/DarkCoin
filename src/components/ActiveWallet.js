@@ -6,8 +6,8 @@ import algosdk from "algosdk"
 
 import DisplayNft from "./DisplayNft"
 import Propose from "./Propose.js"
-import Contract from "./Contract.js"
-import NftVote from "./NftVote.js"
+import Trade from "./contracts/Trade.js"
+
 
 
 
@@ -28,7 +28,11 @@ export default class ActiveWallet extends React.Component {
 
     componentDidMount() {
         
-        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+        const token = {
+            'X-API-Key': process.env.indexerKey
+        }
+    
+        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
 
 
       (async () => {
@@ -42,7 +46,7 @@ export default class ActiveWallet extends React.Component {
           }
           if (asset.amount == 1) {
             this.setState(prevState => ({
-                ownedNfts: [...prevState.ownedNfts, asset["asset-id"]]
+                ownedNfts: [...prevState.ownedNfts, asset]
               }))
           }
     
@@ -62,11 +66,12 @@ export default class ActiveWallet extends React.Component {
 
     render() {
 
-        const govNfts = this.props.govNfts.filter(value => this.state.ownedNfts.includes(value));
-        
-        if (this.state.activeNft) {
-            console.log(this.state.activeNft[1]["unit-name"].slice(0, 4))
+        let ownedNfts = []
 
+        for(var i = 0; i < this.state.ownedNfts.length; i++) {
+            if (this.props.dcNfts.includes(this.state.ownedNfts[i]["asset-id"])) {
+                ownedNfts.push(this.state.ownedNfts[i])
+            }
         }
 
         return (
@@ -89,12 +94,12 @@ export default class ActiveWallet extends React.Component {
                         <br />
                     </Grid>
                     :
-                    govNfts.length > 0 ?
+                    ownedNfts.length > 0 ?
             
-                    govNfts.map((nft, index) => {
+                    ownedNfts.map((nft, index) => {
                         return (
                             <Grid item xs={6} sm={6} md={4} lg={3} key={index} style={{display: "flex", padding: "5%"}}>
-                                <DisplayNft nftId={nft} setActiveNft={(nft) => this.setState({activeNft: nft})} />
+                                <DisplayNft nftId={nft["asset-id"]} setActiveNft={(nft) => this.setState({activeNft: nft})} />
                             </Grid>
                         )
                     })
@@ -112,7 +117,10 @@ export default class ActiveWallet extends React.Component {
 
                 {this.state.activeNft ?
                     this.state.activeNft[1]["unit-name"].slice(0, 4) == "DCGV" ?
-                    <Contract activeNft={this.state.activeNft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
+                    <Typography variant="h4" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> Waiting for the next vote... </Typography>
+                    :
+                    this.state.activeNft[1].name.slice(0, 18) == "Dark Coin Warriors" && this.state.activeNft[1].name.slice(0, 22) != "Dark Coin Warriors 2.0" ?
+                    <Trade ownedNfts={ownedNfts} activeNft={this.state.activeNft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
                     :
                     null
                     :

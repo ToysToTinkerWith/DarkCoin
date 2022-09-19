@@ -9,6 +9,7 @@ import algosdk from "algosdk"
 
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
+import { Nfc } from "@mui/icons-material"
 
 export default class DisplayNft extends React.Component { 
 
@@ -23,30 +24,29 @@ export default class DisplayNft extends React.Component {
         
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
-        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
-        (async () => {
+        console.log()
 
-            let assetInfo = await indexerClient.searchForAssets()
-            .index(this.props.nftId).do();
-
+        let response = await fetch('/api/getNft', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nftId: this.props.nftId
+              }),
             
-            this.setState({
-                nft: assetInfo.assets[0].params,
-                nftUrl: "https://ipfs.dark-coin.io/ipfs/" + assetInfo.assets[0].params.url.slice(7)
-            })
+                
+            });
+        
+        let session = await response.json()
+        
+        this.setState({
+            nft: session.assets[0].params,
+            nftUrl: "https://ipfs.dark-coin.io/ipfs/" + session.assets[0].params.url.slice(7)
+        })
           
-
-          
-        })().catch(e => {
-            console.log(e);
-            console.trace();
-        });
-
-
-    
-    
       }
 
    

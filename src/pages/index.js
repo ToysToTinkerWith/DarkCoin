@@ -9,7 +9,7 @@ import algosdk from "algosdk"
 const AlgoConnect = dynamic(() => import("../components/AlgoConnect"), {ssr: false})
 
 import ActiveWallet from "../components/ActiveWallet"
-const Votes = dynamic(() => import("../components/Votes"), {ssr: false})
+const Votes1 = dynamic(() => import("../components/Votes1"), {ssr: false})
 const DarkCoin = dynamic(() => import("../components/DarkCoin"), {ssr: false})
 
 
@@ -25,48 +25,66 @@ export default class Index extends React.Component {
         this.state = {
             activeAddress: null,
             walletType: "",
-            govNfts: []
+            dcNfts: []
         };
         
     }
 
-    componentDidMount() {
-        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
-        (async () => {
+    async componentDidMount() {
 
-            let numAssets = 0
-            let acct = "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE";
-            let nextToken = ""
+        let numAssets = 0
+        let nextToken = ""
 
-            let accountInfo = await indexerClient.lookupAccountCreatedAssets(acct).limit(1000).do();
-            numAssets = numAssets + accountInfo.assets.length
-            nextToken = accountInfo["next-token"]
-            
-            accountInfo.assets.forEach(async (asset) => {
-            
-              this.setState(prevState => ({
-                govNfts: [...prevState.govNfts, asset.index]
-              }))
-           
-            })
-
-            while (numAssets < 2001) {
-                accountInfo = await indexerClient.lookupAccountCreatedAssets(acct).nextToken(nextToken).limit(1000).do();
-                numAssets = numAssets + accountInfo.assets.length
-                nextToken = accountInfo["next-token"]
-                accountInfo.assets.forEach(async (asset) => {
-                
-                  this.setState(prevState => ({
-                    govNfts: [...prevState.govNfts, asset.index]
-                  }))
-               
-                  })
+        let response = await fetch('/api/getdcAssets', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
             }
+            
+                
+            });
+        
+        let session = await response.json()
+        console.log(session)
+
+        numAssets = session.assets.length
+        nextToken = session["next-token"]
+        
+        session.assets.forEach((asset) => {
+        
+            this.setState(prevState => ({
+            dcNfts: [...prevState.dcNfts, asset.index]
+            }))
+        
+        })
+
+        while (numAssets == 1000) {
+
+            response = await fetch('/api/getdcAssets', {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    nextToken: nextToken
+                  }),
+                  
+              });
+            
+            session = await response.json()
+
+            numAssets = session.assets.length
+            nextToken = session["next-token"]
+            session.assets.forEach(async (asset) => {
+            
+                this.setState(prevState => ({
+                dcNfts: [...prevState.dcNfts, asset.index]
+                }))
+            
+                })
+        }
           
-      })().catch(e => {
-          console.log(e);
-          console.trace();
-      });
+     
     }
 
    
@@ -92,6 +110,9 @@ export default class Index extends React.Component {
                 <img src="./DarkCoinLogo.svg" style={{display: "flex", margin: "auto", padding: 30, width: "100%", maxWidth: 350}}/>
 
                 <br />
+                <DarkCoin />
+                <br />
+
                 <Grid container alignItems="center">
                         <Grid item xs={12} sm={12} md={6}>
                             
@@ -141,22 +162,21 @@ export default class Index extends React.Component {
                     </Grid>
 
                     {this.state.activeAddress ? 
-                        <ActiveWallet govNfts={this.state.govNfts} activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
+                        <ActiveWallet dcNfts={this.state.dcNfts} activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
                         :
                         null
                     }
 
                 </div>
 
-                {this.state.govNfts.length > 2000 ?
-                    <Votes govNfts={this.state.govNfts.slice(1, 2000)} />
+                {this.state.dcNfts.length > 2000 ?
+                    <Votes1 govNfts={this.state.dcNfts.slice(1, 2000)} />
                     :
                     null
                 }
                 
                 
 
-                <DarkCoin />
 
                 <Socials />
 

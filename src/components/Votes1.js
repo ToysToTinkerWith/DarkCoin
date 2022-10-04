@@ -241,21 +241,6 @@ export default class Votes1 extends React.Component {
                 </Button>
                 <br />
 
-
-
-                {/* <ResponsiveContainer aspect={2} width="100%">
-                    <PieChart >
-                    <Pie
-                        dataKey="value0"
-                        
-                        data={parsedValues0}
-                        label={renderCustomizedLabel}
-                        
-                        fill="#000000"
-                    />
-        
-                    </PieChart>
-                </ResponsiveContainer> */}
                 <br />
 
                 <Button onClick={() => this.setState({measure: "2"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
@@ -352,6 +337,20 @@ export default class Votes1 extends React.Component {
                         </Grid>
                       </Grid>
 
+                      <ResponsiveContainer aspect={2} width="100%">
+                            <PieChart >
+                            <Pie
+                                dataKey="value0"
+                                
+                                data={parsedValues0}
+                                label={renderCustomizedLabel}
+                                
+                                fill="#000000"
+                            />
+                
+                            </PieChart>
+                        </ResponsiveContainer>
+
                       <Typography variant="h4" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = A </Typography>
                         <br/>
                     </Card>
@@ -407,9 +406,54 @@ export default class Votes1 extends React.Component {
                         </Grid>
                       </Grid>
 
+                      
+
+                      <ResponsiveContainer width="100%" height={50}>
+                        <ScatterChart
+
+                        >
+                            <XAxis
+                                hide={true}
+                                />
+                            <YAxis
+                                dataKey="value"
+                                tick={false}
+                                axisLine={false}
+                                hide={true}
+                            />
+                            <Tooltip content={this.renderTooltip} />
+                            <ZAxis name="value" type="number" dataKey="value" domain={[0, 0]} range={[0, 100]} />
+                            <Scatter data={parsedValues1} fill="#FFFFFF" />
+                        </ScatterChart>
+                    </ResponsiveContainer>
+
                       <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Amount </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography>
                       <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = 500 </Typography>
+
+                      <ResponsiveContainer width="100%" height={50}>
+                    <ScatterChart
+
+                    >
+                        <XAxis
+                        hide={true}
+                            />
+                        <YAxis
+                            dataKey="value"
+                            tick={false}
+                            axisLine={false}
+                            hide={true}
+                        />
+                        <Tooltip content={this.renderTooltip} />
+                        <ZAxis name="value" type="number" dataKey="value" domain={[0, 0]} range={[0, 100]} />
+                        <Scatter data={parsedValues2} fill="#FFFFFF" />
+                    </ScatterChart>
+                </ResponsiveContainer>
+
+                      
                       <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Price </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography>
+
                       <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = 35 </Typography>
 
                     </Card>

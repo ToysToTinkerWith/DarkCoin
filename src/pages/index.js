@@ -45,7 +45,6 @@ export default class Index extends React.Component {
             });
         
         let session = await response.json()
-        console.log(session)
 
         numAssets = session.assets.length
         nextToken = session["next-token"]

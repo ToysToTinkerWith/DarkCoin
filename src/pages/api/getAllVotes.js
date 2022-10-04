@@ -26,10 +26,10 @@ async function getAllVotes(req, res) {
     let response;
 
     if (req.body.nextToken) {
-        response = await indexerClient.searchForTransactions().applicationID(applicationId).nextToken(nextToken).limit(1000).do()
+        response = await indexerClient.searchForTransactions().maxRound(23058571).applicationID(applicationId).nextToken(nextToken).limit(1000).do()
     }
     else {
-        response = await indexerClient.searchForTransactions().applicationID(applicationId).limit(1000).do()
+        response = await indexerClient.searchForTransactions().maxRound(23058571).applicationID(applicationId).limit(1000).do()
     }
     
     res.json(response);

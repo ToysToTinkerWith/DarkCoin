@@ -7,6 +7,7 @@ import algosdk from "algosdk"
 import DisplayNft from "./DisplayNft"
 import Propose from "./Propose.js"
 import Trade from "./contracts/Trade.js"
+import Mixer from "./contracts/Mixer.js"
 
 
 
@@ -82,6 +83,11 @@ export default class ActiveWallet extends React.Component {
                         <img src="./DarkCoinLogo.svg" style={{display: "flex", margin: "auto", width: "10%", marginBottom: 30}}/>
                         <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", margin: 30}}> {this.state.darkCoin} </Typography>
                     </Grid>
+
+                    <Grid item xs={12} sm={12} md={12}>
+                        <Mixer activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
+                    </Grid>
+                    
 
 
 

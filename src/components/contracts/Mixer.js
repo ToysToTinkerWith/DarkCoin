@@ -17,7 +17,7 @@ const peraWallet = new PeraWalletConnect();
 import algosdk from "algosdk"
 
 
-import { Grid, Card, Modal, Typography, Button, TextField, Select } from "@mui/material"
+import { Grid, Typography, Button, TextField } from "@mui/material"
 
 export default class Trade extends React.Component { 
 
@@ -27,13 +27,17 @@ export default class Trade extends React.Component {
             optedIn: false,
             mixVal: "",
             receiver: "",
-            queued5: 0
+            queued5: 0,
+            queued20: 0,
+            queued50: 0,
+            queued100: 0,
+            queued500: 0,
         };
         this.Optin = this.Optin.bind(this)
         this.Closeout = this.Closeout.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.shuffle = this.shuffle.bind(this)
-        this.assetTransaction = this.assetTransaction.bind(this)
+        this.mix = this.mix.bind(this)
     }
 
     componentDidMount() {
@@ -59,6 +63,18 @@ export default class Trade extends React.Component {
           globalState.forEach((keyVal) => {
             if (atob(keyVal.key) == "queued5") {
               this.setState({queued5: keyVal.value.uint})
+            }
+            else if (atob(keyVal.key) == "queued20") {
+              this.setState({queued20: keyVal.value.uint})
+            }
+            else if (atob(keyVal.key) == "queued50") {
+              this.setState({queued50: keyVal.value.uint})
+            }
+            else if (atob(keyVal.key) == "queued100") {
+              this.setState({queued100: keyVal.value.uint})
+            }
+            else if (atob(keyVal.key) == "queued500") {
+              this.setState({queued500: keyVal.value.uint})
             }
           })
 
@@ -187,9 +203,14 @@ export default class Trade extends React.Component {
         return array;
       }
 
-      async assetTransaction() {
+      async mix() {
 
         let queued5
+        let queued20
+        let queued50
+        let queued100
+        let queued500
+        
 
         const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
 
@@ -201,21 +222,52 @@ export default class Trade extends React.Component {
           if (atob(keyVal.key) == "queued5") {
             queued5 = keyVal.value.uint
           }
+          else if (atob(keyVal.key) == "queued20") {
+            queued20 = keyVal.value.uint
+          }
+          else if (atob(keyVal.key) == "queued50") {
+            queued50 = keyVal.value.uint
+          }
+          else if (atob(keyVal.key) == "queued100") {
+            queued50 = keyVal.value.uint
+          }
+          else if (atob(keyVal.key) == "queued500") {
+            queued500 = keyVal.value.uint
+          }
         })
+
+        let chosenQueue
+
+        if (this.state.mixVal == "5") {
+          chosenQueue = queued5
+        }
+        else if (this.state.mixVal == "20") {
+          chosenQueue = queued20
+        }
+        else if (this.state.mixVal == "50") {
+          chosenQueue = queued50
+        }
+        else if (this.state.mixVal == "100") {
+          chosenQueue = queued100
+        }
+        else if (this.state.mixVal == "500") {
+          chosenQueue = queued500
+        }
+
         
 
         const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
 
         let params = await client.getTransactionParams().do();
 
-        if (queued5 >= 3) {
+        if (chosenQueue >= 3) {
 
           let i = 0
           let trans = []
 
           for (i = 0; i < 3; i++) {
 
-            let docRef = doc(db, "queued5", i.toString());
+            let docRef = doc(db, "queued" + this.state.mixVal, i.toString());
             let docSnap = await getDoc(docRef);
             let receiver = docSnap.data().receiver
     
@@ -224,21 +276,40 @@ export default class Trade extends React.Component {
     
           }
 
+          let cost
+
+          if (this.state.mixVal == "5") {
+            cost = 5100000
+          }
+          else if (this.state.mixVal == "20") {
+            cost = 20400000
+          }
+          else if (this.state.mixVal == "50") {
+            cost = 51000000
+          }
+          else if (this.state.mixVal == "100") {
+            cost = 102000000
+          }
+          else if (this.state.mixVal == "500") {
+            cost = 510000000
+          }
+          
+
           let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
             this.props.activeAddress, 
             "43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA", 
-            5000000, 
+            cost, 
             undefined,
             undefined,
             params
           );
 
-          ftxn.fee = 100000
-
 
           const appArgs = []
           appArgs.push(
-            new Uint8Array(Buffer.from("mix5"))
+            new Uint8Array(Buffer.from("mix")),
+            new Uint8Array(Buffer.from(this.state.mixVal)),
+            algosdk.encodeUint64(chosenQueue)
           )
 
           let accounts = [trans[0], trans[1], trans[2], this.state.receiver]
@@ -288,20 +359,38 @@ export default class Trade extends React.Component {
 
         else {
 
+          let cost
+
+          if (this.state.mixVal == "5") {
+            cost = 5100000
+          }
+          else if (this.state.mixVal == "20") {
+            cost = 20400000
+          }
+          else if (this.state.mixVal == "50") {
+            cost = 51000000
+          }
+          else if (this.state.mixVal == "100") {
+            cost = 102000000
+          }
+          else if (this.state.mixVal == "500") {
+            cost = 510000000
+          }
+
           let txn = algosdk.makePaymentTxnWithSuggestedParams(
             this.props.activeAddress, 
             "43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA", 
-            5000000, 
+            cost, 
             undefined,
             undefined,
             params
           );
 
-          txn.fee = 100000
-
           const appArgs = []
           appArgs.push(
-            new Uint8Array(Buffer.from("mix5"))
+            new Uint8Array(Buffer.from("mix")),
+            new Uint8Array(Buffer.from(this.state.mixVal)),
+            algosdk.encodeUint64(chosenQueue)
           )
 
           const accounts = []
@@ -328,7 +417,7 @@ export default class Trade extends React.Component {
   
               const signedTxn = await peraWallet.signTransaction([multipleTxnGroups]) 
 
-              await setDoc(doc(db, "queued5", queued5.toString()), {
+              await setDoc(doc(db, "queued" + this.state.mixVal, chosenQueue.toString()), {
                 sender: this.props.activeAddress,
                 receiver: this.state.receiver
               });
@@ -358,7 +447,7 @@ export default class Trade extends React.Component {
 
             const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
 
-            await setDoc(doc(db, "queued5", queued5.toString()), {
+            await setDoc(doc(db, "queued" + this.state.mixVal, queued5.toString()), {
               sender: this.props.activeAddress,
               receiver: this.state.receiver
             });
@@ -400,12 +489,12 @@ export default class Trade extends React.Component {
                 <>
                 <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sends at 4 </Typography>
                   <Grid container align="center" >
-                      <Grid item xs={12} sm={12} md={12} lg={12} >
+                      <Grid item xs={12} sm={4} md={4} lg={2} >
                       <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued5} </Typography>
 
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "mix5" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "mix5" ? this.setState({mixVal: ""}) : this.setState({mixVal: "mix5"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "mix5" ? "#000000" : "#FFFFFF"}}> 5 </Typography>
-                          {this.state.mixVal == "mix5" ?
+                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "5" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "5" ? this.setState({mixVal: ""}) : this.setState({mixVal: "5"})}>
+                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "5" ? "#000000" : "#FFFFFF"}}> 5 </Typography>
+                          {this.state.mixVal == "5" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
                           <img src="/AlgoWhite.svg" style={{width: 15}} />
@@ -414,10 +503,11 @@ export default class Trade extends React.Component {
                           </Button>
                           
                       </Grid>
-                      {/* <Grid item xs={12} sm={4} md={4} lg={3}>
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "mix20" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.setState({mixVal: "mix20"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "mix20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
-                          {this.state.mixVal == "mix20" ?
+                      <Grid item xs={12} sm={4} md={4} lg={3}>
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued20} </Typography>
+                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "20" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "20" ? this.setState({mixVal: ""}) : this.setState({mixVal: "20"})}>
+                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
+                          {this.state.mixVal == "20" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
                           <img src="/AlgoWhite.svg" style={{width: 15}} />
@@ -425,9 +515,10 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={2}>
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "mix50" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.setState({mixVal: "mix50"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "mix50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
-                          {this.state.mixVal == "mix50" ?
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued50} </Typography>
+                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "50" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "50" ? this.setState({mixVal: ""}) : this.setState({mixVal: "50"})}>
+                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
+                          {this.state.mixVal == "50" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
                           <img src="/AlgoWhite.svg" style={{width: 15}} />
@@ -435,9 +526,10 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={6} md={6} lg={3}>
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "mix100" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.setState({mixVal: "mix100"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "mix100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
-                          {this.state.mixVal == "mix100" ?
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued100} </Typography>
+                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "100" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "100" ? this.setState({mixVal: ""}) : this.setState({mixVal: "100"})}>
+                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
+                          {this.state.mixVal == "100" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
                           <img src="/AlgoWhite.svg" style={{width: 15}} />
@@ -445,15 +537,16 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={6} md={6} lg={2}>
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "mix500" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.setState({mixVal: "mix500"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "mix500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
-                          {this.state.mixVal == "mix500" ?
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued500} </Typography>
+                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "500" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "500" ? this.setState({mixVal: ""}) : this.setState({mixVal: "500"})}>
+                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
+                          {this.state.mixVal == "500" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
                           <img src="/AlgoWhite.svg" style={{width: 15}} />
                           }
                           </Button>
-                      </Grid> */}
+                      </Grid>
                       
                   </Grid>
 
@@ -479,7 +572,7 @@ export default class Trade extends React.Component {
                         }}
                       />
                        <br />
-                    <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.assetTransaction()}>
+                    <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.mix()}>
                       <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Mix </Typography>
                     </Button>
                   </>

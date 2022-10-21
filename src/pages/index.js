@@ -10,6 +10,7 @@ const AlgoConnect = dynamic(() => import("../components/AlgoConnect"), {ssr: fal
 
 import ActiveWallet from "../components/ActiveWallet"
 const Votes1 = dynamic(() => import("../components/Votes1"), {ssr: false})
+const Votes2 = dynamic(() => import("../components/Votes2"), {ssr: false})
 const DarkCoin = dynamic(() => import("../components/DarkCoin"), {ssr: false})
 
 
@@ -169,7 +170,14 @@ export default class Index extends React.Component {
                 </div>
 
                 {this.state.dcNfts.length > 2000 ?
+                    <>
+                    <Typography align="center" variant="h2" style={{fontFamily: "jacques", color: "#FFFFFF"}}> Governance </Typography>
+                    <Votes2 govNfts={this.state.dcNfts.slice(1, 2000)} />
+                    <br />
+                    <Typography align="center" variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF"}}> Past results </Typography>
                     <Votes1 govNfts={this.state.dcNfts.slice(1, 2000)} />
+                    </>
+                    
                     :
                     null
                 }

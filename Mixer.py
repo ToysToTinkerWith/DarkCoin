@@ -3,7 +3,6 @@ from pyteal import *
 
 def approval_program():
     
-    # don't need any real fancy initialization
     handle_creation = Return(Seq(
         App.globalPut(Bytes("queued5"), Int(0)),
         App.globalPut(Bytes("queued20"), Int(0)),
@@ -13,30 +12,45 @@ def approval_program():
         Int(1)
         ))
 
-    # i for the for loop
     i = ScratchVar(TealType.uint64)
     sendAmount = ScratchVar(TealType.uint64)
 
-    check_valid = Seq(
+    check_send = Seq(
         Assert(Btoi(Txn.application_args[2]) == App.globalGet(Concat(Bytes("queued"), Txn.application_args[1]))),
         If(Txn.application_args[1] == Bytes("5"),
-        Assert(Gtxn[0].amount() == Int(5100000))),
+        Assert(Gtxn[0].amount() == Int(5000000))),
         If(Txn.application_args[1] == Bytes("20"),
-        Assert(Gtxn[0].amount() == Int(20400000))),
+        Assert(Gtxn[0].amount() == Int(20000000))),
         If(Txn.application_args[1] == Bytes("50"),
-        Assert(Gtxn[0].amount() == Int(51000000))),
+        Assert(Gtxn[0].amount() == Int(50000000))),
         If(Txn.application_args[1] == Bytes("100"),
-        Assert(Gtxn[0].amount() == Int(102000000))),
+        Assert(Gtxn[0].amount() == Int(100000000))),
         If(Txn.application_args[1] == Bytes("500"),
-        Assert(Gtxn[0].amount() == Int(510000000))),
+        Assert(Gtxn[0].amount() == Int(500000000))),
         Assert(Gtxn[0].receiver() == Global.current_application_address()),
         Int(1)
     )
 
-     # send out the Osiris
+    check_fee = Seq(
+        If(Gtxn[1].xfer_asset() == Int(601894079), 
+        Int(1),
+        Seq(If(Txn.application_args[1] == Bytes("5"),
+        Assert(Gtxn[1].amount() == Int(100000))),
+        If(Txn.application_args[1] == Bytes("20"),
+        Assert(Gtxn[1].amount() == Int(400000))),
+        If(Txn.application_args[1] == Bytes("50"),
+        Assert(Gtxn[1].amount() == Int(1000000))),
+        If(Txn.application_args[1] == Bytes("100"),
+        Assert(Gtxn[1].amount() == Int(2000000))),
+        If(Txn.application_args[1] == Bytes("500"),
+        Assert(Gtxn[1].amount() == Int(10000000))),
+        Int(1))
+        )
+    )
+
     send_mix = Seq(
+        Assert(Txn.sender() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
         sendAmount.store(Int(0)),
-        Assert(Txn.accounts.length() == Int(4)),
         If(Txn.application_args[1] == Bytes("5"),
         sendAmount.store(Int(5000000))),
         If(Txn.application_args[1] == Bytes("20"),
@@ -56,14 +70,14 @@ def approval_program():
         }),
         InnerTxnBuilder.Submit(),
         )),
+        App.globalPut(Concat(Bytes("queued"), Txn.application_args[1]), Int(0)),
         Int(1)
     )
 
 
-    # opt into the RAGE 
     write_state = Seq(
-        If(App.globalGet(Concat(Bytes("queued"), Txn.application_args[1])) >= Int(3),
-        App.globalPut(Concat(Bytes("queued"), Txn.application_args[1]), Int(0)),
+        If(App.globalGet(Concat(Bytes("queued"), Txn.application_args[1])) > Int(16),
+        Reject(),
         App.globalPut(Concat(Bytes("queued"), Txn.application_args[1]), App.globalGet(Concat(Bytes("queued"), Txn.application_args[1])) + Int(1))),
         Int(1)
     )
@@ -72,13 +86,15 @@ def approval_program():
         
     
     mix = Seq(
-        Assert(check_valid),
-        If(App.globalGet(Concat(Bytes("queued"), Txn.application_args[1])) >= Int(3), Assert(send_mix)),
-        Assert(write_state),
-        
-        
-        Int(1)
-      
+        If(Txn.sender() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE"),
+        send_mix,
+        Seq(
+            Assert(check_send),
+            Assert(check_fee),
+            Assert(write_state),
+            Int(1)
+        )
+        )
     )
     
 

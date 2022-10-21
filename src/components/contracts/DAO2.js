@@ -14,7 +14,7 @@ import algosdk from "algosdk"
 
 import { Grid, Card, Modal, Typography, Button, TextField, Select } from "@mui/material"
 
-export default class DAO1 extends React.Component { 
+export default class DAO2 extends React.Component { 
 
     constructor(props) {
         super(props);
@@ -22,8 +22,7 @@ export default class DAO1 extends React.Component {
             optedIn: false,
             localProposal: "",
             proposal1: "",
-            proposal2: "",
-            proposal3: ""
+            proposal2: ""
         };
         this.Optin = this.Optin.bind(this)
         this.Closeout = this.Closeout.bind(this)
@@ -49,7 +48,7 @@ export default class DAO1 extends React.Component {
             let address = this.props.activeAddress;
             let response = await indexerClient.lookupAccountAppLocalStates(address).do();
             response["apps-local-states"].forEach((app) => {                
-                if (app.id == 826032354) {
+                if (app.id == 896464969) {
                     let localProposal = ""
                     if (app["key-value"]) {
                       app["key-value"].forEach((key) => {
@@ -159,7 +158,7 @@ export default class DAO1 extends React.Component {
           const appArgs = []
             appArgs.push(
                 new Uint8Array(Buffer.from("vote")),
-                new Uint8Array(Buffer.from(String(this.state.proposal1) + "," + String(this.state.proposal2) + "," + String(this.state.proposal3))),
+                new Uint8Array(Buffer.from(String(this.state.proposal1) + "," + String(this.state.proposal2))),
             )
 
           const accounts = [this.props.activeAddress]
@@ -175,7 +174,7 @@ export default class DAO1 extends React.Component {
 
             let txId = await client.sendRawTransaction(signedTxn).do();
 
-            this.setState({localProposal: [this.state.proposal1, this.state.proposal2, this.state.proposal3]})
+            this.setState({localProposal: [this.state.proposal1, this.state.proposal2]})
           }
           else if (this.props.wallet == "myalgo") {
             const myAlgoWallet = new MyAlgo()
@@ -184,7 +183,7 @@ export default class DAO1 extends React.Component {
 
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
 
-            this.setState({localProposal: [this.state.proposal1, this.state.proposal2, this.state.proposal3]})
+            this.setState({localProposal: [this.state.proposal1, this.state.proposal2]})
           }
           
          
@@ -212,13 +211,11 @@ export default class DAO1 extends React.Component {
 
     render() {
 
-      let contract = 826032354
+      let contract = 896464969
 
         return (
-            <div style={{margin: 30}}>
-              <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
-                    Measure 1 <hr /> LP Rewards
-              </Typography>
+            <div style={{margin: 30, display: "grid", margin: "auto"}}>
+              
 
                 
                 <br />
@@ -228,20 +225,22 @@ export default class DAO1 extends React.Component {
                 </Button>
                 :
                 <>
-                <Grid container alignItems="center">
+
+                <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                    Measure 3 <hr /> Puddin Mine
+                </Typography>
+                <Grid container >
                         <Grid item xs={12} sm={12} md={6}>
                             
                         <Button style={{display: "flex", margin: "auto", marginLeft: 10, marginRight: 10, padding: 10, borderRadius: 15, textTransform: "none", border: "1px solid white", backgroundColor: this.state.proposal1 == "A" ? "#FFFFFF" : "#000000"}} onClick={() => this.state.proposal1 == "A" ? this.setState({proposal1: "none"}) : this.setState({proposal1: "A"})}>
                       <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal1 == "A" ? "#000000" : "#FFFFFF"}}> 
                       Option A
                       <hr />
-                      Move LP rewards from AlgoStake to AlgoFaucet
+                      Deposit Dark Coin to the puddin mine so puddin mine users can earn Dark Coin by mining (max deposit is 4,000,000 DC, rewards will last over a year per the devs).
                       <hr />
-                      Proposal to move LP rewards 15% APY program from AlgoStake to AlgoFaucet
+                      PROS: Exposure to more communities and users who theoretically may invest more if they are interested in the project.
                       <hr />
-                      PROS: Reduces expenses to the development team, more out of pocket funds can be reallocated to liquidity & buybacks, LP token holders do not have to take any action to receive daily rewards.
-                      <hr />
-                      CONS: Potential loss of visibility generated from being on AlgoStake platform, adjusting payout amount based on price fluctuations won't take effect instantly. </Typography>
+                      CONS: This theoretically could increase selling pressure and decrease buying pressure if puddin mine users are not buying in to Dark Coin and mining it just to sell it.  </Typography>
                   </Button>
                   <br />
                         </Grid>
@@ -250,59 +249,55 @@ export default class DAO1 extends React.Component {
                             <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal1 == "B" ? "#000000" : "#FFFFFF"}}> 
                             Option B
                             <hr />
-                            Keep LP rewards on AlgoStake platform
+                            Do not deposit Dark Coin to the puddin mine.
                             <hr />
-                            Proposal to continue using the AlgoStake platform the the LP rewards 15% APY program
+                            PROS: Theoretically would decrease selling pressure and increase buying pressure. 
                             <hr />
-                            PROS: Potential increase of visibility generated from being on AlgoStake platform, adjusting payout amount based on price fluctuations DO take effect instantly.
-                            <hr />
-                            CONS: Continued expenses to the development team, less out of pocket funds, LP token holders DO have to access the AlgoStake website daily to claim rewards (or pay for membership to auto-claim). </Typography>
+                            CONS: Dark Coin loses out on the added exposure. </Typography>
                         </Button>
                         <br />
                         </Grid>
                       </Grid>
 
                       <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
-                        Measure 2 <hr /> DAO NFT Shuffle
+                        Measure 4 <hr /> Source of funding for Puddin Mine
                       </Typography>
 
-                      <TextField
-                        onChange={this.handleChange}
-                        value={this.state.proposal2}
-                        type="number"
-                        label="NFTs released"
-                        name="proposal2"
-                        autoComplete="false"
-                        color="secondary"
-                        InputProps={{ style: { color: "white" } }}
-                        InputLabelProps={{ style: { color: "white" } }}
-                        sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
-                        style={{
-                        display: "flex",
-                        margin: "auto",
-                        width: "30%"
-                        }}
-                      />
-                      <br />
+                      <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                      (note that measure 2 is dependent on the results of measure 1. If Measure 1 Option B is passed, this measure loses practical relevance).
+                      </Typography>
 
-                      <TextField
-                        onChange={this.handleChange}
-                        value={this.state.proposal3}
-                        type="number"
-                        label="Price per NFT"
-                        name="proposal3"
-                        autoComplete="false"
-                        color="secondary"
-                        InputProps={{ style: { color: "white" } }}
-                        InputLabelProps={{ style: { color: "white" } }}
-                        sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
-                        style={{
-                        display: "flex",
-                        margin: "auto",
-                        width: "30%"
-                        }}
-                      />
-                       <br />
+
+                      <Grid container >
+                        <Grid item xs={12} sm={12} md={6}>
+                            
+                        <Button style={{display: "flex", margin: "auto", marginLeft: 10, marginRight: 10, padding: 10, borderRadius: 15, textTransform: "none", border: "1px solid white", backgroundColor: this.state.proposal2 == "A" ? "#FFFFFF" : "#000000"}} onClick={() => this.state.proposal2 == "A" ? this.setState({proposal2: "none"}) : this.setState({proposal2: "A"})}>
+                      <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal2 == "A" ? "#000000" : "#FFFFFF"}}> 
+                      Option A
+                      <hr />
+                      Deposit Dark Coin to the puddin mine from the creator wallet reserves (max deposit is 4,000,000 for a years worth of reward payouts).
+                      <hr />
+                      PROS: This is the simplest way to source the funds, and with creator buy backs, 4,000,000 DC will be earned back by the creator wallet over time.
+                      <hr />
+                      CONS: Reduces the amount of Dark Coin immediately available in the creator wallet for adding liquidity and funding staking rewards.  </Typography>
+                  </Button>
+                  <br />
+                        </Grid>
+                        <Grid item xs={12} sm={12} md={6}>
+                        <Button style={{display: "flex", margin: "auto", marginLeft: 10, marginRight: 10, padding: 10, borderRadius: 15, textTransform: "none", border: "1px solid white", backgroundColor: this.state.proposal2 == "B" ? "#FFFFFF" : "#000000"}} onClick={() => this.state.proposal2 == "B" ? this.setState({proposal2: "none"}) : this.setState({proposal2: "B"})}>
+                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal2 == "B" ? "#000000" : "#FFFFFF"}}> 
+                            Option B
+                            <hr />
+                            Deposit half of the balance (2,000,000 Dark Coin) from the creator wallet reserves and accept up to 2,000,000 Dark Coin in community donations.
+                            <hr />
+                            PROS: More DC immediately available in the creator wallet for adding liquidity and funding staking rewards. Community has more control over the amount being deposited into the mine.
+                            <hr />
+                            CONS: Collecting donations is more complicated than just simply donating the entire amount from the creator wallet. </Typography>
+                        </Button>
+                        <br />
+                        </Grid>
+                      </Grid>
+                      <br />
                   
                  
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote(this.props.activeAddress, contract)}>
@@ -323,15 +318,14 @@ export default class DAO1 extends React.Component {
               {this.state.localProposal ? 
                 <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
                     Voted <hr />
-                    Measure 1
+                    Measure 3
                     <br />
                     {this.state.localProposal[0] != "none" ? this.state.localProposal[0] : "No vote"}
                     <hr />
-                    Measure 2
+                    Measure 4
                     <br />
-                    {this.state.localProposal[1] ? this.state.localProposal[1] + " DAO NFTs" : "No vote on NFT release amount"}
-                    <br />
-                    {this.state.localProposal[2] ? this.state.localProposal[2] + " Algo each" : "No vote on NFT release price"} 
+                    {this.state.localProposal[1] != "none" ? this.state.localProposal[1] : "No vote"}
+                    
                 </Typography>
                 :
                 null

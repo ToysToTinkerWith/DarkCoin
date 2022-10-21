@@ -6,7 +6,7 @@ import MyAlgo from '@randlabs/myalgo-connect';
 
 import { db } from "../../../Firebase/FirebaseInit"
 
-import { doc, setDoc, getDoc } from "firebase/firestore"; 
+import { doc, setDoc, getDoc, serverTimestamp  } from "firebase/firestore"; 
 
 //43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA
 
@@ -17,7 +17,7 @@ const peraWallet = new PeraWalletConnect();
 import algosdk from "algosdk"
 
 
-import { Grid, Typography, Button, TextField } from "@mui/material"
+import { Grid, Typography, Button, TextField, Modal, Card } from "@mui/material"
 
 export default class Trade extends React.Component { 
 
@@ -26,21 +26,28 @@ export default class Trade extends React.Component {
         this.state = {
             optedIn: false,
             mixVal: "",
+            feeOption: "",
             receiver: "",
             queued5: 0,
             queued20: 0,
             queued50: 0,
             queued100: 0,
             queued500: 0,
+            sendMix: false,
+            trans: [],
+            contractTrans: []
+            
         };
         this.Optin = this.Optin.bind(this)
         this.Closeout = this.Closeout.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.shuffle = this.shuffle.bind(this)
+        this.sendMix = this.sendMix.bind(this)
         this.mix = this.mix.bind(this)
+        this.getReceivers = this.getReceivers.bind(this)
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         
         peraWallet.reconnectSession()
         .catch((error) => {
@@ -51,6 +58,7 @@ export default class Trade extends React.Component {
               console.log(error)
           }
           });
+
 
         const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
 
@@ -203,6 +211,167 @@ export default class Trade extends React.Component {
         return array;
       }
 
+      async sendMix() {
+
+        let i = 0
+        let receivers = []
+
+        this.state.trans.forEach((tran) => {
+          receivers.push(tran.receiver)
+        })
+
+        console.log(receivers)
+
+        let shuffledReceivers = this.shuffle(receivers)
+
+        console.log(shuffledReceivers)
+
+        const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
+
+        let params = await client.getTransactionParams().do();
+
+        let chunk
+        let txns = []
+        let multipleTxnGroups = []
+
+
+        for (i = 0; i < shuffledReceivers.length; i += 4) {
+
+          chunk = shuffledReceivers.slice(i, i + 4)
+
+          console.log(chunk)
+
+          const appArgs = []
+          appArgs.push(
+            new Uint8Array(Buffer.from("mix")),
+            new Uint8Array(Buffer.from(this.state.mixVal)),
+          )
+
+          const accounts = []
+          const foreignApps = undefined
+            
+          const foreignAssets = []
+          
+          let txn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, 885581567, appArgs, chunk, foreignApps, foreignAssets);
+          
+          txns.push(txn)
+
+          if (this.props.wallet == "pera") {
+            multipleTxnGroups.push({txn: txn, signers: [this.props.activeAddress]})
+          }
+
+          else if (this.props.wallet == "myalgo") {
+            multipleTxnGroups.push(txn.toByte())
+          }
+          
+        }
+
+        let txgroup = algosdk.assignGroupID(txns)
+
+        if (this.props.wallet == "pera") {
+
+          const signedTxn = await peraWallet.signTransaction([multipleTxnGroups]) 
+
+          let txId = await client.sendRawTransaction(signedTxn).do();
+
+          let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
+        }
+
+        else if (this.props.wallet == "myalgo") {
+            
+          const myAlgoWallet = new MyAlgo()
+
+          const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
+
+          let trans = []
+
+          signedTxn.forEach((tran, index) => {
+            trans.push(tran[index].blob)
+          })
+
+
+
+          let txId = await client.sendRawTransaction(trans).do();
+
+          let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);  
+
+        }
+
+
+       
+
+        
+
+
+
+      }
+
+      async getReceivers() {
+
+        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+
+        let appState = await indexerClient.lookupApplications(885581567).do();
+
+        let globalState = appState.application.params["global-state"]
+
+        let queued
+
+        globalState.forEach((keyVal) => {
+          if (atob(keyVal.key) == "queued" + this.state.mixVal) {
+            queued = keyVal.value.uint
+          }
+        })
+
+        let i = 0
+        let trans = []
+        let firstTranRound
+        
+        for (i = 0; i < queued; i++) {
+
+          let docRef = doc(db, "queued" + this.state.mixVal, i.toString());
+          let docSnap = await getDoc(docRef);
+          let tran = docSnap.data()
+
+          if (i == 0) {
+            firstTranRound = docSnap.data().confirmedRound
+          }
+  
+          trans.push(tran)
+
+        }
+
+        this.setState({trans: trans})
+
+        let contractTrans = []
+
+        
+
+        let response = await indexerClient.searchForTransactions()
+        .address("43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA")
+        .minRound(firstTranRound)
+        .do();
+
+
+        response.transactions.forEach((tran) => {
+          if (tran["payment-transaction"]) {
+            if (tran["payment-transaction"].amount == Number(this.state.mixVal) * 1000000) {
+              contractTrans.push({sender: tran.sender, confirmedRound: tran["confirmed-round"]})
+              
+              
+            }
+            
+          }
+        })
+
+        this.setState({
+          contractTrans: contractTrans
+        })
+
+
+
+      }
+
       async mix() {
 
         let queued5
@@ -260,121 +429,23 @@ export default class Trade extends React.Component {
 
         let params = await client.getTransactionParams().do();
 
-        if (chosenQueue >= 3) {
-
-          let i = 0
-          let trans = []
-
-          for (i = 0; i < 3; i++) {
-
-            let docRef = doc(db, "queued" + this.state.mixVal, i.toString());
-            let docSnap = await getDoc(docRef);
-            let receiver = docSnap.data().receiver
-    
-            trans.push(receiver)
-            
-    
-          }
 
           let cost
 
           if (this.state.mixVal == "5") {
-            cost = 5100000
+            cost = 5000000
           }
           else if (this.state.mixVal == "20") {
-            cost = 20400000
+            cost = 20000000
           }
           else if (this.state.mixVal == "50") {
-            cost = 51000000
+            cost = 50000000
           }
           else if (this.state.mixVal == "100") {
-            cost = 102000000
+            cost = 100000000
           }
           else if (this.state.mixVal == "500") {
-            cost = 510000000
-          }
-          
-
-          let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
-            this.props.activeAddress, 
-            "43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA", 
-            cost, 
-            undefined,
-            undefined,
-            params
-          );
-
-
-          const appArgs = []
-          appArgs.push(
-            new Uint8Array(Buffer.from("mix")),
-            new Uint8Array(Buffer.from(this.state.mixVal)),
-            algosdk.encodeUint64(chosenQueue)
-          )
-
-          let accounts = [trans[0], trans[1], trans[2], this.state.receiver]
-          let shuffledAccounts = this.shuffle(accounts)
-          const foreignApps = undefined
-            
-          const foreignAssets = []
-          
-          let atxn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, 885581567, appArgs, shuffledAccounts, foreignApps, foreignAssets);
-          
-          let txns = [ftxn, atxn]
-
-          let txgroup = algosdk.assignGroupID(txns)
-
-          let multipleTxnGroups
-
-          if (this.props.wallet == "pera") {
-
-            multipleTxnGroups = [
-              {txn: ftxn, signers: [this.props.activeAddress]},
-              {txn: atxn, signers: [this.props.activeAddress]}
-            ];
-
-            const signedTxn = await peraWallet.signTransaction([multipleTxnGroups])
-
-            let txId = await client.sendRawTransaction(signedTxn).do();
-
-          }
-          else if (this.props.wallet == "myalgo") {
-
-            multipleTxnGroups = [
-              ftxn.toByte(),
-              atxn.toByte()
-            ];
-
-            const myAlgoWallet = new MyAlgo()
-
-            const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
-
-            let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob]).do();
-
-          }
-
-
-
-        }
-
-        else {
-
-          let cost
-
-          if (this.state.mixVal == "5") {
-            cost = 5100000
-          }
-          else if (this.state.mixVal == "20") {
-            cost = 20400000
-          }
-          else if (this.state.mixVal == "50") {
-            cost = 51000000
-          }
-          else if (this.state.mixVal == "100") {
-            cost = 102000000
-          }
-          else if (this.state.mixVal == "500") {
-            cost = 510000000
+            cost = 500000000
           }
 
           let txn = algosdk.makePaymentTxnWithSuggestedParams(
@@ -385,6 +456,106 @@ export default class Trade extends React.Component {
             undefined,
             params
           );
+
+          let ftxn
+
+          let fee
+
+          if (this.state.feeOption == "ALGO") {
+
+            if (this.state.mixVal == "5") {
+              fee = 100000
+            }
+            else if (this.state.mixVal == "20") {
+              fee = 400000
+            }
+            else if (this.state.mixVal == "50") {
+              fee = 1000000
+            }
+            else if (this.state.mixVal == "100") {
+              fee = 2000000
+            }
+            else if (this.state.mixVal == "500") {
+              fee = 10000000
+            }
+
+            ftxn = algosdk.makePaymentTxnWithSuggestedParams(
+              this.props.activeAddress, 
+              "43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA", 
+              fee, 
+              undefined,
+              undefined,
+              params
+            );
+
+          }
+
+          else if (this.state.feeOption == "DC") {
+
+            const response = await fetch('/api/getDCprices', {
+              method: "POST",
+            
+              headers: {
+                "Content-Type": "application/json",
+              }
+                
+            });
+  
+            const session = await response.json()
+  
+          let algoUsdc = session.usdcInfo.account.amount
+          let usdc
+          session.usdcInfo.account.assets.forEach((asset) => {
+              if (asset["asset-id"] == "31566704") {
+                  usdc = asset.amount
+              }
+          })
+          
+          let algoPrice = usdc/algoUsdc
+  
+          let algoDC = session.DCInfo.account.amount / 1000000
+          let DC
+          session.DCInfo.account.assets.forEach((asset) => {
+              if (asset["asset-id"] == "601894079") {
+                  DC = asset.amount
+              }
+          })
+  
+          let DCalgo = algoDC/DC
+
+
+            if (this.state.mixVal == "5") {
+              fee = 0.05 / DCalgo
+            }
+            else if (this.state.mixVal == "20") {
+              fee = 0.2 / DCalgo
+            }
+            else if (this.state.mixVal == "50") {
+              fee = 0.5 / DCalgo
+            }
+            else if (this.state.mixVal == "100") {
+              fee = 1 / DCalgo
+            }
+            else if (this.state.mixVal == "500") {
+              fee = 10 / DCalgo
+            }
+
+            fee = Math.floor(fee)
+
+            console.log(fee)
+
+            ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+              this.props.activeAddress, 
+              "43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA", 
+              undefined,
+              undefined,
+              fee, 
+              undefined,
+              601894079,
+              params
+            );
+
+          }
 
           const appArgs = []
           appArgs.push(
@@ -400,7 +571,7 @@ export default class Trade extends React.Component {
           
           let atxn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, 885581567, appArgs, accounts, foreignApps, foreignAssets);
           
-          let txns = [txn, atxn]
+          let txns = [txn, ftxn, atxn]
 
           let txgroup = algosdk.assignGroupID(txns)
 
@@ -412,17 +583,21 @@ export default class Trade extends React.Component {
             try {
               multipleTxnGroups = [
                 {txn: txn, signers: [this.props.activeAddress]},
+                {txn: ftxn, signers: [this.props.activeAddress]},
                 {txn: atxn, signers: [this.props.activeAddress]}
               ];
   
               const signedTxn = await peraWallet.signTransaction([multipleTxnGroups]) 
 
+              let txId = await client.sendRawTransaction(signedTxn).do();
+
+              let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
               await setDoc(doc(db, "queued" + this.state.mixVal, chosenQueue.toString()), {
                 sender: this.props.activeAddress,
-                receiver: this.state.receiver
+                receiver: this.state.receiver,
+                confirmedRound: confirmedTxn["confirmed-round"]
               });
-
-              let txId = await client.sendRawTransaction(signedTxn).do();
     
               
             }
@@ -440,6 +615,7 @@ export default class Trade extends React.Component {
 
             multipleTxnGroups = [
               txn.toByte(),
+              ftxn.toByte(),
               atxn.toByte()
             ];
 
@@ -447,14 +623,15 @@ export default class Trade extends React.Component {
 
             const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
 
-            await setDoc(doc(db, "queued" + this.state.mixVal, queued5.toString()), {
-              sender: this.props.activeAddress,
-              receiver: this.state.receiver
-            });
+            let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob, signedTxn[2].blob]).do();
 
-            let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob]).do();
-    
-            
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
+
+            await setDoc(doc(db, "queued" + this.state.mixVal, chosenQueue.toString()), {
+              sender: this.props.activeAddress,
+              receiver: this.state.receiver,
+              confirmedRound: confirmedTxn["confirmed-round"]
+            });
 
           }
 
@@ -462,21 +639,26 @@ export default class Trade extends React.Component {
             console.log(error)
           }
   
-          }
+          
         }
 
         
       
       }
 
+      
+
     render() {
 
       let contract = 885581567  
+
+      let contractTrans = this.state.contractTrans.reverse()
 
         return (
             <div style={{margin: 30}}>
               
               <Typography variant="h4" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Dark Mixer </Typography>
+              <br />
           
 
                 
@@ -487,7 +669,7 @@ export default class Trade extends React.Component {
                 </Button>
                 :
                 <>
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sends at 4 </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Max 16 </Typography>
                   <Grid container align="center" >
                       <Grid item xs={12} sm={4} md={4} lg={2} >
                       <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued5} </Typography>
@@ -550,7 +732,54 @@ export default class Trade extends React.Component {
                       
                   </Grid>
 
-                  {this.state.mixVal ?
+                  {this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ? 
+                    <>
+                    {this.state.mixVal ? 
+                      <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => [this.getReceivers(), this.setState({sendMix: true})]}>
+                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}>  Send Mix </Typography>
+                      </Button>
+                      :
+                      null
+                    }
+                    
+                    </>
+                  :
+                  <>
+                    <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Fee </Typography>
+
+
+                    <Grid container align="center" >
+                        <Grid item xs={12} sm={6} md={6} lg={6} >
+
+                        <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.feeOption == "DC" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "DC" ? this.setState({feeOption: ""}) : this.setState({feeOption: "DC"})}>
+                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.feeOption == "DC" ? "#000000" : "#FFFFFF"}}> 1% </Typography>
+                            {this.state.feeOption == "DC" ?
+                            <img src="/WhiteCoinLogo.svg" style={{width: 15}} />
+                            :
+                            <img src="/DarkCoinLogo.svg" style={{width: 15}} />
+                            }
+                            </Button>
+
+                            
+                            
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={6} lg={6}>
+
+                        <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.feeOption == "ALGO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "ALGO" ? this.setState({feeOption: ""}) : this.setState({feeOption: "ALGO"})}>
+                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.feeOption == "ALGO" ? "#000000" : "#FFFFFF"}}> 2% </Typography>
+                            {this.state.feeOption == "ALGO" ?
+                            <img src="/AlgoBlack.svg" style={{width: 15}} />
+                            :
+                            <img src="/AlgoWhite.svg" style={{width: 15}} />
+                            }
+
+                            </Button>
+                            
+                        </Grid>
+                        
+                    </Grid>
+
+                    {this.state.mixVal && this.state.feeOption ?
                   <>
                     <br />
 
@@ -587,12 +816,77 @@ export default class Trade extends React.Component {
                   </Button>
                 </>
                 }
+                  </>
+                  
+                  }
+
+                  
+
+                  
                 <br />
 
               <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
                   <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
               </Button>
+
+              <br />
+
+              <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/address/43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA")}>
+                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Address</Typography>
+              </Button>
                 
+              {this.state.sendMix ? 
+                <Modal 
+                open={true} 
+                onClose={() => this.setState({sendMix: false})}
+                onClick={() => this.setState({sendMix: false})}
+                style={{
+                    overflowY: "auto",
+                    overflowX: "hidden"
+                }}>
+                    <Card style={{backgroundColor: "#000000"}}>
+                    <Grid container>
+                      <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Firebase </Typography>
+                      </Grid>
+                      <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Contract </Typography>
+                      </Grid>
+                     {this.state.trans.length > 0 ?
+                        this.state.trans.map((tran, index) => {
+                          return (
+                            <>
+                              <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                                <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sender: {tran.sender.substring(0,10)} </Typography>
+                                <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Confirmed: {tran.confirmedRound} </Typography>
+                              </Grid>
+                              {contractTrans.length > 0 ?
+                                <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sender: {contractTrans[index].sender.substring(0,10)} </Typography>
+                                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Confirmed: {contractTrans[index].confirmedRound} </Typography>
+                                </Grid>
+                                :
+                                null
+                              }
+                              
+                              </>
+                          )
+                        })
+                        :
+                        null
+                      }
+                      </Grid>
+
+                      <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: "#FFFFFF", border: "1px solid white"}} onClick={() => this.sendMix()}>
+                          <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Send Mix </Typography>
+                        </Button>
+                    </Card>
+                
+                </Modal>
+                
+                    :
+                    null
+                }
                 
             </div>
         )

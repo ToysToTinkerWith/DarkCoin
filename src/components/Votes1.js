@@ -21,7 +21,7 @@ export default class Votes1 extends React.Component {
 
     async componentDidMount() {
 
-        let response = await fetch('/api/getAllVotes', {
+        let response = await fetch('/api/getAllVotes1', {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export default class Votes1 extends React.Component {
 
         while (numTrans == 1000) {
             
-            response = await fetch('/api/getAllVotes', {
+            response = await fetch('/api/getAllVotes1', {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -228,18 +228,6 @@ export default class Votes1 extends React.Component {
 
         return (
             <div style={{padding: 40}}>
-                <Typography align="center" variant="h2" style={{fontFamily: "jacques", color: "#FFFFFF"}}> Governance </Typography>
-                <br />
-           
-                <Typography variant="h4" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> Waiting for the next vote... </Typography>
-
-                <Typography variant="h4" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> Results from vote 1 </Typography>
-
-                <br />
-                <Button onClick={() => this.setState({measure: "1"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
-                </Button>
-                <br />
 
                 <br />
 
@@ -247,51 +235,15 @@ export default class Votes1 extends React.Component {
                     <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 2 </Typography>
                 </Button>
                 <br />
-                
-                {/* <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography> */}
 
-
-                {/* <ResponsiveContainer width="100%" height={50}>
-                    <ScatterChart
-
-                    >
-                        <XAxis
-                            hide={true}
-                            />
-                        <YAxis
-                            dataKey="value"
-                            tick={false}
-                            axisLine={false}
-                            hide={true}
-                        />
-                        <Tooltip content={this.renderTooltip} />
-                        <ZAxis name="value" type="number" dataKey="value" domain={[0, 0]} range={[0, 100]} />
-                        <Scatter data={parsedValues1} fill="#FFFFFF" />
-                    </ScatterChart>
-                </ResponsiveContainer> */}
+                <br />
+                <Button onClick={() => this.setState({measure: "1"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
+                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
+                </Button>
+                <br />
 
                 
-                {/* <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography> */}
-
-
-                {/* <ResponsiveContainer width="100%" height={50}>
-                    <ScatterChart
-
-                    >
-                        <XAxis
-                        hide={true}
-                            />
-                        <YAxis
-                            dataKey="value"
-                            tick={false}
-                            axisLine={false}
-                            hide={true}
-                        />
-                        <Tooltip content={this.renderTooltip} />
-                        <ZAxis name="value" type="number" dataKey="value" domain={[0, 0]} range={[0, 100]} />
-                        <Scatter data={parsedValues2} fill="#FFFFFF" />
-                    </ScatterChart>
-                </ResponsiveContainer> */}
+               
 
                 {this.state.measure == "1" ? 
                 <Modal 

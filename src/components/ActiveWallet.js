@@ -9,6 +9,8 @@ import Propose from "./Propose.js"
 import Trade from "./contracts/Trade.js"
 import Mixer from "./contracts/Mixer.js"
 
+import DAO2 from "./contracts/DAO2"
+
 
 
 
@@ -21,6 +23,7 @@ export default class ActiveWallet extends React.Component {
         this.state = {
             ownedNfts: [],
             darkCoin: 0,
+            page: "NFTs",
             activeNft: null
             
         };
@@ -38,7 +41,15 @@ export default class ActiveWallet extends React.Component {
 
       (async () => {
         let acct = this.props.activeAddress;
+
+        let numAssets = 0
+        let nextToken = 0
+
         let accountInfo = await indexerClient.lookupAccountAssets(acct).do();
+
+        numAssets = accountInfo.assets.length
+        nextToken = accountInfo["next-token"]
+
         accountInfo.assets.forEach(async (asset) => {
           if (asset["asset-id"] == 601894079) {
             this.setState({
@@ -51,17 +62,39 @@ export default class ActiveWallet extends React.Component {
               }))
           }
     
-          })
+        })
+
+        while (numAssets == 1000) {
+
+            accountInfo = await indexerClient.lookupAccountAssets(acct).nextToken(nextToken).do();
+
+            accountInfo.assets.forEach(async (asset) => {
+                if (asset["asset-id"] == 601894079) {
+                  this.setState({
+                      darkCoin: asset.amount
+                  })
+                }
+                if (asset.amount == 1) {
+                  this.setState(prevState => ({
+                      ownedNfts: [...prevState.ownedNfts, asset]
+                    }))
+                }
+          
+              })
+
+            numAssets = accountInfo.assets.length
+            nextToken = accountInfo["next-token"]
+        }
   
         
         
-            })().catch(e => {
-                console.log(e);
-                console.trace();
-            });
+    })().catch(e => {
+        console.log(e);
+        console.trace();
+    });
     
     
-      }
+    }
 
    
 
@@ -84,13 +117,39 @@ export default class ActiveWallet extends React.Component {
                         <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", margin: 30}}> {this.state.darkCoin} </Typography>
                     </Grid>
 
+                    <Grid container align="center" >
+                      <Grid item xs={6} sm={6} md={6} lg={6} >
+                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.page == "NFTs" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "NFTs" ? this.setState({page: ""}) : this.setState({page: "NFTs"})}>
+                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.page == "NFTs" ? "#000000" : "#FFFFFF"}}> NFTs </Typography>
+                          </Button>
+                          
+                      </Grid>
+                      <Grid item xs={6} sm={6} md={6} lg={6} >
+                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.page == "Mixer" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "Mixer" ? this.setState({page: ""}) : this.setState({page: "Mixer"})}>
+                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.page == "Mixer" ? "#000000" : "#FFFFFF"}}> Mixer </Typography>
+                          </Button>
+                          
+                      </Grid>
+                    </Grid>
+
+                    {this.state.page == "Mixer" ?
                     <Grid item xs={12} sm={12} md={12}>
                         <Mixer activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
                     </Grid>
-                    
+                    :
+                    null
+                    }
 
-
-
+                    {this.state.page == "NFTs" ? 
+                    <>
+                    <Grid container align="center">
+                        <Grid item xs={12} sm={12} md={12}>
+                            <Button style={{ borderRadius: 15, backgroundColor: this.state.page == "NFTs" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => window.open("https://algoxnft.com/collection/dark-coin-dao?tab=buy_now")}>
+                                <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.page == "NFTs" ? "#000000" : "#FFFFFF"}}> Buy NFTs </Typography>
+                            </Button>
+                            
+                        </Grid>
+                       
                     {this.state.activeNft ?
                     <Grid item xs={12} sm={12} md={12}>
                         <Button style={{display: "block", margin: "auto"}} onClick={() => this.setState({activeNft: null})} >
@@ -113,6 +172,32 @@ export default class ActiveWallet extends React.Component {
                     null
                     
                     }
+
+                    </Grid>
+
+                    {this.state.activeNft ?
+                        this.state.activeNft[1]["unit-name"].slice(0, 4) == "DCGV" ?
+                        <DAO2 activeNft={this.state.activeNft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
+                        :
+                        this.state.activeNft[1].name.slice(0, 18) == "Dark Coin Warriors" && this.state.activeNft[1].name.slice(0, 22) != "Dark Coin Warriors 2.0" ?
+                        <Trade ownedNfts={ownedNfts} activeNft={this.state.activeNft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
+                        :
+                        null
+                        :
+                        null
+                    }
+
+                    
+
+                    </>
+                    :
+                    null
+                    }
+                    
+
+
+                   
+                    
                     
                     
                     
@@ -121,17 +206,7 @@ export default class ActiveWallet extends React.Component {
 
                 </Grid>
 
-                {this.state.activeNft ?
-                    this.state.activeNft[1]["unit-name"].slice(0, 4) == "DCGV" ?
-                    <Typography variant="h4" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> Waiting for the next vote... </Typography>
-                    :
-                    this.state.activeNft[1].name.slice(0, 18) == "Dark Coin Warriors" && this.state.activeNft[1].name.slice(0, 22) != "Dark Coin Warriors 2.0" ?
-                    <Trade ownedNfts={ownedNfts} activeNft={this.state.activeNft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
-                    :
-                    null
-                    :
-                    null
-                }
+               <br />
 
             </div>
 

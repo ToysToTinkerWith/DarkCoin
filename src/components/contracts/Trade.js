@@ -12,8 +12,7 @@ const peraWallet = new PeraWalletConnect();
 import algosdk from "algosdk"
 
 
-import { Grid, Card, Modal, Typography, Button, TextField, Select } from "@mui/material"
-import { ConstructionOutlined } from "@mui/icons-material";
+import { Typography, Button, Grid } from "@mui/material"
 
 export default class Trade extends React.Component { 
 
@@ -375,19 +374,24 @@ export default class Trade extends React.Component {
       let contract = 861419580  
 
         return (
-            <div style={{margin: 30}}>
+            <div style={{margin: "auto"}}>
               
               <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> 5 Tier 1 Warriors = 1 Tier 2 Warrior </Typography>
                 <br />
+                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Select 5 Tier 1 Warriors </Typography>
+                <br />
+                <Grid container>
                 {this.props.ownedNfts.length > 0 ?
                   this.props.ownedNfts.map((nft, index) => {
                     if (nft["asset-id"] >= 818167963 && nft["asset-id"] < 846867259) {
                       return (
+                        <Grid key={index} item xs={12} sm={6}>
                         <Button 
-                        key={index}
                         style={{
-                          margin: 10
+                          display: "flex",
+                          margin: "auto"
                         }}
+                     
                         onClick={() => 
                           this.state.trade5.includes(nft["asset-id"]) ? 
                           this.setState({trade5: this.state.trade5.filter(value => value != nft["asset-id"])})
@@ -408,6 +412,7 @@ export default class Trade extends React.Component {
                           {nft["asset-id"]} 
                           </Typography>
                         </Button>
+                        </Grid>
                         )
                     }
                     
@@ -415,6 +420,7 @@ export default class Trade extends React.Component {
                 :
                   null
                 }
+                </Grid>
                 <br />
 
                 
@@ -423,6 +429,7 @@ export default class Trade extends React.Component {
                 <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, contract)}>
                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
                 </Button>
+
                 :
                 <>
                   {this.state.trade5.length == 5 ?
@@ -434,10 +441,9 @@ export default class Trade extends React.Component {
                     </Button>
                   </>
                     :
-                    <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Must select 5 Tier 1 Warriors </Typography>
+                    null
                   }
                   
-                  <br />
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
                       <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
                   </Button>

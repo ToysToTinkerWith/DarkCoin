@@ -32,19 +32,25 @@ def approval_program():
     )
 
     check_fee = Seq(
-        If(Gtxn[1].xfer_asset() == Int(601894079), 
-        Int(1),
-        Seq(If(Txn.application_args[1] == Bytes("5"),
-        Assert(Gtxn[1].amount() == Int(100000))),
-        If(Txn.application_args[1] == Bytes("20"),
-        Assert(Gtxn[1].amount() == Int(400000))),
-        If(Txn.application_args[1] == Bytes("50"),
-        Assert(Gtxn[1].amount() == Int(1000000))),
-        If(Txn.application_args[1] == Bytes("100"),
-        Assert(Gtxn[1].amount() == Int(2000000))),
-        If(Txn.application_args[1] == Bytes("500"),
-        Assert(Gtxn[1].amount() == Int(10000000))),
-        Int(1))
+        If(Gtxn[1].xfer_asset() == Int(601894079),
+        Seq(
+            Assert(Gtxn[1].asset_receiver() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
+            Int(1)
+        ),
+        Seq(
+            Assert(Gtxn[1].receiver() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
+            If(Txn.application_args[1] == Bytes("5"),
+            Assert(Gtxn[1].amount() == Int(100000))),
+            If(Txn.application_args[1] == Bytes("20"),
+            Assert(Gtxn[1].amount() == Int(400000))),
+            If(Txn.application_args[1] == Bytes("50"),
+            Assert(Gtxn[1].amount() == Int(1000000))),
+            If(Txn.application_args[1] == Bytes("100"),
+            Assert(Gtxn[1].amount() == Int(2000000))),
+            If(Txn.application_args[1] == Bytes("500"),
+            Assert(Gtxn[1].amount() == Int(10000000))),
+            Int(1)
+        )
         )
     )
 

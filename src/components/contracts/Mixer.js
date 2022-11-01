@@ -35,7 +35,8 @@ export default class Trade extends React.Component {
             queued500: 0,
             sendMix: false,
             trans: [],
-            contractTrans: []
+            contractTrans: [],
+            confirm: ""
             
         };
         this.Optin = this.Optin.bind(this)
@@ -120,7 +121,17 @@ export default class Trade extends React.Component {
           if (this.props.wallet == "pera") {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
+            this.setState({
+              confirm: "Sending Transaction"
+            })
+
             let txId = await client.sendRawTransaction(signedTxn).do();
+
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
+            this.setState({
+              confirm: "Transaction Confirmed, Opted In."
+            })
 
             this.setState({optedIn: true})
           }
@@ -129,7 +140,18 @@ export default class Trade extends React.Component {
 
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
+            this.setState({
+              confirm: "Sending Transaction"
+            })
+
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
+
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
+            this.setState({
+              confirm: "Transaction Confirmed, Opted In."
+            })
+
 
             this.setState({optedIn: true})
           }
@@ -154,7 +176,18 @@ export default class Trade extends React.Component {
           if (this.props.wallet == "pera") {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
+            this.setState({
+              confirm: "Sending Transaction"
+            })
+
             let txId = await client.sendRawTransaction(signedTxn).do();
+
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
+            this.setState({
+              confirm: "Transaction Confirmed, Opted Out."
+            })
+
 
             this.setState({optedIn: false})
           }
@@ -163,9 +196,20 @@ export default class Trade extends React.Component {
 
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
+            this.setState({
+              confirm: "Sending Transaction"
+            })
+
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
 
-            this.setState({optedIn: false, localProposal: ""})
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
+            this.setState({
+              confirm: "Transaction Confirmed, Opted Out."
+            })
+
+
+            this.setState({optedIn: false})
           }
  
 
@@ -345,8 +389,6 @@ export default class Trade extends React.Component {
 
         let contractTrans = []
 
-        
-
         let response = await indexerClient.searchForTransactions()
         .address("43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA")
         .minRound(firstTranRound)
@@ -354,8 +396,10 @@ export default class Trade extends React.Component {
 
 
         response.transactions.forEach((tran) => {
+          
           if (tran["payment-transaction"]) {
-            if (tran["payment-transaction"].amount == Number(this.state.mixVal) * 1000000) {
+            if (tran["payment-transaction"].amount == Number(this.state.mixVal) * 1000000 || tran["payment-transaction"].amount == 20400000) {
+              console.log(tran)
               contractTrans.push({sender: tran.sender, confirmedRound: tran["confirmed-round"]})
               
               
@@ -481,7 +525,7 @@ export default class Trade extends React.Component {
 
             ftxn = algosdk.makePaymentTxnWithSuggestedParams(
               this.props.activeAddress, 
-              "43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA", 
+              "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE", 
               fee, 
               undefined,
               undefined,
@@ -546,7 +590,7 @@ export default class Trade extends React.Component {
 
             ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
               this.props.activeAddress, 
-              "43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA", 
+              "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE", 
               undefined,
               undefined,
               fee, 
@@ -591,6 +635,10 @@ export default class Trade extends React.Component {
 
               let txId = await client.sendRawTransaction(signedTxn).do();
 
+              this.setState({
+                confirm: "Sending Transaction"
+              })
+
               let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
 
               await setDoc(doc(db, "queued" + this.state.mixVal, chosenQueue.toString()), {
@@ -598,6 +646,10 @@ export default class Trade extends React.Component {
                 receiver: this.state.receiver,
                 confirmedRound: confirmedTxn["confirmed-round"]
               });
+
+              this.setState({
+                confirm: "Transaction Confirmed, Mixed Transaction Queued"
+              })
     
               
             }
@@ -625,6 +677,10 @@ export default class Trade extends React.Component {
 
             let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob, signedTxn[2].blob]).do();
 
+            this.setState({
+              confirm: "Sending Transaction"
+            })
+
             let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
 
             await setDoc(doc(db, "queued" + this.state.mixVal, chosenQueue.toString()), {
@@ -632,6 +688,10 @@ export default class Trade extends React.Component {
               receiver: this.state.receiver,
               confirmedRound: confirmedTxn["confirmed-round"]
             });
+
+            this.setState({
+              confirm: "Transaction Confirmed, Mixed Transaction Queued"
+            })
 
           }
 
@@ -808,6 +868,15 @@ export default class Trade extends React.Component {
                     :
                     null
                   }
+
+                  {this.state.confirm ? 
+                    <>
+                    <br />
+                    <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
+                    </>
+                    :
+                    null
+                  }
                   
                   
                   <br />
@@ -846,22 +915,22 @@ export default class Trade extends React.Component {
                 }}>
                     <Card style={{backgroundColor: "#000000"}}>
                     <Grid container>
-                      <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                      <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
                         <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Firebase </Typography>
                       </Grid>
-                      <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                      <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
                         <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Contract </Typography>
                       </Grid>
                      {this.state.trans.length > 0 ?
                         this.state.trans.map((tran, index) => {
                           return (
                             <>
-                              <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                              <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
                                 <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sender: {tran.sender.substring(0,10)} </Typography>
                                 <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Confirmed: {tran.confirmedRound} </Typography>
                               </Grid>
                               {contractTrans.length > 0 ?
-                                <Grid item sm={6} style={{border: "1px solid white",  padding: 30}}>
+                                <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
                                   <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sender: {contractTrans[index].sender.substring(0,10)} </Typography>
                                   <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Confirmed: {contractTrans[index].confirmedRound} </Typography>
                                 </Grid>

@@ -72,6 +72,69 @@ def approval_program():
         Int(1)
       
     )
+
+    nftName = AssetParam.name(Txn.assets[0])
+
+    dao = Seq(
+        nftName,
+        Assert(Substring(nftName.value(), Int(0), Int(13)) == Bytes("Dark Coin DAO")),
+        Assert(Gtxn[0].xfer_asset() == Int(601894079)),
+        Assert(Gtxn[0].asset_receiver() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
+        Assert(Gtxn[0].asset_amount() == Int(100000)),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields({
+            TxnField.type_enum: TxnType.AssetTransfer,
+            TxnField.xfer_asset: Txn.assets[0],
+            TxnField.asset_receiver: Txn.sender(),
+            TxnField.asset_amount: Int(1),
+        }),
+        InnerTxnBuilder.Submit(),
+       Int(1)
+
+        
+        
+    )
+
+    warrior1 = Seq(
+        nftName,
+        Assert(Substring(nftName.value(), Int(0), Int(18)) == Bytes("Dark Coin Warriors")),
+        Assert(Substring(nftName.value(), Int(0), Int(22)) != Bytes("Dark Coin Warriors 2.0")),
+        Assert(Gtxn[0].xfer_asset() == Int(601894079)),
+        Assert(Gtxn[0].asset_receiver() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
+        Assert(Gtxn[0].asset_amount() == Int(250000)),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields({
+            TxnField.type_enum: TxnType.AssetTransfer,
+            TxnField.xfer_asset: Txn.assets[0],
+            TxnField.asset_receiver: Txn.sender(),
+            TxnField.asset_amount: Int(1),
+        }),
+        InnerTxnBuilder.Submit(),
+       Int(1)
+
+        
+        
+    )
+
+    warrior2 = Seq(
+        nftName,
+        Assert(Substring(nftName.value(), Int(0), Int(22)) == Bytes("Dark Coin Warriors 2.0")),
+        Assert(Gtxn[0].xfer_asset() == Int(601894079)),
+        Assert(Gtxn[0].asset_receiver() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
+        Assert(Gtxn[0].asset_amount() == Int(1250000)),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields({
+            TxnField.type_enum: TxnType.AssetTransfer,
+            TxnField.xfer_asset: Txn.assets[0],
+            TxnField.asset_receiver: Txn.sender(),
+            TxnField.asset_amount: Int(1),
+        }),
+        InnerTxnBuilder.Submit(),
+       Int(1)
+
+        
+        
+    )
     
 
     # doesn't need anyone to opt in
@@ -95,7 +158,11 @@ def approval_program():
         [Txn.on_completion() == OnComplete.UpdateApplication, handle_updateapp],
         [Txn.on_completion() == OnComplete.DeleteApplication, handle_deleteapp],
         [Txn.application_args[0] == Bytes("optin"), Return(opt_in)],
-        [Txn.application_args[0] == Bytes("trade"), Return(trade)]
+        [Txn.application_args[0] == Bytes("trade"), Return(trade)],
+        [Txn.application_args[0] == Bytes("DAO"), Return(dao)],
+        [Txn.application_args[0] == Bytes("Warrior1"), Return(warrior1)],
+        [Txn.application_args[0] == Bytes("Warrior2"), Return(warrior2)],
+
     )
     
     return program

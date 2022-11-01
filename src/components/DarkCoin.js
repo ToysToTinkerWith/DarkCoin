@@ -62,7 +62,7 @@ export default class DarkCoin extends React.Component {
             }}
             >
             
-            {data.amount}
+            {(data.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </div>
         );
         }

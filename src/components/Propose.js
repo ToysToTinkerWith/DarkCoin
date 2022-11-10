@@ -80,9 +80,9 @@ export default class Propose extends React.Component {
                     rows={5}
                     value={this.state.proposal}
                     type="text"
-                    label={<Typography variant="body1" style={{fontFamily: "Chango", color: "#FFFFFF"}}> Proposal </Typography>}
+                    label={<Typography variant="body1" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Proposal </Typography>}
                     name={"proposal"}
-                    inputProps={{ style: { color: "white", fontFamily: "Chango" }}}
+                    inputProps={{ style: { color: "white", fontFamily: "Consolas" }}}
     
                     sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
                     style={{width: "80%", display: "flex", margin: "auto"}}
@@ -94,11 +94,11 @@ export default class Propose extends React.Component {
                     onChange={this.handleChange}
                     value={this.state.amount}
                     type="number"
-                    label={<Typography variant="body1" style={{fontFamily: "Chango", color: "#FFFFFF"}}> Amount </Typography>}
+                    label={<Typography variant="body1" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Amount </Typography>}
                     name="amount"
                     autoComplete="false"
                     color="primary"
-                    inputProps={{ style: { color: "white", fontFamily: "Chango" }}}
+                    inputProps={{ style: { color: "white", fontFamily: "Consolas" }}}
                     sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
                     style={{
                     display: "flex",
@@ -108,7 +108,7 @@ export default class Propose extends React.Component {
                 />
 
                 <Button onClick={() => this.sendTrans()} style={{display: "flex", margin: "auto", backgroundColor: "#FFFFFF", padding: 10, borderRadius: 15, marginTop: "2%"}}> 
-                    <Typography variant="h6" style={{fontFamily: "Chango", color: "#000000"}}> Propose </Typography>
+                    <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Propose </Typography>
                 </Button>
                 <br />
             </div>

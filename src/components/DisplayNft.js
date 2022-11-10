@@ -57,7 +57,7 @@ export default class DisplayNft extends React.Component {
             return (
                 <div>
                     <Button onClick={() => this.props.setActiveNft([this.props.nftId, this.state.nft])} >
-                        <Typography align="left" variant="caption" style={{color: "#FFFFFF", fontFamily: "Jacques", fontWeight: "800", padding: 20, position: "absolute", top: 0, left: 0, width: 100}}> {this.state.nft.name} </Typography>
+                        <Typography align="left" variant="caption" style={{color: "#FFFFFF", fontFamily: "Consolas", fontWeight: "800", padding: 20, position: "absolute", top: 0, left: 0, width: 100}}> {this.state.nft.name} </Typography>
                         <img src={this.state.nftUrl} style={{width: "100%"}} />
                     </Button>
                 </div>

@@ -264,16 +264,16 @@ export default class BuyNft extends React.Component {
                     <img src={this.state.nftUrl} style={{width: "100%", maxWidth: 500}} />
                   </Button>
                   <br />
-                  <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques"}}> {this.state.nft.name} </Typography>
+                  <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Consolas"}}> {this.state.nft.name} </Typography>
                   <br />
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.BuyNft()}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Buy </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Buy </Typography>
                   </Button>
 
                   {this.state.confirm ? 
                     <>
                     <br />
-                    <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
+                    <Typography align="center" variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
                     
 
                     </>
@@ -293,7 +293,7 @@ export default class BuyNft extends React.Component {
             return (
                 <div>
                     <Button onClick={() => this.props.setNft(this.props.nftId)} >
-                        <Typography align="left" variant="caption" style={{color: "#FFFFFF", fontFamily: "Jacques", fontWeight: "800", padding: 20, position: "absolute", top: 0, left: 0, width: 100}}> {this.state.nft.name} </Typography>
+                        <Typography align="left" variant="caption" style={{color: "#FFFFFF", fontFamily: "Consolas", fontWeight: "800", padding: 20, position: "absolute", top: 0, left: 0, width: 100}}> {this.state.nft.name} </Typography>
                         <img src={this.state.nftUrl} style={{width: "100%"}} />
                     </Button>
                 </div>

@@ -379,9 +379,9 @@ export default class Votes1 extends React.Component {
                         </ScatterChart>
                     </ResponsiveContainer>
 
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Amount </Typography>
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography>
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = 500 </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> DAO NFT Release Amount </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Result = 500 </Typography>
 
                       <ResponsiveContainer width="100%" height={50}>
                     <ScatterChart
@@ -403,10 +403,10 @@ export default class Votes1 extends React.Component {
                 </ResponsiveContainer>
 
                       
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Price </Typography>
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> DAO NFT Release Price </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography>
 
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = 35 </Typography>
+                      <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Result = 35 </Typography>
 
                     </Card>
                 

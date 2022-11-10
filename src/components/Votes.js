@@ -228,11 +228,11 @@ export default class Votes extends React.Component {
 
         return (
             <div style={{padding: 40}}>
-                <Typography align="center" variant="h2" style={{fontFamily: "jacques", color: "#FFFFFF"}}> Governance </Typography>
+                <Typography align="center" variant="h2" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Governance </Typography>
                 <br />
                 <br />
                 <Button onClick={() => this.setState({measure: "1"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
+                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
                 </Button>
 
                 <ResponsiveContainer aspect={2} width="100%">
@@ -251,11 +251,11 @@ export default class Votes extends React.Component {
                 <br />
 
                 <Button onClick={() => this.setState({measure: "2"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 2 </Typography>
+                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 2 </Typography>
                 </Button>
                 <br />
-                <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Amount </Typography>
-                <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> DAO NFT Release Amount </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography>
 
 
                 <ResponsiveContainer width="100%" height={50}>
@@ -278,8 +278,8 @@ export default class Votes extends React.Component {
                 </ResponsiveContainer>
 
                 
-                <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Price </Typography>
-                <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> DAO NFT Release Price </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography>
 
                 <ResponsiveContainer width="100%" height={50}>
                     <ScatterChart

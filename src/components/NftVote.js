@@ -87,13 +87,13 @@ export default class NftVote extends React.Component {
         return (
             <div style={{margin: 30}}>
 
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> {this.props.activeNft[0].name} </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 30}}> {this.props.activeNft[0].name} </Typography>
 
 
                 {this.props.activeNft[1].keyvalues ? 
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> {this.props.activeNft[1].keyvalues.proposal} </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 30}}> {this.props.activeNft[1].keyvalues.proposal} </Typography>
                 :
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> {this.state.localProposal} </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 30}}> {this.state.localProposal} </Typography>
 
                 }
 
@@ -107,9 +107,9 @@ export default class NftVote extends React.Component {
                     rows={5}
                     value={this.state.proposal}
                     type="text"
-                    label={<Typography variant="body1" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Proposal </Typography>}
+                    label={<Typography variant="body1" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Proposal </Typography>}
                     name={"proposal"}
-                    inputProps={{ style: { color: "white", fontFamily: "Jacques" }}}
+                    inputProps={{ style: { color: "white", fontFamily: "Consolas" }}}
 
                     sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
                     style={{width: "80%", display: "flex", margin: "auto"}}
@@ -117,7 +117,7 @@ export default class NftVote extends React.Component {
                 />
                 <br />
                 <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote()}>
-                    <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Vote </Typography>
+                    <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Vote </Typography>
                 </Button>
                
                 

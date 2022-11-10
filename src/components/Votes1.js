@@ -232,13 +232,13 @@ export default class Votes1 extends React.Component {
                 <br />
 
                 <Button onClick={() => this.setState({measure: "2"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 2 </Typography>
+                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 2 </Typography>
                 </Button>
                 <br />
 
                 <br />
                 <Button onClick={() => this.setState({measure: "1"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
+                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
                 </Button>
                 <br />
 

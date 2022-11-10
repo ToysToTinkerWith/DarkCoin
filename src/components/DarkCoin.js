@@ -11,6 +11,8 @@ import { BarChart, XAxis, YAxis, Bar, Tooltip, ResponsiveContainer} from "rechar
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
+import styles from "../index.module.css"
+
 export default class DarkCoin extends React.Component { 
 
     constructor(props) {
@@ -77,9 +79,9 @@ export default class DarkCoin extends React.Component {
         let sortedHolders = this.state.holders.sort((a, b) => (a.amount < b.amount) ? 1 : -1)
        
         return (
-            <div style={{margin: 30}}>
-                <Typography align="center" variant="h5" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Holders </Typography>
-                <ResponsiveContainer width="75%" height={225} >
+            <div className={styles.chart}>
+                <Typography align="center" variant="h5" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Dark Coin Holders </Typography>
+                <ResponsiveContainer width="100%" height={150} >
                 <BarChart data={sortedHolders}>
                 <XAxis 
                 hide={true}

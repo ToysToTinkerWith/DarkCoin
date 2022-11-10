@@ -89,7 +89,7 @@ export default function AlgoConnect(props) {
                 style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}}
                 onClick={() => disconnect()}
             > 
-            <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Disconnect </Typography>
+            <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Disconnect </Typography>
             </Button>
             </>
             :
@@ -99,7 +99,7 @@ export default function AlgoConnect(props) {
                 style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}}
                 onClick={() => handleConnectWalletClick()}
                 > 
-                <Typography variant="h6" style={{fontFamily: "Chango",  color: "#000000"}}> Pera </Typography>
+                <Typography variant="h6" style={{fontFamily: "Consolas",  color: "#000000"}}> Pera </Typography>
             </Button>
             <br />
             <Button 
@@ -107,7 +107,7 @@ export default function AlgoConnect(props) {
                 style={{display: "flex", margin: "auto", borderRadius: 15, backgroundColor: "#FFFFFF"}}
                 onClick={() => connectToMyAlgo()}
                 > 
-                <Typography variant="h6" style={{fontFamily: "Chango", color: "#000000", borderRadius: 15}}> MyAlgo </Typography>
+                <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000", borderRadius: 15}}> MyAlgo </Typography>
             </Button>
             </>
             

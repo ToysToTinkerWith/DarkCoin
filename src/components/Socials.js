@@ -24,7 +24,7 @@ export default class Index extends React.Component {
 
                 
                 <IconButton style={{display: "grid", margin: "auto"}} onClick={() => window.open("https://discord.com/invite/xdZ6V5ybmq")} >
-                <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Consolas", padding: 30}}>
                     Join the discussion
                     </Typography>
                     <img src={"discord.svg"} style={{width: 50, display: "flex", margin: "auto"}} />

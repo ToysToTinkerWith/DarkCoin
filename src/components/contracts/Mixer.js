@@ -710,7 +710,7 @@ export default class Trade extends React.Component {
         return (
             <div style={{margin: 30}}>
               
-              <Typography variant="h4" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Dark Mixer </Typography>
+              <Typography variant="h4" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Dark Mixer </Typography>
               <br />
           
 
@@ -718,17 +718,17 @@ export default class Trade extends React.Component {
                 <br />
                 {this.state.optedIn == false ? 
                 <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
+                     <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt in </Typography>
                 </Button>
                 :
                 <>
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Max 16 </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Max 16 </Typography>
                   <Grid container align="center" >
                       <Grid item xs={12} sm={4} md={4} lg={2} >
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued5} </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.queued5} </Typography>
 
                           <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "5" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "5" ? this.setState({mixVal: ""}) : this.setState({mixVal: "5"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "5" ? "#000000" : "#FFFFFF"}}> 5 </Typography>
+                          <Typography variant="h6" style={{fontFamily: "Consolas", color: this.state.mixVal == "5" ? "#000000" : "#FFFFFF"}}> 5 </Typography>
                           {this.state.mixVal == "5" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
@@ -739,9 +739,9 @@ export default class Trade extends React.Component {
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={3}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued20} </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.queued20} </Typography>
                           <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "20" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "20" ? this.setState({mixVal: ""}) : this.setState({mixVal: "20"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
+                          <Typography variant="h6" style={{fontFamily: "Consolas", color: this.state.mixVal == "20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
                           {this.state.mixVal == "20" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
@@ -750,9 +750,9 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={2}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued50} </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.queued50} </Typography>
                           <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "50" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "50" ? this.setState({mixVal: ""}) : this.setState({mixVal: "50"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
+                          <Typography variant="h6" style={{fontFamily: "Consolas", color: this.state.mixVal == "50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
                           {this.state.mixVal == "50" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
@@ -761,9 +761,9 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={6} md={6} lg={3}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued100} </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.queued100} </Typography>
                           <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "100" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "100" ? this.setState({mixVal: ""}) : this.setState({mixVal: "100"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
+                          <Typography variant="h6" style={{fontFamily: "Consolas", color: this.state.mixVal == "100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
                           {this.state.mixVal == "100" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
@@ -772,9 +772,9 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={6} md={6} lg={2}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.queued500} </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.queued500} </Typography>
                           <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.mixVal == "500" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "500" ? this.setState({mixVal: ""}) : this.setState({mixVal: "500"})}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.mixVal == "500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
+                          <Typography variant="h6" style={{fontFamily: "Consolas", color: this.state.mixVal == "500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
                           {this.state.mixVal == "500" ?
                           <img src="/AlgoBlack.svg" style={{width: 15}} />
                           :
@@ -789,7 +789,7 @@ export default class Trade extends React.Component {
                     <>
                     {this.state.mixVal ? 
                       <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => [this.getReceivers(), this.setState({sendMix: true})]}>
-                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}>  Send Mix </Typography>
+                        <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}>  Send Mix </Typography>
                       </Button>
                       :
                       null
@@ -798,14 +798,14 @@ export default class Trade extends React.Component {
                     </>
                   :
                   <>
-                    <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Fee </Typography>
+                    <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Fee </Typography>
 
 
                     <Grid container align="center" >
                         <Grid item xs={12} sm={6} md={6} lg={6} >
 
                         <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.feeOption == "DC" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "DC" ? this.setState({feeOption: ""}) : this.setState({feeOption: "DC"})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.feeOption == "DC" ? "#000000" : "#FFFFFF"}}> 1% </Typography>
+                            <Typography variant="h6" style={{fontFamily: "Consolas", color: this.state.feeOption == "DC" ? "#000000" : "#FFFFFF"}}> 1% </Typography>
                             {this.state.feeOption == "DC" ?
                             <img src="/WhiteCoinLogo.svg" style={{width: 15}} />
                             :
@@ -819,7 +819,7 @@ export default class Trade extends React.Component {
                         <Grid item xs={12} sm={6} md={6} lg={6}>
 
                         <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.feeOption == "ALGO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "ALGO" ? this.setState({feeOption: ""}) : this.setState({feeOption: "ALGO"})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.feeOption == "ALGO" ? "#000000" : "#FFFFFF"}}> 2% </Typography>
+                            <Typography variant="h6" style={{fontFamily: "Consolas", color: this.state.feeOption == "ALGO" ? "#000000" : "#FFFFFF"}}> 2% </Typography>
                             {this.state.feeOption == "ALGO" ?
                             <img src="/AlgoBlack.svg" style={{width: 15}} />
                             :
@@ -855,7 +855,7 @@ export default class Trade extends React.Component {
                       />
                        <br />
                     <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.mix()}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Mix </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Mix </Typography>
                     </Button>
                   </>
                     :
@@ -865,7 +865,7 @@ export default class Trade extends React.Component {
                   {this.state.confirm ? 
                     <>
                     <br />
-                    <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
+                    <Typography align="center" variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
                     </>
                     :
                     null
@@ -874,7 +874,7 @@ export default class Trade extends React.Component {
                   
                   <br />
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt out </Typography>
                   </Button>
                 </>
                 }
@@ -888,13 +888,13 @@ export default class Trade extends React.Component {
                 <br />
 
               <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
+                  <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> View Contract </Typography>
               </Button>
 
               <br />
 
               <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/address/43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA")}>
-                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Address</Typography>
+                  <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> View Address</Typography>
               </Button>
                 
               {this.state.sendMix ? 
@@ -909,23 +909,23 @@ export default class Trade extends React.Component {
                     <Card style={{backgroundColor: "#000000"}}>
                     <Grid container>
                       <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
-                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Firebase </Typography>
+                        <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Firebase </Typography>
                       </Grid>
                       <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
-                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Contract </Typography>
+                        <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Contract </Typography>
                       </Grid>
                      {this.state.trans.length > 0 ?
                         this.state.trans.map((tran, index) => {
                           return (
                             <>
                               <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
-                                <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sender: {tran.sender.substring(0,10)} </Typography>
-                                <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Confirmed: {tran.confirmedRound} </Typography>
+                                <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Sender: {tran.sender.substring(0,10)} </Typography>
+                                <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Confirmed: {tran.confirmedRound} </Typography>
                               </Grid>
                               {contractTrans.length > 0 ?
                                 <Grid item xs={6} sm={6} style={{border: "1px solid white",  padding: 30}}>
-                                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Sender: {contractTrans[index].sender.substring(0,10)} </Typography>
-                                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Confirmed: {contractTrans[index].confirmedRound} </Typography>
+                                  <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Sender: {contractTrans[index].sender.substring(0,10)} </Typography>
+                                  <Typography variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Confirmed: {contractTrans[index].confirmedRound} </Typography>
                                 </Grid>
                                 :
                                 null
@@ -940,7 +940,7 @@ export default class Trade extends React.Component {
                       </Grid>
 
                       <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: "#FFFFFF", border: "1px solid white"}} onClick={() => this.sendMix()}>
-                          <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Send Mix </Typography>
+                          <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Send Mix </Typography>
                         </Button>
                     </Card>
                 

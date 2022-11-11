@@ -118,7 +118,7 @@ export default class Index extends React.Component {
                 <Grid container alignItems="center">
                         <Grid item xs={12} sm={12} md={6}>
                             
-                        <Button style={{display: "flex", margin: "auto", textTransform: "none", border: "1px solid white", borderRadius: 15, '&hover': {border: "3px solid white", borderRadius: 25}}} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>
+                        <Button className={styles.button1} style={{display: "flex", margin: "auto", textTransform: "none", border: "1px solid white", borderRadius: 15}} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>
                             <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Consolas", padding: 10}}>
                                 Dark Paper
                             </Typography>
@@ -127,7 +127,7 @@ export default class Index extends React.Component {
                         <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                        <Button style={{display: "flex", margin: "auto", textTransform: "none", border: "1px solid white", borderRadius: 15, '&hover': {border: "3px solid white", borderRadius: 25}}} onClick={() => window.open("https://github.com/ToysToTinkerWith/DarkCoin")}>
+                        <Button className={styles.button2} style={{display: "flex", margin: "auto", textTransform: "none", border: "1px solid white", borderRadius: 15}} onClick={() => window.open("https://github.com/ToysToTinkerWith/DarkCoin")}>
                             <Typography align="center" variant="h5" style={{color: "#FFFFFF", fontFamily: "Consolas", padding: 10}}>
                                 Dark Repo
                             </Typography>

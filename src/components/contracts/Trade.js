@@ -376,9 +376,9 @@ export default class Trade extends React.Component {
         return (
             <div style={{margin: "auto"}}>
               
-              <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> 5 Tier 1 Warriors = 1 Tier 2 Warrior </Typography>
+              <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> 5 Tier 1 Warriors = 1 Tier 2 Warrior </Typography>
                 <br />
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Select 5 Tier 1 Warriors </Typography>
+                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Select 5 Tier 1 Warriors </Typography>
                 <br />
                 <Grid container>
                 {this.props.ownedNfts.length > 0 ?
@@ -406,7 +406,7 @@ export default class Trade extends React.Component {
                               borderRadius: 15,
                               color: this.state.trade5.includes(nft["asset-id"]) ? "#000000" : "#FFFFFF", 
                               backgroundColor: this.state.trade5.includes(nft["asset-id"]) ? "#FFFFFF" : "#000000", 
-                              fontFamily: "Jacques"
+                              fontFamily: "Consolas"
                             }}
                           > 
                           {nft["asset-id"]} 
@@ -427,17 +427,17 @@ export default class Trade extends React.Component {
                 <br />
                 {this.state.optedIn == false ? 
                 <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
+                     <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt in </Typography>
                 </Button>
 
                 :
                 <>
                   {this.state.trade5.length == 5 ?
                   <>
-                    <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Note: The first transaction will opt you into the next available Tier 2 Warrior </Typography>
+                    <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Note: The first transaction will opt you into the next available Tier 2 Warrior </Typography>
                     <br />
                     <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.assetTransaction()}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Trade </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Trade </Typography>
                     </Button>
                   </>
                     :
@@ -445,14 +445,14 @@ export default class Trade extends React.Component {
                   }
                   
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt out </Typography>
                   </Button>
                 </>
                 }
                 <br />
 
               <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
+                  <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> View Contract </Typography>
               </Button>
                 
                 

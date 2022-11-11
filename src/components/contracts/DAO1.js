@@ -224,7 +224,7 @@ export default class DAO1 extends React.Component {
                 <br />
                 {this.state.optedIn == false ? 
                 <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
+                     <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt in </Typography>
                 </Button>
                 :
                 <>
@@ -306,22 +306,22 @@ export default class DAO1 extends React.Component {
                   
                  
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Vote </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Vote </Typography>
                   </Button>
                   <br />
                   <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
+                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt out </Typography>
                   </Button>
                 </>
                 }
                 <br />
 
               <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
+                  <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> View Contract </Typography>
               </Button>
 
               {this.state.localProposal ? 
-                <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Consolas", padding: 30}}>
                     Voted <hr />
                     Measure 1
                     <br />

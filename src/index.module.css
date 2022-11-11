@@ -23,3 +23,13 @@ div .chart {
   border-radius: 15px;
   padding: 10px 10px 30px 10px;
 }
+
+.button1:hover {
+  border: 3px solid white;
+  border-radius: 25px;
+}
+
+.button2:hover {
+  border: 3px solid white;
+  border-radius: 25px;
+}

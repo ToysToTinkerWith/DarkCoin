@@ -9,6 +9,10 @@ import { PieChart, Pie, LabelList, Tooltip, ResponsiveContainer, ScatterChart, X
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class Votes extends React.Component { 
 
     constructor(props) {
@@ -227,12 +231,12 @@ export default class Votes extends React.Component {
      
 
         return (
-            <div style={{padding: 40}}>
-                <Typography align="center" variant="h2" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Governance </Typography>
+            <div className={styles.bodybottom}>
+                <Typography className={muisty.governanceh2} align="center" variant="h2"> Governance </Typography>
                 <br />
                 <br />
-                <Button onClick={() => this.setState({measure: "1"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
+                <Button className={muisty.measurebtn} onClick={() => this.setState({measure: "1"})}>
+                    <Typography className={muisty.measureh4} variant="h4"> Measure 1 </Typography>
                 </Button>
 
                 <ResponsiveContainer aspect={2} width="100%">
@@ -250,12 +254,12 @@ export default class Votes extends React.Component {
                 </ResponsiveContainer>
                 <br />
 
-                <Button onClick={() => this.setState({measure: "2"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 2 </Typography>
+                <Button className={muisty.measurebtn} onClick={() => this.setState({measure: "2"})}>
+                    <Typography className={muisty.measureh4} variant="h4"> Measure 2 </Typography>
                 </Button>
                 <br />
-                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> DAO NFT Release Amount </Typography>
-                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography>
+                <Typography className={muisty.measureh6} variant="h6" align="center"> DAO NFT Release Amount </Typography>
+                <Typography className={muisty.measureh6} variant="h6" align="center"> Median = {values1Median} </Typography>
 
 
                 <ResponsiveContainer width="100%" height={50}>
@@ -278,8 +282,8 @@ export default class Votes extends React.Component {
                 </ResponsiveContainer>
 
                 
-                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> DAO NFT Release Price </Typography>
-                <Typography variant="h6" align="center" style={{fontFamily: "Consolas", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography>
+                <Typography className={muisty.measureh6} variant="h6" align="center"> DAO NFT Release Price </Typography>
+                <Typography className={muisty.measureh6} variant="h6" align="center"> Median = {values2Median} </Typography>
 
                 <ResponsiveContainer width="100%" height={50}>
                     <ScatterChart
@@ -310,7 +314,7 @@ export default class Votes extends React.Component {
                     overflowX: "hidden"
                 }}>
                     <Card style={{backgroundColor: "#000000"}}>
-                    <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                    <Typography className={measureth4} align="center" variant="h4">
                     Measure 1 <hr /> LP Rewards
                     </Typography>
                         <br />

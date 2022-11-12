@@ -8,6 +8,8 @@ const peraWallet = new PeraWalletConnect();
 
 import { Button, Typography } from "@mui/material"
 
+import muisty from "../muistyles.module.css"
+
 export default function AlgoConnect(props) {
 
     useEffect(() => {
@@ -83,7 +85,7 @@ export default function AlgoConnect(props) {
         <div >
             {props.activeAddress ? 
             <>
-            <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {props.activeAddress.slice(0, 10)} </Typography>
+            <Typography className={muisty.connectedAddress} align="center" variant="h6"> {props.activeAddress.slice(0, 10)} </Typography>
             <br />
             <Button 
                 style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}}

@@ -57,7 +57,7 @@ export default class DarkCoin extends React.Component {
         if (active && payload && payload.length) {
         const data = payload[0] && payload[0].payload;
         return (
-            <div className={styles.DarkCoinJS}>
+            <div className={styles.holderbalance}>
             
             {(data.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </div>

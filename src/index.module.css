@@ -17,19 +17,19 @@ img.logoimg {
   max-width: 350px;
 }
 
-div .DarkCoinJS {
-  backgroundColor: #fff;
-  border: 1px solid #999;
-  margin: 0;
-  padding: 10px;
-}
-
 div .chart {
   margin: 30px;
   border: 3px solid white;
   border-radius: 15px;
   padding: 10px 10px 30px 10px;
   box-shadow: 0 0 15px 5px rgba(211,211,211,.75);
+}
+
+div .holderbalance {
+  background-color: #fff;
+  border: 1px solid #999;
+  margin: 0;
+  padding: 10px;
 }
 
 .dpicon {
@@ -47,4 +47,8 @@ div .innerbody {
   border-radius: 15px;
   margin: 30px;
   box-shadow: 0 0 15px 5px rgba(211,211,211,.75);
+}
+
+div .bottombody {
+  padding: 40px;
 }

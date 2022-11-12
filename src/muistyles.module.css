@@ -40,6 +40,11 @@
     float: right;
 }
 
+div .connectedAddress {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
 .h3 {
     color: #FFFFFF;
     font-family: Consolas;
@@ -54,4 +59,35 @@
 .h4 {
     font-family: Consolas;
     color: #FFFFFF;
+}
+
+.governanceh2 {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.measurebtn {
+    text-transform: none; 
+    display: flex; 
+    margin: auto; 
+    border: 1px solid white; 
+    border-radius: 15px;
+}
+
+.measureh4 {
+    font-family: Vivaldi;
+    color: #FFFFFF;
+    padding: 10px;
+}
+
+.measureh6 {
+    font-family: Consolas;
+    color: #FFFFFF;
+    padding: 20px;
+}
+
+.measureth4 {
+    color: #FFFFFF; 
+    font-family: Jacques; 
+    padding: 30px;
 }

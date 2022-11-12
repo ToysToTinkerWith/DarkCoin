@@ -10,17 +10,34 @@
     text-transform: none;
     border: 1px solid white;
     border-radius: 15px;
+    box-shadow: 5px 5px 10px rgba(255,255,255,.75);
 }
 
 .button:hover {
     border: 3px solid white;
-    border-radius: 25px;
+    border-radius: 15px;
+    box-shadow: none;
   }
 
 .h5 {
     color: #FFFFFF;
     font-family: Consolas;
     padding: 10px;
+}
+
+.h5holders {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.holder1 {
+    display: flex;
+    float: left;
+}
+
+.holdermax {
+    display: flex;
+    float: right;
 }
 
 .h3 {

@@ -24,12 +24,18 @@ div .chart {
   padding: 10px 10px 30px 10px;
 }
 
-.button1:hover {
-  border: 3px solid white;
-  border-radius: 25px;
+.dpicon {
+  width: 10%; 
+  max-width: 100px;
 }
 
-.button2:hover {
+.dricon {
+  width: 20%;
+  max-width: 100px;
+}
+
+div .innerbody {
   border: 3px solid white;
-  border-radius: 25px;
+  border-radius: 15px;
+  margin: 30px;
 }

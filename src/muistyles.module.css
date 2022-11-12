@@ -1,0 +1,40 @@
+.h1 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    padding: 30;
+}
+
+.button {
+    display: flex;
+    margin: auto;
+    text-transform: none;
+    border: 1px solid white;
+    border-radius: 15px;
+}
+
+.button:hover {
+    border: 3px solid white;
+    border-radius: 25px;
+  }
+
+.h5 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    padding: 10px;
+}
+
+.h3 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    padding: 30px;
+}
+
+.h2 {
+   font-family: Consolas;
+   color: #FFFFFF;
+}
+
+.h4 {
+    font-family: Consolas;
+    color: #FFFFFF;
+}

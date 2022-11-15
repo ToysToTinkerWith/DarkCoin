@@ -9,6 +9,10 @@ import { PieChart, Pie, LabelList, Tooltip, ResponsiveContainer, ScatterChart, X
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class Votes1 extends React.Component { 
 
     constructor(props) {
@@ -100,14 +104,7 @@ export default class Votes1 extends React.Component {
         const data = payload[0] && payload[0].payload;
 
         return (
-            <div
-            style={{
-                backgroundColor: '#fff',
-                border: '1px solid #999',
-                margin: 0,
-                padding: 10,
-            }}
-            >
+            <div className={styles.votes} >
             {data.value}
             </div>
         );
@@ -194,18 +191,18 @@ export default class Votes1 extends React.Component {
      
 
         return (
-            <div style={{padding: 40}}>
+            <div className={styles.bottombody}>
 
                 <br />
 
-                <Button onClick={() => this.setState({measure: "4"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 4 </Typography>
+                <Button className={muisty.measurebtn} onClick={() => this.setState({measure: "4"})}>
+                    <Typography className={muisty.measureh4} variant="h4"> Measure 4 </Typography>
                 </Button>
                 <br />
 
                 <br />
-                <Button onClick={() => this.setState({measure: "3"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "Vivaldi", color: "#FFFFFF", padding: 10}}> Measure 3 </Typography>
+                <Button className={muisty.measurebtn} onClick={() => this.setState({measure: "3"})}>
+                    <Typography className={muisty.measureh4} variant="h4"> Measure 3 </Typography>
                 </Button>
                 <br />
 
@@ -213,22 +210,18 @@ export default class Votes1 extends React.Component {
                
 
                 {this.state.measure == "3" ? 
-                <Modal 
+                <Modal className={muisty.modal}
                 open={true} 
                 onClose={() => this.setState({measure: ""})}
-                onClick={() => this.setState({measure: ""})}
-                style={{
-                    overflowY: "auto",
-                    overflowX: "hidden"
-                }}>
-                    <Card style={{backgroundColor: "#000000"}}>
-                    <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                onClick={() => this.setState({measure: ""})}>
+                    <Card className={muisty.card}>
+                    <Typography className={muisty.measureth4} align="center" variant="h4">
                     Measure 3 <hr /> Puddin Mine
                 </Typography>
                 <Grid container align="center">
                         <Grid item xs={12} sm={12} md={6} >
                             
-                      <Typography variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                      <Typography className={muisty.measurebody} variant="h6"> 
                       Option A
                       <hr />
                       Deposit Dark Coin to the puddin mine so puddin mine users can earn Dark Coin by mining (max deposit is 4,000,000 DC, rewards will last over a year per the devs).
@@ -239,7 +232,7 @@ export default class Votes1 extends React.Component {
                   <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6} >
-                            <Typography variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                            <Typography className={muisty.measurebody} variant="h6"> 
                             Option B
                             <hr />
                             Do not deposit Dark Coin to the puddin mine.
@@ -277,20 +270,16 @@ export default class Votes1 extends React.Component {
                 }
 
             {this.state.measure == "4" ? 
-                <Modal 
+                <Modal className={muisty.modal}
                 open={true} 
                 onClose={() => this.setState({measure: ""})}
-                onClick={() => this.setState({measure: ""})}
-                style={{
-                    overflowY: "auto",
-                    overflowX: "hidden"
-                }}>
-                    <Card style={{backgroundColor: "#000000"}}>
-                    <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                onClick={() => this.setState({measure: ""})}>
+                    <Card className={muisty.card}>
+                    <Typography className={muisty.measureth4} align="center" variant="h4">
                         Measure 4 <hr /> Source of funding for Puddin Mine
                       </Typography>
 
-                      <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                      <Typography className={muisty.measurenoteh6} align="center" variant="h6">
                       (note that Measure 4 is dependent on the results of measure 3. If measure 3 Option B is passed, this measure loses practical relevance).
                       </Typography>
 
@@ -298,7 +287,7 @@ export default class Votes1 extends React.Component {
                       <Grid container align="center">
                         <Grid item xs={12} sm={12} md={6}>
                             
-                      <Typography variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                      <Typography className={muisty.measurebody} variant="h6"> 
                       Option A
                       <hr />
                       Deposit Dark Coin to the puddin mine from the creator wallet reserves (max deposit is 4,000,000 for a years worth of reward payouts).
@@ -309,7 +298,7 @@ export default class Votes1 extends React.Component {
                   <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                            <Typography className={muisty.measurebody} variant="h6"> 
                             Option B
                             <hr />
                             Deposit half of the balance (2,000,000 Dark Coin) from the creator wallet reserves and accept up to 2,000,000 Dark Coin in community donations.

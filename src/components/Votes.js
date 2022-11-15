@@ -104,14 +104,7 @@ export default class Votes extends React.Component {
         const data = payload[0] && payload[0].payload;
 
         return (
-            <div
-            style={{
-                backgroundColor: '#fff',
-                border: '1px solid #999',
-                margin: 0,
-                padding: 10,
-            }}
-            >
+            <div className={styles.votes}>
             {data.value}
             </div>
         );
@@ -305,15 +298,11 @@ export default class Votes extends React.Component {
                 </ResponsiveContainer>
 
                 {this.state.measure == "1" ? 
-                <Modal 
+                <Modal className={muisty.modal} 
                 open={true} 
                 onClose={() => this.setState({measure: ""})}
-                onClick={() => this.setState({measure: ""})}
-                style={{
-                    overflowY: "auto",
-                    overflowX: "hidden"
-                }}>
-                    <Card style={{backgroundColor: "#000000"}}>
+                onClick={() => this.setState({measure: ""})}>
+                    <Card className={muisty.card}>
                     <Typography className={measureth4} align="center" variant="h4">
                     Measure 1 <hr /> LP Rewards
                     </Typography>
@@ -321,7 +310,7 @@ export default class Votes extends React.Component {
                     <Grid container >
                         <Grid item xs={12} sm={12} md={6}>
                             
-                      <Typography align="center" variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                      <Typography className={muisty.measurebody} align="center" variant="h6"> 
                       Option A
                       <hr />
                       Move LP rewards from AlgoStake to AlgoFaucet.
@@ -334,7 +323,7 @@ export default class Votes extends React.Component {
                     <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                            <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", border: "1px solid white", borderRadius: 15, margin: 20, padding: 20}}> 
+                            <Typography className={muisty.measurebody} variant="h6" align="center"> 
                             Option B
                             <hr />
                             Keep LP rewards on AlgoStake platform.
@@ -356,23 +345,19 @@ export default class Votes extends React.Component {
                 }
 
             {this.state.measure == "2" ? 
-                <Modal 
+                <Modal className={muisty.modal}
                 open={true} 
                 onClose={() => this.setState({measure: ""})}
-                onClick={() => this.setState({measure: ""})}
-                style={{
-                    overflowY: "auto",
-                    overflowX: "hidden"
-                }}>
-                    <Card style={{backgroundColor: "#000000"}}>
-                    <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                onClick={() => this.setState({measure: ""})}>
+                    <Card className={muisty.card}>
+                    <Typography className={muisty.measureth4} align="center" variant="h4">
                         Measure 2 <hr /> DAO NFT Shuffle
                       </Typography>
                       <br />
                     <Grid container >
                         <Grid item xs={12} sm={12} md={6}>
                             
-                      <Typography align="center" variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                      <Typography className={muisty.measurebody} align="center" variant="h6"> 
                       DAO NFT Release Amount
                       <hr />
                       How many DAO NFTs will be released in the next batch.
@@ -385,7 +370,7 @@ export default class Votes extends React.Component {
                         <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                            <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", border: "1px solid white", borderRadius: 15, margin: 20, padding: 20}}> 
+                            <Typography className={muisty.measurebody} variant="h6" align="center"> 
                             DAO NFT Release Price
                             <hr />
                             What will the released DAO NFTs be priced at.

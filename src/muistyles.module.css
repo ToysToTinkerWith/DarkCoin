@@ -45,6 +45,92 @@ div .connectedAddress {
     color: #FFFFFF;
 }
 
+.connectpera {
+    display: flex;
+    margin: auto;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.perah6 {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.connectmyalgo {
+    display: flex;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.myalgoh6 {
+    font-family: Consolas;
+    color: #000000;
+    border-radius: 15px;
+}
+
+.disconnectbtn {
+    display: flex;
+    margin: auto;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.disconnecth6 {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.darkcoinh6 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    margin: 30px;
+}
+
+.dcbalance {
+    color: #FFFFFF; 
+    font-family: Consolas; 
+    margin: 30px;
+}
+
+.bodytab {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+}
+
+.bodytabt {
+    font-family: Consolas;
+}
+
+.buytab {
+    border-radius: 15px; 
+}
+
+.buytabt {
+    font-family: Consolas;
+}
+
+.activenft {
+    display: block; 
+    margin: auto;
+}
+
+.activenftname {
+    color: #FFFFFF;
+    font-family: Consolas;
+    font-weight: 800;
+    padding: 20px;
+}
+
+.activenftgrid {
+    display: flex;
+    padding: 5%;
+}
+
 .h3 {
     color: #FFFFFF;
     font-family: Consolas;
@@ -72,6 +158,13 @@ div .connectedAddress {
     margin: auto; 
     border: 1px solid white; 
     border-radius: 15px;
+    box-shadow: 5px 5px 10px rgba(255,255,255,.75);
+}
+
+.measurebtn:hover {
+    border: 3px solid white;
+    border-radius: 15px;
+    box-shadow: none;
 }
 
 .measureh4 {
@@ -89,5 +182,46 @@ div .connectedAddress {
 .measureth4 {
     color: #FFFFFF; 
     font-family: Jacques; 
+    padding: 30px;
+}
+
+.modal {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.card {
+    background-color: #000000;
+}
+
+.measurebody {
+    font-family: Jacques;
+    border: 1px solid white;
+    border-radius: 15px;
+    color: #FFFFFF;
+    margin: 20px;
+    padding: 20px;
+}
+
+.measurenoteh6 {
+    color: #FFFFFF;
+    font-family: Jacques;
+    padding: 30px;
+}
+
+.measureresult {
+    font-family: jacques; 
+    color: #FFFFFF; 
+    padding: 20px;
+}
+
+.socialsbtn {
+    display: grid;
+    margin: auto;
+}
+
+.socialsh5 {
+    color: #FFFFFF;
+    font-family: Consolas;
     padding: 30px;
 }

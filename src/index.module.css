@@ -49,6 +49,44 @@ div .innerbody {
   box-shadow: 0 0 15px 5px rgba(211,211,211,.75);
 }
 
+.bodylogo {
+  display: flex; 
+  margin: auto; 
+  width: 10%; 
+  margin-bottom: 30px;
+}
+
+img.activenftzoom {
+  display: flex;
+  margin: auto;
+  width: 100%;
+  max-width: 500px;
+}
+
 div .bottombody {
   padding: 40px;
+}
+
+div .votes {
+  background-color: #fff;
+  border: 1px solid #999;
+  margin: 0px;
+  padding: 10px;
+}
+
+div .socials {
+  background-color: #000000;
+}
+
+.discordicon {
+  width: 50px;
+  display: flex;
+  margin: auto;
+}
+
+img.footerimg {
+  width: 80%;
+  transform: scaleY(-1);
+  display: flex;
+  margin: auto;
 }

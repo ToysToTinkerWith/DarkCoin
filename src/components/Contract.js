@@ -14,6 +14,10 @@ import algosdk from "algosdk"
 
 import { Grid, Card, Modal, Typography, Button, TextField, Select } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class Contract extends React.Component { 
 
     constructor(props) {
@@ -222,24 +226,24 @@ export default class Contract extends React.Component {
 
 
         return (
-            <div style={{margin: 30}}>
-              <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+            <div className={styles.contractdiv}>
+              <Typography className={muisty.measureth4} align="center" variant="h4">
                     Measure 1 <hr /> LP Rewards
               </Typography>
 
                 
                 <br />
                 {this.state.optedIn == false ? 
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt in </Typography>
+                <Button className={muisty.contractbtn} onClick={() => this.Optin(this.props.activeAddress, contract)}>
+                     <Typography className={muisty.contractbtnt} variant="h6"> Opt in </Typography>
                 </Button>
                 :
                 <>
                 <Grid container alignItems="center">
                         <Grid item xs={12} sm={12} md={6}>
                             
-                        <Button style={{display: "flex", margin: "auto", marginLeft: 10, marginRight: 10, padding: 10, borderRadius: 15, textTransform: "none", border: "1px solid white", backgroundColor: this.state.proposal1 == "A" ? "#FFFFFF" : "#000000"}} onClick={() => this.state.proposal1 == "A" ? this.setState({proposal1: "none"}) : this.setState({proposal1: "A"})}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal1 == "A" ? "#000000" : "#FFFFFF"}}> 
+                        <Button className={muisty.selectoption} style={{backgroundColor: this.state.proposal1 == "A" ? "#FFFFFF" : "#000000"}} onClick={() => this.state.proposal1 == "A" ? this.setState({proposal1: "none"}) : this.setState({proposal1: "A"})}>
+                      <Typography className={muisty.selectoptiont} variant="h6" style={{color: this.state.proposal1 == "A" ? "#000000" : "#FFFFFF"}}> 
                       Option A
                       <hr />
                       Move LP rewards from AlgoStake to AlgoFaucet
@@ -253,8 +257,8 @@ export default class Contract extends React.Component {
                   <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                        <Button style={{display: "flex", margin: "auto", marginLeft: 10, marginRight: 10, padding: 10, borderRadius: 15, textTransform: "none", border: "1px solid white", backgroundColor: this.state.proposal1 == "B" ? "#FFFFFF" : "#000000"}} onClick={() => this.state.proposal1 == "B" ? this.setState({proposal1: "none"}) : this.setState({proposal1: "B"})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.proposal1 == "B" ? "#000000" : "#FFFFFF"}}> 
+                        <Button className={muisty.selectoption} style={{backgroundColor: this.state.proposal1 == "B" ? "#FFFFFF" : "#000000"}} onClick={() => this.state.proposal1 == "B" ? this.setState({proposal1: "none"}) : this.setState({proposal1: "B"})}>
+                            <Typography className={muisty.selectoptiont} variant="h6" style={{color: this.state.proposal1 == "B" ? "#000000" : "#FFFFFF"}}> 
                             Option B
                             <hr />
                             Keep LP rewards on AlgoStake platform
@@ -269,11 +273,11 @@ export default class Contract extends React.Component {
                         </Grid>
                       </Grid>
 
-                      <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                      <Typography className={muisty.measureth4} align="center" variant="h4">
                         Measure 2 <hr /> DAO NFT Shuffle
                       </Typography>
 
-                      <TextField
+                      <TextField   /* ...Leaving the TextField styling inline */
                         onChange={this.handleChange}
                         value={this.state.proposal2}
                         type="number"
@@ -312,23 +316,23 @@ export default class Contract extends React.Component {
                        <br />
                   
                  
-                  <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Vote </Typography>
+                  <Button className={muisty.contractbtn} onClick={() => this.Vote(this.props.activeAddress, contract)}>
+                      <Typography className={muisty.contractbtnt} variant="h6"> Vote </Typography>
                   </Button>
                   <br />
-                  <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Opt out </Typography>
+                  <Button className={muisty.contractbtn} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
+                      <Typography className={muisty.contractbtnt} variant="h6"> Opt out </Typography>
                   </Button>
                 </>
                 }
                 <br />
 
-              <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                  <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> View Contract </Typography>
+              <Button className={muisty.contractbtn} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
+                  <Typography className={muisty.contractbtnt} variant="h6"> View Contract </Typography>
               </Button>
 
               {this.state.localProposal ? 
-                <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Vivaldi", padding: 30}}>
+                <Typography className={muisty.voteresults} align="center" variant="h4">
                     Voted <hr />
                     Measure 1
                     <br />

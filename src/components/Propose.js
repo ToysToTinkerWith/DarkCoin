@@ -73,7 +73,7 @@ export default class Propose extends React.Component {
         console.log(this.props)
         return (
             <div >
-                <TextField
+                <TextField /* Leave TextField styling in line */
                     color="primary"
                     variant="outlined"
                     multiline
@@ -107,8 +107,8 @@ export default class Propose extends React.Component {
                     }}
                 />
 
-                <Button onClick={() => this.sendTrans()} style={{display: "flex", margin: "auto", backgroundColor: "#FFFFFF", padding: 10, borderRadius: 15, marginTop: "2%"}}> 
-                    <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Propose </Typography>
+                <Button className={muisty.proposebtn} onClick={() => this.sendTrans()}> 
+                    <Typography className={muisty.proposebtnt} variant="h6"> Propose </Typography>
                 </Button>
                 <br />
             </div>

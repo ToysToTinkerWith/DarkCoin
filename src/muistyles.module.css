@@ -131,6 +131,105 @@ div .connectedAddress {
     padding: 5%;
 }
 
+.nftbuypreview {
+    display: flex;
+    margin: auto;
+}
+
+.nftbuybtn {
+    display: flex;
+    margin: auto;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.nftvoteh6 {
+    font-family: Consolas;
+    color: #FFFFFF;
+    padding: 30px;
+}
+
+.nftbuybtnt {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.contractbtn {
+    display: flex;
+    margin: auto; 
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.contractbtnt {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.proposebtn {
+    display: flex;
+    margin: auto;
+    background-color: #FFFFFF;
+    padding: 10px;
+    border-radius: 15px;
+    margin-top: 2%;
+}
+
+.proposebtnt {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.selectoption {
+    display: flex;
+    margin: auto;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    border-radius: 15px;
+    text-transform: none;
+    border: 1px solid white;
+}
+
+.selectoptiont {
+    font-family: Jacques;
+}
+
+.voteresults {
+    color: #FFFFFF;
+    font-family: Vivaldi;
+    padding: 30px;
+}
+
+.displaynftname {
+    color: #FFFFFF;
+    font-family: Consolas;
+    font-weight: 800px;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+}
+
+.buyconfirmationtxt {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.buynftidt {
+    color: #FFFFFF;
+    font-family: Consolas;
+    font-weight: 800px;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+}
+
 .h3 {
     color: #FFFFFF;
     font-family: Consolas;

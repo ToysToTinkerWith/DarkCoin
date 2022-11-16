@@ -63,6 +63,23 @@ img.activenftzoom {
   max-width: 500px;
 }
 
+.nftbuyimg {
+  width: 100%;
+  max-width: 500px;
+}
+
+.displaynftimg {
+  width: 100%;
+}
+
+.buynftidimg {
+  width: 100%;
+}
+
+div .nftvotediv {
+  margin: 30px;
+}
+
 div .bottombody {
   padding: 40px;
 }
@@ -72,6 +89,10 @@ div .votes {
   border: 1px solid #999;
   margin: 0px;
   padding: 10px;
+}
+
+.contractdiv {
+  margin: 30px;
 }
 
 div .socials {

@@ -11,6 +11,10 @@ import algosdk from "algosdk"
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 import { Nfc } from "@mui/icons-material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class DisplayNft extends React.Component { 
 
     constructor(props) {
@@ -57,8 +61,8 @@ export default class DisplayNft extends React.Component {
             return (
                 <div>
                     <Button onClick={() => this.props.setActiveNft([this.props.nftId, this.state.nft])} >
-                        <Typography align="left" variant="caption" style={{color: "#FFFFFF", fontFamily: "Consolas", fontWeight: "800", padding: 20, position: "absolute", top: 0, left: 0, width: 100}}> {this.state.nft.name} </Typography>
-                        <img src={this.state.nftUrl} style={{width: "100%"}} />
+                        <Typography className={muisty.displaynftname} align="left" variant="caption"> {this.state.nft.name} </Typography>
+                        <img className={styles.displaynftimg} src={this.state.nftUrl} />
                     </Button>
                 </div>
     

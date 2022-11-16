@@ -16,6 +16,10 @@ const peraWallet = new PeraWalletConnect();
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class BuyNft extends React.Component { 
 
     constructor(props) {
@@ -259,21 +263,21 @@ export default class BuyNft extends React.Component {
         if (this.props.zoom && this.state.nft && this.state.nftUrl) {
             return (
                 
-              <Card style={{backgroundColor: "#000000"}}>
-                  <Button style={{display: "flex", margin: "auto"}} onClick={() => this.props.setNft(null)}>
-                    <img src={this.state.nftUrl} style={{width: "100%", maxWidth: 500}} />
+              <Card className={muisty.card}>
+                  <Button className={muisty.nftbuypreview} onClick={() => this.props.setNft(null)}>
+                    <img className={styles.nftbuyimg} src={this.state.nftUrl} />
                   </Button>
                   <br />
-                  <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Consolas"}}> {this.state.nft.name} </Typography>
+                  <Typography className={muisty.h4} align="center" variant="h4"> {this.state.nft.name} </Typography>
                   <br />
-                  <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.BuyNft()}>
-                      <Typography variant="h6" style={{fontFamily: "Consolas", color: "#000000"}}> Buy </Typography>
+                  <Button className={muisty.nftbuybtn} onClick={() => this.BuyNft()}>
+                      <Typography className={muisty.nftbuybtnt} variant="h6"> Buy </Typography>
                   </Button>
 
                   {this.state.confirm ? 
                     <>
                     <br />
-                    <Typography align="center" variant="h6" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
+                    <Typography className={muisty.buyconfirmationtxt} align="center" variant="h6"> {this.state.confirm} </Typography>
                     
 
                     </>
@@ -293,8 +297,8 @@ export default class BuyNft extends React.Component {
             return (
                 <div>
                     <Button onClick={() => this.props.setNft(this.props.nftId)} >
-                        <Typography align="left" variant="caption" style={{color: "#FFFFFF", fontFamily: "Consolas", fontWeight: "800", padding: 20, position: "absolute", top: 0, left: 0, width: 100}}> {this.state.nft.name} </Typography>
-                        <img src={this.state.nftUrl} style={{width: "100%"}} />
+                        <Typography className={muisty.buynftidt} align="left" variant="caption"> {this.state.nft.name} </Typography>
+                        <img className={styles.buynftidimg} src={this.state.nftUrl} />
                     </Button>
                 </div>
     

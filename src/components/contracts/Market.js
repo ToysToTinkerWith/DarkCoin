@@ -27,7 +27,7 @@ export default class Market extends React.Component {
             displayWarriors1: [],
             Warriors2: [],
             displayWarriors2: [],
-            cat: "DAO",
+            cat: "",
             zoomNft: null,
             confirm: ""
         };
@@ -436,19 +436,10 @@ export default class Market extends React.Component {
                     
                     </Grid>
 
+                    <br />
+
                     
-
-
-                  
-                  <br />
-                  <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
-                  </Button>
-                </>
-                }
-                <br />
-
-                {this.state.confirm ? 
+                    {this.state.confirm ? 
                     <>
                     <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
                     <br />
@@ -458,9 +449,32 @@ export default class Market extends React.Component {
                     null
                   }
 
-              <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
-              </Button>
+                  {this.state.cat == "" ?
+                    <>
+                      <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
+                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
+                      </Button>
+                      <br />
+                      <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
+                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
+                      </Button>
+                    </>
+                    :
+                    null
+                  }
+
+                  
+                  
+                  
+
+                  
+
+                </>
+                }
+
+                
+
+             
                 
                 
             </div>

@@ -264,11 +264,7 @@ export default class Trade extends React.Component {
           receivers.push(tran.receiver)
         })
 
-        console.log(receivers)
-
         let shuffledReceivers = this.shuffle(receivers)
-
-        console.log(shuffledReceivers)
 
         const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
 
@@ -282,8 +278,6 @@ export default class Trade extends React.Component {
         for (i = 0; i < shuffledReceivers.length; i += 4) {
 
           chunk = shuffledReceivers.slice(i, i + 4)
-
-          console.log(chunk)
 
           const appArgs = []
           appArgs.push(
@@ -330,8 +324,8 @@ export default class Trade extends React.Component {
 
           let trans = []
 
-          signedTxn.forEach((tran, index) => {
-            trans.push(tran[index].blob)
+          signedTxn.forEach((tran) => {
+            trans.push(tran.blob)
           })
 
 
@@ -399,7 +393,6 @@ export default class Trade extends React.Component {
           
           if (tran["payment-transaction"]) {
             if (tran["payment-transaction"].amount == Number(this.state.mixVal) * 1000000 || tran["payment-transaction"].amount == 20400000) {
-              console.log(tran)
               contractTrans.push({sender: tran.sender, confirmedRound: tran["confirmed-round"]})
               
               

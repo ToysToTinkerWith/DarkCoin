@@ -53,6 +53,10 @@ div .connectedAddress {
     background-color: #FFFFFF;
 }
 
+.connectpera:hover {
+    background-color: #FFFFFF;
+}
+
 .perah6 {
     font-family: Consolas;
     color: #000000;
@@ -62,6 +66,10 @@ div .connectedAddress {
     display: flex;
     margin: auto;
     border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.connectmyalgo:hover {
     background-color: #FFFFFF;
 }
 
@@ -76,6 +84,10 @@ div .connectedAddress {
     margin: auto;
     padding: 10px;
     border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.disconnectbtn:hover {
     background-color: #FFFFFF;
 }
 
@@ -163,9 +175,63 @@ div .connectedAddress {
     background-color: #FFFFFF;
 }
 
+.contractbtn:hover {
+    background-color: #FFFFFF;
+}
+
 .contractbtnt {
     font-family: Consolas;
     color: #000000;
+}
+
+.marketbtn {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+}
+
+.marketbtnt {
+    font-family: Consolas;
+}
+
+.nftpricedc {
+    font-family: Consolas;
+    color: #FFFFFF;
+    padding: 20px;
+}
+
+.mixerbtn {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+}
+
+.mixerbtnt {
+    font-family: Consolas;
+}
+
+.mixergrid {
+    border: 1px solid white;
+    padding: 30px;
+}
+
+.sendmixbtn {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+    border: 1px solid white;
+}
+
+.tradebtn {
+    display: flex;
+    margin: auto;
+}
+
+.tradebtnt {
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 15px;
 }
 
 .proposebtn {
@@ -242,6 +308,11 @@ div .connectedAddress {
 }
 
 .h4 {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.h6 {
     font-family: Consolas;
     color: #FFFFFF;
 }

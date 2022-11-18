@@ -14,6 +14,10 @@ import DAO2 from "./contracts/DAO2"
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class ActiveWallet extends React.Component { 
 
     constructor(props) {
@@ -110,27 +114,27 @@ export default class ActiveWallet extends React.Component {
             <div>
                 <Grid container alignItems="center" >
                     <Grid item xs={12} sm={12} md={12}>
-                        <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", margin: 30}}> Dark Coin </Typography>
-                        <img src="./DarkCoinLogo.svg" style={{display: "flex", margin: "auto", width: "10%", marginBottom: 30}}/>
-                        <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", margin: 30}}> {(this.state.darkCoin).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Typography>
+                        <Typography className={muisty.darkcoinh6} align="center" variant="h6"> Dark Coin </Typography>
+                        <img className={styles.bodylogo} src="./DarkCoinLogo.svg"/>
+                        <Typography className={muisty.dcbalance} align="center" variant="h6"> {(this.state.darkCoin).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Typography>
                     </Grid>
 
                     <Grid container align="center" >
                       <Grid item xs={12} sm={4} md={4} lg={4} >
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.page == "NFTs" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "NFTs" ? this.setState({page: ""}) : this.setState({page: "NFTs"})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.page == "NFTs" ? "#000000" : "#FFFFFF"}}> NFTs </Typography>
+                          <Button className={muisty.bodytab} style={{backgroundColor: this.state.page == "NFTs" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "NFTs" ? this.setState({page: ""}) : this.setState({page: "NFTs"})}>
+                            <Typography className={muisty.bodytabt} variant="h6" style={{color: this.state.page == "NFTs" ? "#000000" : "#FFFFFF"}}> NFTs </Typography>
                           </Button>
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={4} >
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.page == "Market" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "Market" ? this.setState({page: ""}) : this.setState({page: "Market"})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.page == "Market" ? "#000000" : "#FFFFFF"}}> Market </Typography>
+                          <Button className={muisty.bodytab} style={{backgroundColor: this.state.page == "Market" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "Market" ? this.setState({page: ""}) : this.setState({page: "Market"})}>
+                            <Typography className={muisty.bodytabt} variant="h6" style={{color: this.state.page == "Market" ? "#000000" : "#FFFFFF"}}> Market </Typography>
                           </Button>
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={4} >
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.page == "Mixer" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "Mixer" ? this.setState({page: ""}) : this.setState({page: "Mixer"})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.page == "Mixer" ? "#000000" : "#FFFFFF"}}> Mixer </Typography>
+                          <Button className={muisty.bodytab} style={{backgroundColor: this.state.page == "Mixer" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.page == "Mixer" ? this.setState({page: ""}) : this.setState({page: "Mixer"})}>
+                            <Typography className={muisty.bodytabt} variant="h6" style={{color: this.state.page == "Mixer" ? "#000000" : "#FFFFFF"}}> Mixer </Typography>
                           </Button>
                           
                       </Grid>
@@ -151,17 +155,17 @@ export default class ActiveWallet extends React.Component {
                     <Grid container align="center">
                         <Grid item xs={12} sm={12} md={12}>
                             <br />
-                            <Button style={{ borderRadius: 15, backgroundColor: this.state.page == "NFTs" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => window.open("https://algoxnft.com/collection/dark-coin-dao?tab=buy_now")}>
-                                <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.page == "NFTs" ? "#000000" : "#FFFFFF"}}> Buy NFTs </Typography>
+                            <Button className={muisty.buytab} style={{backgroundColor: this.state.page == "NFTs" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => window.open("https://algoxnft.com/collection/dark-coin-dao?tab=buy_now")}>
+                                <Typography className={muisty.buytabt} variant="h6" style={{color: this.state.page == "NFTs" ? "#000000" : "#FFFFFF"}}> Buy NFTs </Typography>
                             </Button>
                             
                         </Grid>
                        
                     {this.state.activeNft ?
                     <Grid item xs={12} sm={12} md={12}>
-                        <Button style={{display: "block", margin: "auto"}} onClick={() => this.setState({activeNft: null})} >
-                            <Typography align="center" variant="h6" style={{color: "#FFFFFF", fontFamily: "Jacques", fontWeight: "800", padding: 20}}> {this.state.activeNft[1].name} </Typography>
-                            <img src={"https://ipfs.dark-coin.io/ipfs/" + this.state.activeNft[1].url.slice(7)} style={{display: "flex", margin: "auto", width: "100%", maxWidth: 500}} />
+                        <Button className={muisty.activenft} onClick={() => this.setState({activeNft: null})} >
+                            <Typography className={muisty.activenftname} align="center" variant="h6"> {this.state.activeNft[1].name} </Typography>
+                            <img className={styles.activenftzoom} src={"https://ipfs.dark-coin.io/ipfs/" + this.state.activeNft[1].url.slice(7)} />
                         </Button>
                         <br />
                     </Grid>
@@ -170,7 +174,7 @@ export default class ActiveWallet extends React.Component {
             
                     ownedNfts.map((nft, index) => {
                         return (
-                            <Grid item xs={6} sm={6} md={4} lg={3} key={index} style={{display: "flex", padding: "5%"}}>
+                            <Grid className={muisty.activenftgrid} item xs={6} sm={6} md={4} lg={3} key={index}>
                                 <DisplayNft nftId={nft["asset-id"]} setActiveNft={(nft) => this.setState({activeNft: nft})} />
                             </Grid>
                         )

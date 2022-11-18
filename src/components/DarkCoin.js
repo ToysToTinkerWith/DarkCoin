@@ -11,6 +11,10 @@ import { BarChart, XAxis, YAxis, Bar, Tooltip, ResponsiveContainer} from "rechar
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class DarkCoin extends React.Component { 
 
     constructor(props) {
@@ -53,14 +57,7 @@ export default class DarkCoin extends React.Component {
         if (active && payload && payload.length) {
         const data = payload[0] && payload[0].payload;
         return (
-            <div
-            style={{
-                backgroundColor: '#fff',
-                border: '1px solid #999',
-                margin: 0,
-                padding: 10,
-            }}
-            >
+            <div className={styles.holderbalance}>
             
             {(data.amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </div>
@@ -77,9 +74,9 @@ export default class DarkCoin extends React.Component {
         let sortedHolders = this.state.holders.sort((a, b) => (a.amount < b.amount) ? 1 : -1)
        
         return (
-            <div style={{margin: 30}}>
-                <Typography align="center" variant="h5" style={{fontFamily: "jacques", color: "#FFFFFF"}}> Holders </Typography>
-                <ResponsiveContainer width="100%" height={300} >
+            <div className={styles.chart}>
+                <Typography className={muisty.h5holders} align="center" variant="h5"> Dark Coin Holders </Typography>
+                <ResponsiveContainer width="100%" height={115} >
                 <BarChart data={sortedHolders}>
                 <XAxis 
                 hide={true}
@@ -94,8 +91,8 @@ export default class DarkCoin extends React.Component {
                 <Bar dataKey="amount" fill="#000000" stroke="#FFFFFF"/>
                 </BarChart>
                 </ResponsiveContainer>
-                <Typography color="secondary" style={{display: "flex", float: "left"}}> 1 </Typography>
-                <Typography color="secondary" style={{display: "flex", float: "right"}}> {sortedHolders.length} </Typography>
+                <Typography className={muisty.holder1} color="secondary"> 1 </Typography>
+                <Typography className={muisty.holdermax} color="secondary"> {sortedHolders.length} </Typography>
             </div>
         )
     }

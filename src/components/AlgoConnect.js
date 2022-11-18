@@ -8,6 +8,8 @@ const peraWallet = new PeraWalletConnect();
 
 import { Button, Typography } from "@mui/material"
 
+import muisty from "../muistyles.module.css"
+
 export default function AlgoConnect(props) {
 
     useEffect(() => {
@@ -83,31 +85,23 @@ export default function AlgoConnect(props) {
         <div >
             {props.activeAddress ? 
             <>
-            <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {props.activeAddress.slice(0, 10)} </Typography>
+            <Typography className={muisty.connectedAddress} align="center" variant="h6"> {props.activeAddress.slice(0, 10)} </Typography>
             <br />
-            <Button 
-                style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}}
-                onClick={() => disconnect()}
-            > 
-            <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Disconnect </Typography>
+            <Button className={muisty.disconnectbtn}
+                onClick={() => disconnect()}> 
+            <Typography className={muisty.disconnecth6} variant="h6"> Disconnect </Typography>
             </Button>
             </>
             :
             <>
-            <Button 
-                
-                style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}}
-                onClick={() => handleConnectWalletClick()}
-                > 
-                <Typography variant="h6" style={{fontFamily: "Chango",  color: "#000000"}}> Pera </Typography>
+            <Button className={muisty.connectpera}
+                onClick={() => handleConnectWalletClick()}> 
+                <Typography className={muisty.perah6} variant="h6"> Pera </Typography>
             </Button>
             <br />
-            <Button 
-                
-                style={{display: "flex", margin: "auto", borderRadius: 15, backgroundColor: "#FFFFFF"}}
-                onClick={() => connectToMyAlgo()}
-                > 
-                <Typography variant="h6" style={{fontFamily: "Chango", color: "#000000", borderRadius: 15}}> MyAlgo </Typography>
+            <Button className={muisty.connectmyalgo}
+                onClick={() => connectToMyAlgo()}> 
+                <Typography className={muisty.myalgoh6} variant="h6"> MyAlgo </Typography>
             </Button>
             </>
             

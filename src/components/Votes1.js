@@ -9,6 +9,10 @@ import { PieChart, Pie, LabelList, Tooltip, ResponsiveContainer, ScatterChart, X
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class Votes1 extends React.Component { 
 
     constructor(props) {
@@ -100,14 +104,7 @@ export default class Votes1 extends React.Component {
         const data = payload[0] && payload[0].payload;
 
         return (
-            <div
-            style={{
-                backgroundColor: '#fff',
-                border: '1px solid #999',
-                margin: 0,
-                padding: 10,
-            }}
-            >
+            <div className={styles.votes}>
             {data.value}
             </div>
         );
@@ -227,18 +224,18 @@ export default class Votes1 extends React.Component {
      
 
         return (
-            <div style={{padding: 40}}>
+            <div className={styles.boddybottom}>
 
                 <br />
 
-                <Button onClick={() => this.setState({measure: "2"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 2 </Typography>
+                <Button className={muisty.measurebtn} onClick={() => this.setState({measure: "2"})}>
+                    <Typography className={muisty.measureh4} variant="h4"> Measure 2 </Typography>
                 </Button>
                 <br />
 
                 <br />
-                <Button onClick={() => this.setState({measure: "1"})} style={{textTransform: "none", display: "flex", margin: "auto", border: "1px solid white", borderRadius: 15}}>
-                    <Typography variant="h4" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 10}}> Measure 1 </Typography>
+                <Button className={muisty.measurebtn} onClick={() => this.setState({measure: "1"})}>
+                    <Typography className={muisty.measureh4} variant="h4"> Measure 1 </Typography>
                 </Button>
                 <br />
 
@@ -246,23 +243,19 @@ export default class Votes1 extends React.Component {
                
 
                 {this.state.measure == "1" ? 
-                <Modal 
+                <Modal className={muisty.modal}
                 open={true} 
                 onClose={() => this.setState({measure: ""})}
-                onClick={() => this.setState({measure: ""})}
-                style={{
-                    overflowY: "auto",
-                    overflowX: "hidden"
-                }}>
-                    <Card style={{backgroundColor: "#000000"}}>
-                    <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                onClick={() => this.setState({measure: ""})}>
+                    <Card className={muisty.card}>
+                    <Typography className={muisty.measureth4} align="center" variant="h4">
                     Measure 1 <hr /> LP Rewards
                     </Typography>
                         <br />
                     <Grid container >
                         <Grid item xs={12} sm={12} md={6}>
                             
-                      <Typography align="center" variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                      <Typography className={muisty.measurebody} align="center" variant="h6"> 
                       Option A
                       <hr />
                       Move LP rewards from AlgoStake to AlgoFaucet.
@@ -275,7 +268,7 @@ export default class Votes1 extends React.Component {
                     <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                            <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", border: "1px solid white", borderRadius: 15, margin: 20, padding: 20}}> 
+                            <Typography className={muisty.measurebody} variant="h6" align="center"> 
                             Option B
                             <hr />
                             Keep LP rewards on AlgoStake platform.
@@ -303,7 +296,7 @@ export default class Votes1 extends React.Component {
                             </PieChart>
                         </ResponsiveContainer>
 
-                      <Typography variant="h4" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = A </Typography>
+                      <Typography className={muisty.measureresult} variant="h4" align="center"> Result = A </Typography>
                         <br/>
                     </Card>
 
@@ -315,23 +308,19 @@ export default class Votes1 extends React.Component {
                 }
 
             {this.state.measure == "2" ? 
-                <Modal 
+                <Modal className={muisty.modal}
                 open={true} 
                 onClose={() => this.setState({measure: ""})}
-                onClick={() => this.setState({measure: ""})}
-                style={{
-                    overflowY: "auto",
-                    overflowX: "hidden"
-                }}>
-                    <Card style={{backgroundColor: "#000000"}}>
-                    <Typography align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Jacques", padding: 30}}>
+                onClick={() => this.setState({measure: ""})}>
+                    <Card className={muisty.card}>
+                    <Typography className={muisty.measureth4} align="center" variant="h4">
                         Measure 2 <hr /> DAO NFT Shuffle
                       </Typography>
                       <br />
                     <Grid container >
                         <Grid item xs={12} sm={12} md={6}>
                             
-                      <Typography align="center" variant="h6" style={{fontFamily: "Jacques", border: "1px solid white", borderRadius: 15, color: "#FFFFFF", margin: 20, padding: 20}}> 
+                      <Typography className={muisty.measurebody} align="center" variant="h6"> 
                       DAO NFT Release Amount
                       <hr />
                       How many DAO NFTs will be released in the next batch.
@@ -344,7 +333,7 @@ export default class Votes1 extends React.Component {
                         <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                            <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", border: "1px solid white", borderRadius: 15, margin: 20, padding: 20}}> 
+                            <Typography className={muisty.measurebody} variant="h6" align="center"> 
                             DAO NFT Release Price
                             <hr />
                             What will the released DAO NFTs be priced at.
@@ -379,9 +368,9 @@ export default class Votes1 extends React.Component {
                         </ScatterChart>
                     </ResponsiveContainer>
 
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Amount </Typography>
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values1Median} </Typography>
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = 500 </Typography>
+                      <Typography className={muisty.measureh6} variant="h6" align="center"> DAO NFT Release Amount </Typography>
+                      <Typography className={muisty.measureh6} variant="h6" align="center"> Median = {values1Median} </Typography>
+                      <Typography className={muisty.measureresult} variant="h6" align="center"> Result = 500 </Typography>
 
                       <ResponsiveContainer width="100%" height={50}>
                     <ScatterChart
@@ -403,10 +392,10 @@ export default class Votes1 extends React.Component {
                 </ResponsiveContainer>
 
                       
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> DAO NFT Release Price </Typography>
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Median = {values2Median} </Typography>
+                      <Typography className={muisty.measureh6} variant="h6" align="center"> DAO NFT Release Price </Typography>
+                      <Typography className={muisty.measureh6} variant="h6" align="center"> Median = {values2Median} </Typography>
 
-                      <Typography variant="h6" align="center" style={{fontFamily: "jacques", color: "#FFFFFF", padding: 20}}> Result = 35 </Typography>
+                      <Typography className={muisty.measureresult} variant="h6" align="center"> Result = 35 </Typography>
 
                     </Card>
                 

@@ -14,6 +14,10 @@ import algosdk from "algosdk"
 
 import { Grid, Card, Modal, Typography, Button, TextField } from "@mui/material"
 
+import styles from "../index.module.css"
+
+import muisty from "../muistyles.module.css"
+
 export default class NftVote extends React.Component { 
 
     constructor(props) {
@@ -85,39 +89,39 @@ export default class NftVote extends React.Component {
 
        console.log(this.props.activeNft)
         return (
-            <div style={{margin: 30}}>
+            <div className={styles.nftvotediv}>
 
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> {this.props.activeNft[0].name} </Typography>
+                <Typography className={muisty.nftvoteh6} variant="h6" align="center"> {this.props.activeNft[0].name} </Typography>
 
 
                 {this.props.activeNft[1].keyvalues ? 
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> {this.props.activeNft[1].keyvalues.proposal} </Typography>
+                <Typography className={muisty.nftvoteh6} variant="h6" align="center"> {this.props.activeNft[1].keyvalues.proposal} </Typography>
                 :
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 30}}> {this.state.localProposal} </Typography>
+                <Typography className={muisty.nftvoteh6} variant="h6" align="center"> {this.state.localProposal} </Typography>
 
                 }
 
                 
 
                 
-                <TextField
+                <TextField /* Going to leave this TextField styling in line as well */
                     color="primary"
                     variant="outlined"
                     multiline
                     rows={5}
                     value={this.state.proposal}
                     type="text"
-                    label={<Typography variant="body1" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Proposal </Typography>}
+                    label={<Typography variant="body1" style={{fontFamily: "Consolas", color: "#FFFFFF"}}> Proposal </Typography>}
                     name={"proposal"}
-                    inputProps={{ style: { color: "white", fontFamily: "Jacques" }}}
+                    inputProps={{ style: { color: "white", fontFamily: "Consolas" }}}
 
                     sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
                     style={{width: "80%", display: "flex", margin: "auto"}}
                     onChange={this.handleChange}
                 />
                 <br />
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Vote()}>
-                    <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Vote </Typography>
+                <Button className={muisty.contractbtn} onClick={() => this.Vote()}>
+                    <Typography className={muisty.contractbtnt} variant="h6"> Vote </Typography>
                 </Button>
                
                 

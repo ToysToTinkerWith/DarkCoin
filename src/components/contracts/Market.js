@@ -16,6 +16,10 @@ import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
 import BuyNft from "../BuyNft"
 
+import styles from "../../index.module.css"
+
+import muisty from "../../muistyles.module.css"
+
 export default class Market extends React.Component { 
 
     constructor(props) {
@@ -294,32 +298,32 @@ export default class Market extends React.Component {
 
     
         return (
-            <div style={{margin: 30}}>
+            <div className={styles.market}>
               
 
                 <br />
                 {this.state.optedIn == false ? 
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
+                <Button className={muisty.contractbtn} onClick={() => this.Optin(this.props.activeAddress, contract)}>
+                     <Typography className={muisty.contractbtnt} variant="h6"> Opt in </Typography>
                 </Button>
                 :
                 <>
                   <Grid container align="center" >
                       <Grid item xs={12} sm={4} md={4} lg={4} >
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.cat == "DAO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "DAO" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "DAO", zoomNft: null, confirm: ""})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.cat == "DAO" ? "#000000" : "#FFFFFF"}}> DAOs </Typography>
+                          <Button className={muisty.marketbtn} style={{backgroundColor: this.state.cat == "DAO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "DAO" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "DAO", zoomNft: null, confirm: ""})}>
+                            <Typography className={muisty.marketbtnt} variant="h6" style={{color: this.state.cat == "DAO" ? "#000000" : "#FFFFFF"}}> DAOs </Typography>
                           </Button>
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={4} >
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.cat == "Warrior1" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "Warrior1" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "Warrior1", zoomNft: null, confirm: ""})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.cat == "Warrior1" ? "#000000" : "#FFFFFF"}}> Warriors1 </Typography>
+                          <Button className={muisty.marketbtn} style={{backgroundColor: this.state.cat == "Warrior1" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "Warrior1" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "Warrior1", zoomNft: null, confirm: ""})}>
+                            <Typography className={muisty.marketbtnt} variant="h6" style={{color: this.state.cat == "Warrior1" ? "#000000" : "#FFFFFF"}}> Warriors1 </Typography>
                           </Button>
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={4} >
-                          <Button style={{padding: 10, margin: 20, borderRadius: 15, backgroundColor: this.state.cat == "Warrior2" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "Warrior2" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "Warrior2", zoomNft: null, confirm: ""})}>
-                            <Typography variant="h6" style={{fontFamily: "Jacques", color: this.state.cat == "Warrior2" ? "#000000" : "#FFFFFF"}}> Warriors2 </Typography>
+                          <Button className={muisty.marketbtn} style={{backgroundColor: this.state.cat == "Warrior2" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "Warrior2" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "Warrior2", zoomNft: null, confirm: ""})}>
+                            <Typography className={muisty.marketbtnt} variant="h6" style={{color: this.state.cat == "Warrior2" ? "#000000" : "#FFFFFF"}}> Warriors2 </Typography>
                           </Button>
                           
                       </Grid>
@@ -328,8 +332,8 @@ export default class Market extends React.Component {
 
                     {this.state.cat == "DAO" ? 
                       <>
-                        <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 20}}> 
-                        <img src="./DarkCoinLogo.svg" style={{width: 30, margin: 10}}/>
+                        <Typography className={muisty.nftpricedc} align="center" variant="h6"> 
+                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.svg"/>
                         {(100000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
  
                         </Typography>
@@ -342,8 +346,8 @@ export default class Market extends React.Component {
                     
                     {this.state.cat == "Warrior1" ? 
                       <>
-                        <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 20}}> 
-                        <img src="./DarkCoinLogo.svg" style={{width: 30, margin: 10}}/>
+                        <Typography className={muisty.nftpricedc} align="center" variant="h6"> 
+                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.svg"/>
                         {(250000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
  
                         </Typography>
@@ -356,8 +360,8 @@ export default class Market extends React.Component {
 
                     {this.state.cat == "Warrior2" ? 
                       <>
-                        <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF", padding: 20}}> 
-                        <img src="./DarkCoinLogo.svg" style={{width: 30, margin: 10}}/>
+                        <Typography className={muisty.nftpricedc} align="center" variant="h6"> 
+                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.svg"/>
                         {(1250000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
  
                         </Typography>
@@ -441,7 +445,7 @@ export default class Market extends React.Component {
                     
                     {this.state.confirm ? 
                     <>
-                    <Typography align="center" variant="h6" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> {this.state.confirm} </Typography>
+                    <Typography className={muisty.buyconfirmationtxt} align="center" variant="h6"> {this.state.confirm} </Typography>
                     <br />
 
                     </>

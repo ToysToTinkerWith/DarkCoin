@@ -14,6 +14,10 @@ import algosdk from "algosdk"
 
 import { Typography, Button, Grid } from "@mui/material"
 
+import styles from "../../index.module.css"
+
+import muisty from "../../muistyles.module.css"
+
 export default class Trade extends React.Component { 
 
     constructor(props) {
@@ -398,11 +402,11 @@ export default class Trade extends React.Component {
       console.log(this.state)
 
         return (
-            <div style={{margin: "auto"}}>
+            <div className={styles.trade}>
               
-              <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> 5 Tier 1 Warriors = 1 Tier 2 Warrior </Typography>
+              <Typography className={muisty.h6} variant="h6" align="center"> 5 Tier 1 Warriors = 1 Tier 2 Warrior </Typography>
                 <br />
-                <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Select 5 Tier 1 Warriors </Typography>
+                <Typography className={muisty.h6} variant="h6" align="center"> Select 5 Tier 1 Warriors </Typography>
                 <br />
                 <Grid container>
                 {this.props.ownedNfts.length > 0 ?
@@ -410,12 +414,7 @@ export default class Trade extends React.Component {
                     if (nft["asset-id"] >= 818167963 && nft["asset-id"] < 846867259) {
                       return (
                         <Grid key={index} item xs={12} sm={6}>
-                        <Button 
-                        style={{
-                          display: "flex",
-                          margin: "auto"
-                        }}
-                     
+                        <Button className={muisty.tradebtn}                     
                         onClick={() => 
                           this.state.trade5.includes(nft["asset-id"]) ? 
                           this.setState({trade5: this.state.trade5.filter(value => value != nft["asset-id"])})
@@ -423,14 +422,11 @@ export default class Trade extends React.Component {
                           this.setState(prevState => ({trade5: [...prevState.trade5, nft["asset-id"]]}))
                         }
                         >
-                          <Typography 
-                            style={{
-                              padding: 10,
-                              border: "1px solid white",
-                              borderRadius: 15,
+                          <Typography className={muisty.tradebtnt}
+                            style={{                              
                               color: this.state.trade5.includes(nft["asset-id"]) ? "#000000" : "#FFFFFF", 
                               backgroundColor: this.state.trade5.includes(nft["asset-id"]) ? "#FFFFFF" : "#000000", 
-                              fontFamily: "Jacques"
+                              fontFamily: "Consolas"
                             }}
                           > 
                           {nft["asset-id"]} 
@@ -450,33 +446,33 @@ export default class Trade extends React.Component {
                 
                 <br />
                 {this.state.optedIn == false ? 
-                <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt in </Typography>
+                <Button className={muisty.contractbtn} onClick={() => this.Optin(this.props.activeAddress, contract)}>
+                     <Typography className={muisty.contractbtnt} variant="h6"> Opt in </Typography>
                 </Button>
 
                 :
                 <>
                   {this.state.trade5.length == 5 ?
                   <>
-                    <Typography variant="h6" align="center" style={{fontFamily: "Jacques", color: "#FFFFFF"}}> Note: The first transaction will opt you into the next available Tier 2 Warrior </Typography>
+                    <Typography className={muisty.h6} variant="h6" align="center"> Note: The first transaction will opt you into the next available Tier 2 Warrior </Typography>
                     <br />
-                    <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.assetTransaction()}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Trade </Typography>
+                    <Button className={muisty.contractbtn} onClick={() => this.assetTransaction()}>
+                      <Typography className={muisty.contractbtnt} variant="h6"> Trade </Typography>
                     </Button>
                   </>
                     :
                     null
                   }
                   
-                  <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                      <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
+                  <Button className={muisty.contractbtn} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
+                      <Typography className={muisty.contractbtnt} variant="h6"> Opt out </Typography>
                   </Button>
                 </>
                 }
                 <br />
 
-              <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                  <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
+              <Button className={muisty.contractbtn} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
+                  <Typography className={muisty.contractbtnt} variant="h6"> View Contract </Typography>
               </Button>
                 
                 

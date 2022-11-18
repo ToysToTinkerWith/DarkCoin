@@ -50,6 +50,8 @@ async function govVote(req, res) {
 
           if (req.body.wallet == "pera") {
 
+           
+
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
             let txId = await client.sendRawTransaction(signedTxn).do();

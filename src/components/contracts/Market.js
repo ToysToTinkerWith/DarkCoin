@@ -455,12 +455,12 @@ export default class Market extends React.Component {
 
                   {this.state.cat == "" ?
                     <>
-                      <Button className={muisty.contractbtn} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                        <Typography className={muisty.contractbtnt} variant="h6"> View Contract </Typography>
+                      <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
+                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> View Contract </Typography>
                       </Button>
                       <br />
-                      <Button className={muisty.contractbtn} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                        <Typography className={muisty.contractbtnt} variant="h6"> Opt out </Typography>
+                      <Button style={{display: "flex", margin: "auto", padding: 10, borderRadius: 15, backgroundColor: "#FFFFFF"}} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
+                        <Typography variant="h6" style={{fontFamily: "Jacques", color: "#000000"}}> Opt out </Typography>
                       </Button>
                     </>
                     :

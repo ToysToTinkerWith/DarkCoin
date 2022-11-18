@@ -59,7 +59,7 @@ export default class Trade extends React.Component {
 
           let contract = "FU6ROUCD4M77UBHJCUFPQR4FPLT35NZKDABAKJP2X6W7WS4EWWUYLBKVRQ";
           let assets = await indexerClient.lookupAccountAssets(contract).do();
-          
+
           assets.assets.forEach(async (asset) => {
             if(asset["asset-id"] >= 846867259 && asset.amount == 1) {
               this.setState(prevState => ({
@@ -68,6 +68,28 @@ export default class Trade extends React.Component {
             }
             
           })
+
+          let assetsLen = assets.assets.length
+          let assetsNext = assets["next-token"]
+
+          while (assetsLen == 1000) {
+
+            assets = await indexerClient.lookupAccountAssets(contract).nextToken(assetsNext).do();
+
+            assets.assets.forEach(async (asset) => {
+              if(asset["asset-id"] >= 846867259 && asset.amount == 1) {
+                this.setState(prevState => ({
+                  available2: [...prevState.available2, asset["asset-id"]]
+                }))
+              }
+              
+            })
+
+            assetsLen = assets.assets.length
+            assetsNext = assets["next-token"]
+
+
+          }
 
         })().catch(e => {
             console.error(e);
@@ -332,7 +354,7 @@ export default class Trade extends React.Component {
 
             const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
 
-            let txId = await client.sendRawTransaction(signedTxn.blob).do();
+            let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob, signedTxn[2].blob, signedTxn[3].blob, signedTxn[4].blob, signedTxn[5].blob]).do();
 
           }
 
@@ -376,6 +398,8 @@ export default class Trade extends React.Component {
     render() {
 
       let contract = 861419580  
+
+      console.log(this.state)
 
         return (
             <div className={styles.trade}>

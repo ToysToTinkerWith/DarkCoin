@@ -25,7 +25,7 @@ Developed under the Next.js framework, the logic of the appication can be unders
 The Council is a place where users can propose changes to the Dark Coin Project, and amend existing proposals that are voted on by the Dark Coin DAO.
 To use the Council, one must click the Council Button located in the Dark Coin DApp.
 
-The user is presented with 3 options.
+The user is presented with 3 options:
 
 ## Propose
 

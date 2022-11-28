@@ -16,9 +16,13 @@ https://dark-coin.com
 
 # src
 
-Folder containing all the web components used to process and render the application. 
+Folder containing # all the web components used to process and render the application. 
 
 Developed under the Next.js framework, the logic of the appication can be understood through the sequential rendering of the components contained in this folder. A user can see what APIs/SDKs are being used, and how the data from the Algorand Blockchain is processed to create the Dark Coin Application. The goal for this project is to be as open as possible, in ensuring trust, and creating transparency within the community.
+
+# Council.py
+
+The Council is a place where one can 
 
 # DAO.py
 

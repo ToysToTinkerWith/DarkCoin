@@ -22,7 +22,30 @@ Developed under the Next.js framework, the logic of the appication can be unders
 
 # Council.py
 
-The Council is a place where one can 
+The Council is a place where users can propose changes to the Dark Coin Project, and amend existing proposals that are voted on by the Dark Coin DAO.
+To use the Council, one must click the Council Button located in the Dark Coin DApp.
+
+The user is presented with 3 options.
+
+## Propose
+
+A connected wallet may propose a change or addition to the Dark Coin Project. The user is allowed to type 2000 characters into the textfield provided, to persuade the DAO of their idea. This transaction will cost the wallet x Dark Coin per character. Once the proposer is ready, they may sign their proposal to the Council Smart Contract to be written on chain.
+
+Dark Coin uses the box feature of Algorand Smart Contracts to store proposals sent to the contract. This enables on-chain storage of up to 32k bytes for each proposal.
+
+*Propose Pyteal code snippit*
+
+## Vote
+
+Anyone with a Dark Coin DAO NFT may use it to vote on proposals made to the Council Smart Contract. Memebers of the DAO may choose to either "accept", or "reject" the proposal. After x rounds, the votes are finalized and a transaction to accept the proposal is pushed to the chain. The Dark Coin Team will now take action into implementing the new proposal.
+
+*Vote Pyteal code snippit*
+
+## Amend
+
+Proposals that have been accepted by the Dark Coin DAO, will have the option to be amended. A user may type up to 1000 characters as an amendment to the accepted proposal, and the trasnaction will cost x Dark Coin per character. Signing the transaction will send the amendment to the Council Smart Contract to  be voted on by the DAO. Amendments that get accepted by the DAO will have its contents pushed to the chain in the same box as the original proposal.
+
+*Amend Pyteal code snippit*
 
 # DAO.py
 

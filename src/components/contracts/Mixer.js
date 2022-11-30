@@ -6,7 +6,7 @@ import MyAlgo from '@randlabs/myalgo-connect';
 
 import { db } from "../../../Firebase/FirebaseInit"
 
-import { doc, setDoc, getDoc, serverTimestamp  } from "firebase/firestore"; 
+import { doc, setDoc, getDoc  } from "firebase/firestore"; 
 
 //43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA
 
@@ -91,13 +91,17 @@ export default class Trade extends React.Component {
             }
           })
 
-          let address = this.props.activeAddress;
-          response = await indexerClient.lookupAccountAppLocalStates(address).do();
-          response["apps-local-states"].forEach((app) => {                
-              if (app.id == 885581567) {
-                  this.setState({optedIn: true})
-              }
-          })
+          if (this.props.activeAddress) {
+            let address = this.props.activeAddress;
+            response = await indexerClient.lookupAccountAppLocalStates(address).do();
+            response["apps-local-states"].forEach((app) => {                
+                if (app.id == 885581567) {
+                    this.setState({optedIn: true})
+                }
+            })
+          }
+
+          
 
           
 
@@ -126,7 +130,7 @@ export default class Trade extends React.Component {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction(signedTxn).do();
@@ -145,7 +149,7 @@ export default class Trade extends React.Component {
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
@@ -181,7 +185,7 @@ export default class Trade extends React.Component {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction(signedTxn).do();
@@ -201,7 +205,7 @@ export default class Trade extends React.Component {
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
@@ -415,6 +419,20 @@ export default class Trade extends React.Component {
 
       async mix() {
 
+        if (this.state.mixVal == ""){
+          this.setState({confirm: "Select an amount to send"})
+        }
+
+        else if (this.state.feeOption == ""){
+          this.setState({confirm: "Select a fee option"})
+        }
+
+        else if (this.state.receiver.length != 58){
+          this.setState({confirm: "Choose a valid receiving address"})
+        }
+
+        else {
+        
         let queued5
         let queued20
         let queued50
@@ -583,8 +601,6 @@ export default class Trade extends React.Component {
 
             fee = Math.floor(fee)
 
-            console.log(fee)
-
             ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
               this.props.activeAddress, 
               "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE", 
@@ -633,7 +649,7 @@ export default class Trade extends React.Component {
               let txId = await client.sendRawTransaction(signedTxn).do();
 
               this.setState({
-                confirm: "Sending Transaction"
+                confirm: "Sending Transaction..."
               })
 
               let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
@@ -675,7 +691,7 @@ export default class Trade extends React.Component {
             let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob, signedTxn[2].blob]).do();
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
@@ -699,6 +715,10 @@ export default class Trade extends React.Component {
           
         }
 
+        }
+
+        
+
         
       
       }
@@ -712,27 +732,16 @@ export default class Trade extends React.Component {
       let contractTrans = this.state.contractTrans.reverse()
 
         return (
-            <div className={styles.mixer}>
+            <div>
               
-              <Typography className={muisty.h4} variant="h4" align="center"> Dark Mixer </Typography>
+              <Typography color="secondary" variant="h6" align="center"> Select amount to send: </Typography>
               <br />
-          
-
-                
-                <br />
-                {this.state.optedIn == false ? 
-                <Button className={muisty.contractbtn} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography className={muisty.contractbtnt} variant="h6"> Opt in </Typography>
-                </Button>
-                :
-                <>
-                <Typography className={muisty.h6} variant="h6" align="center"> Max 16 </Typography>
                   <Grid container align="center" >
                       <Grid item xs={12} sm={4} md={4} lg={2} >
-                      <Typography className={muisty.h6} variant="h6"> {this.state.queued5} </Typography>
+                      <Typography color="secondary" variant="h6"> {this.state.queued5} </Typography>
 
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "5" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "5" ? this.setState({mixVal: ""}) : this.setState({mixVal: "5"})}>
-                          <Typography className={muisty.mixerbtnt} variant="h6" style={{color: this.state.mixVal == "5" ? "#000000" : "#FFFFFF"}}> 5 </Typography>
+                          <Typography  variant="h6" style={{color: this.state.mixVal == "5" ? "#000000" : "#FFFFFF"}}> 5 </Typography>
                           {this.state.mixVal == "5" ?
                           <img className={styles.algologo} src="/AlgoBlack.svg" />
                           :
@@ -743,9 +752,9 @@ export default class Trade extends React.Component {
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={3}>
-                      <Typography className={muisty.h6} variant="h6"> {this.state.queued20} </Typography>
+                      <Typography color="secondary" variant="h6"> {this.state.queued20} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "20" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "20" ? this.setState({mixVal: ""}) : this.setState({mixVal: "20"})}>
-                          <Typography className={muisty.mixerbtnt} variant="h6" style={{color: this.state.mixVal == "20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
+                          <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
                           {this.state.mixVal == "20" ?
                           <img className={styles.algologo} src="/AlgoBlack.svg" />
                           :
@@ -754,9 +763,9 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={2}>
-                      <Typography className={muisty.h6} variant="h6"> {this.state.queued50} </Typography>
+                      <Typography color="secondary" variant="h6"> {this.state.queued50} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "50" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "50" ? this.setState({mixVal: ""}) : this.setState({mixVal: "50"})}>
-                          <Typography className={muisty.mixerbtnt} variant="h6" style={{color: this.state.mixVal == "50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
+                          <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
                           {this.state.mixVal == "50" ?
                           <img className={styles.algologo} src="/AlgoBlack.svg" />
                           :
@@ -765,9 +774,9 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={6} md={6} lg={3}>
-                      <Typography className={muisty.h6} variant="h6"> {this.state.queued100} </Typography>
+                      <Typography color="secondary" variant="h6"> {this.state.queued100} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "100" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "100" ? this.setState({mixVal: ""}) : this.setState({mixVal: "100"})}>
-                          <Typography className={muisty.mixerbtnt} variant="h6" style={{color: this.state.mixVal == "100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
+                          <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
                           {this.state.mixVal == "100" ?
                           <img className={styles.algologo} src="/AlgoBlack.svg" />
                           :
@@ -776,9 +785,9 @@ export default class Trade extends React.Component {
                           </Button>
                       </Grid>
                       <Grid item xs={12} sm={6} md={6} lg={2}>
-                      <Typography className={muisty.h6} variant="h6"> {this.state.queued500} </Typography>
+                      <Typography color="secondary" variant="h6"> {this.state.queued500} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "500" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "500" ? this.setState({mixVal: ""}) : this.setState({mixVal: "500"})}>
-                          <Typography className={muisty.mixerbtnt} variant="h6" style={{color: this.state.mixVal == "500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
+                          <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
                           {this.state.mixVal == "500" ?
                           <img className={styles.algologo} src="/AlgoBlack.svg" />
                           :
@@ -789,31 +798,18 @@ export default class Trade extends React.Component {
                       
                   </Grid>
 
-                  {this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ? 
-                    <>
-                    {this.state.mixVal ? 
-                      <Button className={muisty.contractbtn} onClick={() => [this.getReceivers(), this.setState({sendMix: true})]}>
-                        <Typography className={muisty.contractbtnt} variant="h6">  Send Mix </Typography>
-                      </Button>
-                      :
-                      null
-                    }
-                    
-                    </>
-                  :
-                  <>
-                    <Typography className={muisty.h6} variant="h6" align="center"> Fee </Typography>
+                  <Typography color="secondary" variant="h6" align="center"> Select fee options: </Typography>
 
 
                     <Grid container align="center" >
                         <Grid item xs={12} sm={6} md={6} lg={6} >
 
                         <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.feeOption == "DC" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "DC" ? this.setState({feeOption: ""}) : this.setState({feeOption: "DC"})}>
-                            <Typography className={muisty.mixerbtnt} variant="h6" style={{color: this.state.feeOption == "DC" ? "#000000" : "#FFFFFF"}}> 1% </Typography>
+                            <Typography color="secondary" variant="h6" style={{color: this.state.feeOption == "DC" ? "#000000" : "#FFFFFF"}}> 1% </Typography>
                             {this.state.feeOption == "DC" ?
                             <img className={styles.algologo} src="/WhiteCoinLogo.svg" />
                             :
-                            <img className={styles.algologo} src="/DarkCoinLogo.svg" />
+                            <img className={styles.algologo} src="/DarkCoinLogo.png" />
                             }
                             </Button>
 
@@ -823,7 +819,7 @@ export default class Trade extends React.Component {
                         <Grid item xs={12} sm={6} md={6} lg={6}>
 
                         <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.feeOption == "ALGO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "ALGO" ? this.setState({feeOption: ""}) : this.setState({feeOption: "ALGO"})}>
-                            <Typography className={muisty.mixerbtnt} variant="h6" style={{color: this.state.feeOption == "ALGO" ? "#000000" : "#FFFFFF"}}> 2% </Typography>
+                            <Typography color="secondary" variant="h6" style={{color: this.state.feeOption == "ALGO" ? "#000000" : "#FFFFFF"}}> 2% </Typography>
                             {this.state.feeOption == "ALGO" ?
                             <img className={styles.algologo} src="/AlgoBlack.svg" />
                             :
@@ -836,21 +832,25 @@ export default class Trade extends React.Component {
                         
                     </Grid>
 
-                    {this.state.mixVal && this.state.feeOption ?
-                  <>
+                    <Typography color="secondary" variant="h6" align="center"> Receiving Wallet: </Typography>
+
                     <br />
+
+                    
 
                     <TextField                /* Leaving all TextField styling inline in jsx */
                         onChange={this.handleChange}
                         value={this.state.receiver}
                         type="text"
-                        label="Receiver"
+                        label=""
                         name="receiver"
                         autoComplete="false"
-                        color="secondary"
-                        InputProps={{ style: { color: "white" } }}
-                        InputLabelProps={{ style: { color: "white" } }}
-                        sx={{"& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF'}}}}
+                        InputProps={{ style: { color: "black" } }}
+                        sx={{input: {
+                          color: "black",
+                          background: "white",
+                          borderRadius: 15
+                        }, "& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF', borderRadius: 15}}}}
                         style={{
                         display: "flex",
                         margin: "auto",
@@ -858,48 +858,77 @@ export default class Trade extends React.Component {
                         }}
                       />
                        <br />
+                    
+          
+
+                
+
+                {this.props.activeAddress ? 
+                this.state.optedIn == false ? 
+                  <>
+                  {this.state.confirm ? 
+                      <>
+                      <Typography color="secondary" align="center" variant="h6"> {this.state.confirm} </Typography>
+                      <br />
+                      </>
+                      :
+                      null
+                    }
+                  <Button className={muisty.contractbtn} onClick={() => this.Optin(this.props.activeAddress, contract)}>
+                       <Typography variant="h6"> Opt in </Typography>
+                  </Button>
+                  </>
+                  :
+                  <>
+                  
+  
+                    {this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ? 
+                      <>
+                        <Button className={muisty.contractbtn} onClick={() => [this.getReceivers(), this.setState({sendMix: true})]}>
+                          <img src="invMixer.svg" style={{width: 40, paddingRight: 10}} />
+                          <Typography className={muisty.contractbtnt} variant="h6">  Send Mix </Typography>
+                        </Button>
+                      </>
+                    :
+                    <>
+  
+                    {this.state.confirm ? 
+                      <>
+                      <Typography color="secondary" align="center" variant="h6"> {this.state.confirm} </Typography>
+                      <br />
+                      </>
+                      :
+                      null
+                    }
+                    
                     <Button className={muisty.contractbtn} onClick={() => this.mix()}>
-                      <Typography className={muisty.contractbtnt} variant="h6"> Mix </Typography>
+                      <img src="invMixer.svg" style={{width: 40, paddingRight: 10}} />
+                      <Typography variant="h6"> Mix </Typography>
+                    </Button>
+                    
+                    <br />
+                    <Button className={muisty.contractbtn} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
+                        <Typography variant="h6"> Opt out </Typography>
                     </Button>
                   </>
-                    :
-                    null
                   }
-
-                  {this.state.confirm ? 
-                    <>
-                    <br />
-                    <Typography className={muisty.buyconfirmationtxt} align="center" variant="h6"> {this.state.confirm} </Typography>
                     </>
-                    :
-                    null
-                  }
+                    
+                    
                   
-                  
-                  <br />
-                  <Button className={muisty.contractbtn} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                      <Typography className={muisty.contractbtnt} variant="h6"> Opt out </Typography>
+                  :
+                  <Button className={muisty.contractbtn} onClick={() => window.scrollTo(0, 0)}>
+                      <Typography  variant="h6"> Connect Wallet </Typography>
                   </Button>
-                </>
                 }
-                  </>
-                  
-                  }
+
+                
 
                   
 
                   
                 <br />
 
-              <Button className={muisty.contractbtn} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                  <Typography className={muisty.contractbtnt} variant="h6"> View Contract </Typography>
-              </Button>
-
-              <br />
-
-              <Button className={muisty.contractbtn} onClick={() => window.open("https://algoexplorer.io/address/43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA")}>
-                  <Typography className={muisty.contractbtnt} variant="h6"> View Address</Typography>
-              </Button>
                 
               {this.state.sendMix ? 
                 <Modal className={muisty.modal}

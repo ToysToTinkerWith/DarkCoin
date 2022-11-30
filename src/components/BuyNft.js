@@ -156,7 +156,7 @@ export default class BuyNft extends React.Component {
             const signedTxn = await peraWallet.signTransaction([multipleTxnGroups])
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction(signedTxn).do();
@@ -181,7 +181,7 @@ export default class BuyNft extends React.Component {
             const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob]).do();
@@ -216,7 +216,7 @@ export default class BuyNft extends React.Component {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction(signedTxn).do();
@@ -235,7 +235,7 @@ export default class BuyNft extends React.Component {
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
             let txId = await client.sendRawTransaction(signedTxn.blob).do();
@@ -268,16 +268,18 @@ export default class BuyNft extends React.Component {
                     <img className={styles.nftbuyimg} src={this.state.nftUrl} />
                   </Button>
                   <br />
-                  <Typography className={muisty.h4} align="center" variant="h4"> {this.state.nft.name} </Typography>
+                  <Typography color="secondary" align="center" variant="h4"> {this.state.nft.name} </Typography>
                   <br />
-                  <Button className={muisty.nftbuybtn} onClick={() => this.BuyNft()}>
-                      <Typography className={muisty.nftbuybtnt} variant="h6"> Buy </Typography>
+                  <Button 
+                  style={{display: "flex", margin: "auto", borderRadius: 15, backgroundColor: "white"}}
+                  onClick={() => this.BuyNft()}>
+                      <Typography variant="h6"> Buy </Typography>
                   </Button>
 
                   {this.state.confirm ? 
                     <>
                     <br />
-                    <Typography className={muisty.buyconfirmationtxt} align="center" variant="h6"> {this.state.confirm} </Typography>
+                    <Typography color="secondary" align="center" variant="h6"> {this.state.confirm} </Typography>
                     
 
                     </>

@@ -6,7 +6,10 @@ import dynamic from "next/dynamic"
 
 import algosdk from "algosdk"
 
-const AlgoConnect = dynamic(() => import("../components/AlgoConnect"), {ssr: false})
+const AlgoConnect = dynamic(() => import("../components/connect/AlgoConnect"), {ssr: false})
+
+import Mixer from "../components/contracts/Mixer"
+import Market from "../components/contracts/Market"
 
 import ActiveWallet from "../components/ActiveWallet"
 const Votes1 = dynamic(() => import("../components/Votes1"), {ssr: false})
@@ -29,63 +32,14 @@ export default class Index extends React.Component {
         this.state = {
             activeAddress: null,
             walletType: "",
-            dcNfts: []
+            place: ""
         };
         
     }
 
     async componentDidMount() {
 
-        let numAssets = 0
-        let nextToken = ""
-
-        let response = await fetch('/api/getdcAssets', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            }
-            
-                
-            });
-        
-        let session = await response.json()
-
-        numAssets = session.assets.length
-        nextToken = session["next-token"]
-        
-        session.assets.forEach((asset) => {
-        
-            this.setState(prevState => ({
-            dcNfts: [...prevState.dcNfts, asset.index]
-            }))
-        
-        })
-
-        while (numAssets == 1000) {
-
-            response = await fetch('/api/getdcAssets', {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    nextToken: nextToken
-                  }),
-                  
-              });
-            
-            session = await response.json()
-
-            numAssets = session.assets.length
-            nextToken = session["next-token"]
-            session.assets.forEach(async (asset) => {
-            
-                this.setState(prevState => ({
-                dcNfts: [...prevState.dcNfts, asset.index]
-                }))
-            
-                })
-        }
+      
           
      
     }
@@ -104,16 +58,101 @@ export default class Index extends React.Component {
                 
                 </Head>
 
-                <img className={styles.headerimg} src="./Polygon.svg"/>
+                <Grid container>
+                    <Grid item xs={2} sm={4}>
+                    <img src="invDC.svg" style={{display: "flex", margin: "auto", width: "30%", minWidth: 100, padding: 20}} />
+                    
+                    </Grid>
+                    <Grid item xs={10} sm={8} style={{padding: 20}}>
+                        <AlgoConnect activeAddress={this.state.activeAddress} setActiveAddress={(account) => this.setState({activeAddress: account})} setWalletType={(wallet) => this.setState({walletType: wallet})} />
+                    </Grid>
 
+                </Grid>
 
-                <Typography className={muisty.h1}align="center" variant="h1">
-                    Dark Coin
-                </Typography>
-                <img className={styles.logoimg} src="./DarkCoinLogo.svg" />
-
+                {this.state.place == "council" ? 
+                    <Button 
+                    style={{display: "grid", margin: "auto"}}
+                    onClick={() => this.setState({place: ""})}>
+                    <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
+                    <Typography align="center" variant="h5" color="secondary">
+                        Council
+                    </Typography>
+                    </Button>
+                    :
+                    null
+                }
+                {this.state.place == "market" ? 
+                    <>
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
+                        onClick={() => this.setState({place: ""})}>
+                        <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Market
+                        </Typography>
+                        </Button>
+                        <Market activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
+                    </>
+                    :
+                    null
+                }
+                {this.state.place == "mixer" ? 
+                    <>
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
+                        onClick={() => this.setState({place: ""})}>
+                        <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Mixer
+                        </Typography>
+                        </Button>
+                        <br />
+                        <Mixer activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
+                    </>
+                    :
+                    null
+                }
                 <br />
-                <DarkCoin />
+                <br />
+
+                {this.state.place == "" ? 
+                    <Grid container>
+                    <Grid item xs={12} sm={4}>
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
+                        onClick={() => this.setState({place: "council"})}>
+                        <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Council
+                        </Typography>
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
+                        onClick={() => this.setState({place: "market"})}>
+                        <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Market
+                        </Typography>
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
+                        onClick={() => this.setState({place: "mixer"})}>
+                        <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Mixer
+                        </Typography>
+                        </Button>
+                    </Grid>
+                    </Grid>
+                    :
+                    null
+                }
+                
+                <br />
                 <br />
 
                 <Grid container alignItems="center">
@@ -140,61 +179,6 @@ export default class Index extends React.Component {
                     </Grid>
                 
 
-                
-
-                <div className={styles.innerbody}>
-                    <Grid container alignItems="center">
-                        <Grid item xs={12} sm={12} md={6}>
-                            
-                            {this.state.activeAddress ?
-                            <Typography className={muisty.h3} align="center" variant="h3">
-                            Welcome
-                            </Typography>
-                            :
-                            <Typography className={muisty.h3} align="center" variant="h3">
-                            Connect with an Algorand Wallet
-                            </Typography>
-                            }
-                        
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={6}>
-                            <br />
-                            <AlgoConnect activeAddress={this.state.activeAddress} setActiveAddress={(account) => this.setState({activeAddress: account})} setWalletType={(wallet) => this.setState({walletType: wallet})} />
-                        </Grid>
-
-                    </Grid>
-
-                    {this.state.activeAddress ? 
-                        <ActiveWallet dcNfts={this.state.dcNfts} activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
-                        :
-                        null
-                    }
-
-                </div>
-
-                {this.state.dcNfts.length > 2000 ?
-                    <>
-                    <Typography className={muisty.h2} align="center" variant="h2"> Governance </Typography>
-                    <Votes2 govNfts={this.state.dcNfts.slice(1, 2000)} />
-                    <br />
-                    <Typography className={muisty.h4} align="center" variant="h4"> Past results </Typography>
-                    <Votes1 govNfts={this.state.dcNfts.slice(1, 2000)} />
-                    </>
-                    
-                    :
-                    null
-                }
-                
-                
-
-
-                <Socials />
-
-                
-
-
-
-                  
             </div>
         )
     }

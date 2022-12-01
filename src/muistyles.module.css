@@ -66,7 +66,7 @@ div .connectedAddress {
     display: flex;
     margin: auto;
     border-radius: 15px;
-    background-color: #FFFFFF;
+    
 }
 
 .connectmyalgo:hover {
@@ -75,7 +75,7 @@ div .connectedAddress {
 
 .myalgoh6 {
     font-family: Consolas;
-    color: #000000;
+    color: #FFFFFF;
     border-radius: 15px;
 }
 

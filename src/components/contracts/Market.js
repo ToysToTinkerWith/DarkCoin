@@ -186,7 +186,7 @@ export default class Market extends React.Component {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
 
@@ -207,7 +207,7 @@ export default class Market extends React.Component {
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
 
@@ -244,7 +244,7 @@ export default class Market extends React.Component {
             const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
 
@@ -265,7 +265,7 @@ export default class Market extends React.Component {
             const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
 
             this.setState({
-              confirm: "Sending Transaction"
+              confirm: "Sending Transaction..."
             })
 
 
@@ -300,30 +300,38 @@ export default class Market extends React.Component {
         return (
             <div className={styles.market}>
               
-
-                <br />
                 {this.state.optedIn == false ? 
-                <Button className={muisty.contractbtn} onClick={() => this.Optin(this.props.activeAddress, contract)}>
-                     <Typography className={muisty.contractbtnt} variant="h6"> Opt in </Typography>
-                </Button>
+                <>
+                  {this.state.confirm ? 
+                    <>
+                    <Typography color="secondary" align="center" variant="h6"> {this.state.confirm} </Typography>
+                    <br />
+                    </>
+                    :
+                    null
+                  }
+                  <Button className={muisty.contractbtn} onClick={() => this.Optin(this.props.activeAddress, contract)}>
+                      <Typography variant="h6"> Opt in </Typography>
+                  </Button>
+                </>
                 :
                 <>
                   <Grid container align="center" >
                       <Grid item xs={12} sm={4} md={4} lg={4} >
                           <Button className={muisty.marketbtn} style={{backgroundColor: this.state.cat == "DAO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "DAO" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "DAO", zoomNft: null, confirm: ""})}>
-                            <Typography className={muisty.marketbtnt} variant="h6" style={{color: this.state.cat == "DAO" ? "#000000" : "#FFFFFF"}}> DAOs </Typography>
+                            <Typography  variant="h6" style={{color: this.state.cat == "DAO" ? "#000000" : "#FFFFFF"}}> DAOs </Typography>
                           </Button>
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={4} >
                           <Button className={muisty.marketbtn} style={{backgroundColor: this.state.cat == "Warrior1" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "Warrior1" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "Warrior1", zoomNft: null, confirm: ""})}>
-                            <Typography className={muisty.marketbtnt} variant="h6" style={{color: this.state.cat == "Warrior1" ? "#000000" : "#FFFFFF"}}> Warriors1 </Typography>
+                            <Typography  variant="h6" style={{color: this.state.cat == "Warrior1" ? "#000000" : "#FFFFFF"}}> Warriors1 </Typography>
                           </Button>
                           
                       </Grid>
                       <Grid item xs={12} sm={4} md={4} lg={4} >
                           <Button className={muisty.marketbtn} style={{backgroundColor: this.state.cat == "Warrior2" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.cat == "Warrior2" ? this.setState({cat: "", zoomNft: null, confirm: ""}) : this.setState({cat: "Warrior2", zoomNft: null, confirm: ""})}>
-                            <Typography className={muisty.marketbtnt} variant="h6" style={{color: this.state.cat == "Warrior2" ? "#000000" : "#FFFFFF"}}> Warriors2 </Typography>
+                            <Typography  variant="h6" style={{color: this.state.cat == "Warrior2" ? "#000000" : "#FFFFFF"}}> Warriors2 </Typography>
                           </Button>
                           
                       </Grid>
@@ -332,8 +340,8 @@ export default class Market extends React.Component {
 
                     {this.state.cat == "DAO" ? 
                       <>
-                        <Typography className={muisty.nftpricedc} align="center" variant="h6"> 
-                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.svg"/>
+                        <Typography color="secondary" align="center" variant="h6"> 
+                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.png"/>
                         {(100000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
  
                         </Typography>
@@ -346,8 +354,8 @@ export default class Market extends React.Component {
                     
                     {this.state.cat == "Warrior1" ? 
                       <>
-                        <Typography className={muisty.nftpricedc} align="center" variant="h6"> 
-                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.svg"/>
+                        <Typography color="secondary" align="center" variant="h6"> 
+                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.png"/>
                         {(250000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
  
                         </Typography>
@@ -360,8 +368,8 @@ export default class Market extends React.Component {
 
                     {this.state.cat == "Warrior2" ? 
                       <>
-                        <Typography className={muisty.nftpricedc} align="center" variant="h6"> 
-                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.svg"/>
+                        <Typography color="secondary" align="center" variant="h6"> 
+                        <img className={styles.nftpricedcimg} src="./DarkCoinLogo.png"/>
                         {(1250000).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
  
                         </Typography>
@@ -372,7 +380,13 @@ export default class Market extends React.Component {
                       null
                     }
 
-                    
+                    {this.state.confirm ? 
+                      <>
+                      <Typography color="secondary" align="center" variant="h6"> {this.state.confirm} </Typography>
+                      </>
+                      :
+                      null
+                    }
 
                     <Grid container>
 
@@ -442,25 +456,10 @@ export default class Market extends React.Component {
 
                     <br />
 
-                    
-                    {this.state.confirm ? 
-                    <>
-                    <Typography className={muisty.buyconfirmationtxt} align="center" variant="h6"> {this.state.confirm} </Typography>
-                    <br />
-
-                    </>
-                    :
-                    null
-                  }
-
                   {this.state.cat == "" ?
                     <>
-                      <Button className={muisty.contractbtn} onClick={() => window.open("https://algoexplorer.io/application/" + contract)}>
-                        <Typography className={muisty.contractbtnt} variant="h6"> View Contract </Typography>
-                      </Button>
-                      <br />
                       <Button className={muisty.contractbtn} onClick={() => this.Closeout(this.props.activeAddress, contract)}>
-                        <Typography className={muisty.contractbtnt} variant="h6"> Opt out </Typography>
+                        <Typography variant="h6"> Opt out </Typography>
                       </Button>
                     </>
                     :

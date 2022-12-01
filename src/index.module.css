@@ -71,6 +71,11 @@ div .mixer {
   margin: 30px;
 }
 
+.invMixerIcon {
+  width: 40px;
+  padding-right: 10px;
+}
+
 .algologo {
   width: 15px;
 }

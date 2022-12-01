@@ -135,6 +135,13 @@ div .connectedAddress {
     font-family: Consolas;
 }
 
+.buyNftBtn {
+    display: flex;
+    margin: auto;
+    border-radius: 15px;
+    background-color: white;
+}
+
 .activenft {
     display: block; 
     margin: auto;

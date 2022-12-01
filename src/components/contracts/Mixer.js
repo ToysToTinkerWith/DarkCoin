@@ -885,7 +885,7 @@ export default class Trade extends React.Component {
                     {this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ? 
                       <>
                         <Button className={muisty.contractbtn} onClick={() => [this.getReceivers(), this.setState({sendMix: true})]}>
-                          <img src="invMixer.svg" style={{width: 40, paddingRight: 10}} />
+                          <img className={styles.invMixerIcon} src="invMixer.svg" />
                           <Typography className={muisty.contractbtnt} variant="h6">  Send Mix </Typography>
                         </Button>
                       </>
@@ -902,7 +902,7 @@ export default class Trade extends React.Component {
                     }
                     
                     <Button className={muisty.contractbtn} onClick={() => this.mix()}>
-                      <img src="invMixer.svg" style={{width: 40, paddingRight: 10}} />
+                      <img className={styles.invMixerIcon} src="invMixer.svg" />
                       <Typography variant="h6"> Mix </Typography>
                     </Button>
                     

@@ -17,6 +17,20 @@ img.logoimg {
   max-width: 350px;
 }
 
+img.invertedLogo {
+  display: flex;
+  margin: auto;
+  width: 30%;
+  min-width: 100px;
+  padding: 20px;
+}
+
+.navIcon {
+  display: flex;
+  margin: auto;
+  height: 75px;
+}
+
 div .chart {
   margin: 30px;
   border: 3px solid white;
@@ -55,6 +69,11 @@ div .market {
 
 div .mixer {
   margin: 30px;
+}
+
+.invMixerIcon {
+  width: 40px;
+  padding-right: 10px;
 }
 
 .algologo {

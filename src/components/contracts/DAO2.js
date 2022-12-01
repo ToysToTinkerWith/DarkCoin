@@ -320,7 +320,7 @@ export default class DAO2 extends React.Component {
               </Button>
 
               {this.state.localProposal ? 
-                <Typography className={muisty.voteresults} align="center" variant="h4" style={{color: "#FFFFFF", fontFamily: "Consolas", padding: 30}}>
+                <Typography className={muisty.voteresults} align="center" variant="h4">
                     Voted <hr />
                     Measure 3
                     <br />

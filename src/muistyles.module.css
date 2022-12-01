@@ -4,6 +4,15 @@
     padding: 30;
 }
 
+.activeWalletGrid {
+    padding: 20px;
+}
+
+.navbtn {
+    display: grid;
+    margin: auto;
+}
+
 .button {
     display: flex;
     margin: auto;
@@ -124,6 +133,13 @@ div .connectedAddress {
 
 .buytabt {
     font-family: Consolas;
+}
+
+.buyNftBtn {
+    display: flex;
+    margin: auto;
+    border-radius: 15px;
+    background-color: white;
 }
 
 .activenft {

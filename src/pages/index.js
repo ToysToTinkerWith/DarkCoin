@@ -60,20 +60,19 @@ export default class Index extends React.Component {
 
                 <Grid container>
                     <Grid item xs={2} sm={4}>
-                    <img src="invDC.svg" style={{display: "flex", margin: "auto", width: "30%", minWidth: 100, padding: 20}} />
+                    <img className={styles.invertedLogo} src="invDC.svg" />
                     
                     </Grid>
-                    <Grid item xs={10} sm={8} style={{padding: 20}}>
+                    <Grid className={muisty.activeWalletGrid} item xs={10} sm={8}>
                         <AlgoConnect activeAddress={this.state.activeAddress} setActiveAddress={(account) => this.setState({activeAddress: account})} setWalletType={(wallet) => this.setState({walletType: wallet})} />
                     </Grid>
 
                 </Grid>
 
                 {this.state.place == "council" ? 
-                    <Button 
-                    style={{display: "grid", margin: "auto"}}
+                    <Button className={muisty.navbtn}
                     onClick={() => this.setState({place: ""})}>
-                    <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
+                    <img className={styles.navIcon} src="council.png" />
                     <Typography align="center" variant="h5" color="secondary">
                         Council
                     </Typography>
@@ -83,10 +82,9 @@ export default class Index extends React.Component {
                 }
                 {this.state.place == "market" ? 
                     <>
-                        <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        <Button className={muisty.navbtn}
                         onClick={() => this.setState({place: ""})}>
-                        <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <img className={styles.navIcon} src="market.svg" />
                         <Typography align="center" variant="h5" color="secondary">
                             Market
                         </Typography>
@@ -98,10 +96,9 @@ export default class Index extends React.Component {
                 }
                 {this.state.place == "mixer" ? 
                     <>
-                        <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        <Button className={muisty.navbtn}
                         onClick={() => this.setState({place: ""})}>
-                        <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <img className={styles.navIcon} src="mixer.svg" />
                         <Typography align="center" variant="h5" color="secondary">
                             Mixer
                         </Typography>
@@ -118,30 +115,27 @@ export default class Index extends React.Component {
                 {this.state.place == "" ? 
                     <Grid container>
                     <Grid item xs={12} sm={4}>
-                        <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        <Button className={muisty.navbtn}
                         onClick={() => this.setState({place: "council"})}>
-                        <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
+                        <img className={styles.navIcon} src="council.png" />
                         <Typography align="center" variant="h5" color="secondary">
                             Council
                         </Typography>
                         </Button>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                        <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        <Button className={muisty.navbtn}
                         onClick={() => this.setState({place: "market"})}>
-                        <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <img className={styles.navIcon} src="market.svg" />
                         <Typography align="center" variant="h5" color="secondary">
                             Market
                         </Typography>
                         </Button>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                        <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        <Button className={muisty.navbtn}
                         onClick={() => this.setState({place: "mixer"})}>
-                        <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <img className={styles.navIcon} src="mixer.svg" />
                         <Typography align="center" variant="h5" color="secondary">
                             Mixer
                         </Typography>

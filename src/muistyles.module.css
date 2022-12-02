@@ -4,13 +4,76 @@
     padding: 30;
 }
 
-.activeWalletGrid {
+.headerBar {
+    width: 100%;
+    margin: auto;
+    border-bottom: 3px solid gray;
+}
+
+.connectWalletGrid {
+    padding: 20px 10px 20px 10px;
+}
+
+.algoConnect {
+    border: 1px solid white;
+    border-radius: 15px;
+}
+
+.connectbtn {
     padding: 20px;
+}
+
+.connectbtnt {
+    color: #FFFFFF;
+}
+
+.walletTypeGrid {
+    margin-top: 10px;
+}
+
+.myAlgoBtn {
+    margin-right: 10px;
+}
+
+.disconnectbtn {
+    background-color: white;
+    border-radius: 15px;
+    margin: 10px;
+    float: right;
+}
+
+.connectedNavBarBtn {
+    padding: 20px;
+    float: left;
+}
+
+.disconnectbtnt {
+    color: black;
+}
+
+.activeWallet {
+    color: #7CFC00;
+}
+
+.navBar {
+    width: 85%;
+    margin: auto;
 }
 
 .navbtn {
     display: grid;
     margin: auto;
+}
+
+.navbtn:hover {
+    border-bottom: 1px solid white;
+}
+
+.footerBar {
+    width: 100%;
+    margin: auto;
+    padding-top: 30px;
+    border-top: 3px solid gray;
 }
 
 .button {
@@ -88,23 +151,6 @@ div .connectedAddress {
     border-radius: 15px;
 }
 
-.disconnectbtn {
-    display: flex;
-    margin: auto;
-    padding: 10px;
-    border-radius: 15px;
-    background-color: #FFFFFF;
-}
-
-.disconnectbtn:hover {
-    background-color: #FFFFFF;
-}
-
-.disconnecth6 {
-    font-family: Consolas;
-    color: #000000;
-}
-
 .darkcoinh6 {
     color: #FFFFFF;
     font-family: Consolas;
@@ -112,9 +158,7 @@ div .connectedAddress {
 }
 
 .dcbalance {
-    color: #FFFFFF; 
-    font-family: Consolas; 
-    margin: 30px;
+    color: #FFFFFF;
 }
 
 .bodytab {

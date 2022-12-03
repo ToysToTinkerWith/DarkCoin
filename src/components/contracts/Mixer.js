@@ -736,8 +736,8 @@ export default class Trade extends React.Component {
               
               <Typography color="secondary" variant="h6" align="center"> Select amount to send: </Typography>
               <br />
-                  <Grid container align="center" >
-                      <Grid item xs={12} sm={4} md={4} lg={2} >
+                  <Grid className={muisty.mixerbtngrid} container align="center" >
+                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={4} md={4} lg={2} >
                       <Typography color="secondary" variant="h6"> {this.state.queued5} </Typography>
 
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "5" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "5" ? this.setState({mixVal: ""}) : this.setState({mixVal: "5"})}>
@@ -751,7 +751,7 @@ export default class Trade extends React.Component {
                           </Button>
                           
                       </Grid>
-                      <Grid item xs={12} sm={4} md={4} lg={3}>
+                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={4} md={4} lg={3}>
                       <Typography color="secondary" variant="h6"> {this.state.queued20} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "20" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "20" ? this.setState({mixVal: ""}) : this.setState({mixVal: "20"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
@@ -762,7 +762,7 @@ export default class Trade extends React.Component {
                           }
                           </Button>
                       </Grid>
-                      <Grid item xs={12} sm={4} md={4} lg={2}>
+                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={4} md={4} lg={2}>
                       <Typography color="secondary" variant="h6"> {this.state.queued50} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "50" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "50" ? this.setState({mixVal: ""}) : this.setState({mixVal: "50"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
@@ -773,7 +773,7 @@ export default class Trade extends React.Component {
                           }
                           </Button>
                       </Grid>
-                      <Grid item xs={12} sm={6} md={6} lg={3}>
+                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={3}>
                       <Typography color="secondary" variant="h6"> {this.state.queued100} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "100" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "100" ? this.setState({mixVal: ""}) : this.setState({mixVal: "100"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
@@ -784,7 +784,7 @@ export default class Trade extends React.Component {
                           }
                           </Button>
                       </Grid>
-                      <Grid item xs={12} sm={6} md={6} lg={2}>
+                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={2}>
                       <Typography color="secondary" variant="h6"> {this.state.queued500} </Typography>
                           <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "500" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "500" ? this.setState({mixVal: ""}) : this.setState({mixVal: "500"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
@@ -801,8 +801,8 @@ export default class Trade extends React.Component {
                   <Typography color="secondary" variant="h6" align="center"> Select fee options: </Typography>
 
 
-                    <Grid container align="center" >
-                        <Grid item xs={12} sm={6} md={6} lg={6} >
+                    <Grid className={muisty.mixerbtngrid} container align="center" >
+                        <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={6} >
 
                         <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.feeOption == "DC" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "DC" ? this.setState({feeOption: ""}) : this.setState({feeOption: "DC"})}>
                             <Typography color="secondary" variant="h6" style={{color: this.state.feeOption == "DC" ? "#000000" : "#FFFFFF"}}> 1% </Typography>
@@ -816,7 +816,7 @@ export default class Trade extends React.Component {
                             
                             
                         </Grid>
-                        <Grid item xs={12} sm={6} md={6} lg={6}>
+                        <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={6}>
 
                         <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.feeOption == "ALGO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "ALGO" ? this.setState({feeOption: ""}) : this.setState({feeOption: "ALGO"})}>
                             <Typography color="secondary" variant="h6" style={{color: this.state.feeOption == "ALGO" ? "#000000" : "#FFFFFF"}}> 2% </Typography>

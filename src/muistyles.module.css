@@ -260,6 +260,14 @@ div .connectedAddress {
     padding: 20px;
 }
 
+.mixerbtngrid {
+    display: inline-block;
+}
+
+.mixerbtnwrap {
+    display: inline-block;
+}
+
 .mixerbtn {
     padding: 10px;
     margin: 20px;

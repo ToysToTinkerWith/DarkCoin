@@ -12,6 +12,8 @@ import ActiveDC from "./ActiveDC"
 
 import muisty from "../../muistyles.module.css"
 
+import styles from "../../index.module.css"
+
 export default function AlgoConnect(props) {
 
     const [open, setOpen] = useState(false)
@@ -86,22 +88,21 @@ export default function AlgoConnect(props) {
     
 
     return (
-        <Grid container style={{border: "1px solid white", borderRadius: 15, maxWidth: open ? 350 : 200, float: "right"}}>
+        <Grid className={muisty.algoConnect} container style={{maxWidth: open ? 350 : 200, float: "right"}}>
             {props.activeAddress ? 
             open ?
             <>
             <Grid item xs={12} sm={6} md={6}>
-                <Button 
-                    onClick={() => setOpen(!open)}
-                    style={{padding: 20}}> 
-                    <img src="walletGreen.svg" style={{ paddingRight: 10}} />
-                    <Typography variant="h6" style={{color: "#7CFC00"}}> {props.activeAddress.slice(0,3) + "..." + props.activeAddress.slice(55)} </Typography>
+                <Button className={muisty.connectbtn}
+                    onClick={() => setOpen(!open)}> 
+                    <img className={styles.walletGreenSvg} src="walletGreen.svg" />
+                    <Typography className={muisty.activeWallet} variant="h6"> {props.activeAddress.slice(0,3) + "..." + props.activeAddress.slice(55)} </Typography>
                 </Button>
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
-            <Button style={{backgroundColor: "white", borderRadius: 15, margin: 10, float: "right"}}
+            <Button className={muisty.disconnectbtn} 
                 onClick={() => disconnect()}> 
-            <Typography variant="subtitle2"> Disconnect </Typography>
+            <Typography className={muisty.disconnectbtnt} variant="subtitle2"> Disconnect </Typography>
             </Button>
             </Grid>
             <Grid item xs={12} sm={12} >
@@ -112,11 +113,10 @@ export default function AlgoConnect(props) {
             :
             <>
              <Grid item xs={12} sm={12} >
-                <Button 
-                    onClick={() => setOpen(!open)}
-                    style={{padding: 20, float: "left"}}> 
-                    <img src="walletGreen.svg" style={{paddingRight: 10}} />
-                    <Typography variant="h6" style={{color: "#7CFC00"}}> {props.activeAddress.slice(0,4) + "..." + props.activeAddress.slice(54)} </Typography>
+                <Button className={muisty.connectedNavBarBtn}
+                    onClick={() => setOpen(!open)}> 
+                    <img className={styles.walletGreenSvg} src="walletGreen.svg" />
+                    <Typography className={muisty.activeWallet} variant="h6"> {props.activeAddress.slice(0,4) + "..." + props.activeAddress.slice(54)} </Typography>
                 </Button>
             </Grid>
                 
@@ -125,21 +125,20 @@ export default function AlgoConnect(props) {
             open ?
             <>
             <Grid item xs={6}>
-                <Button 
-                    onClick={() => setOpen(!open)}
-                    style={{padding: 20, float: "left"}}> 
-                    <img src="wallet.svg"  style={{paddingRight: 10}}/>
-                    <Typography variant="h6" style={{color: "#FFFFFF"}}> Connect </Typography>
+                <Button className={muisty.connectedNavBarBtn}
+                    onClick={() => setOpen(!open)}> 
+                    <img className={styles.walletGreenSvg} src="wallet.svg" />
+                    <Typography className={muisty.connectbtnt} variant="h6"> Connect </Typography>
                 </Button>
             </Grid>
-            <Grid item xs={3} style={{marginTop: 10}}>
+            <Grid className={muisty.walletTypeGrid} item xs={3}>
                 <Button 
                     onClick={() => handleConnectWalletClick()}> 
                     <img src="Pera.svg"  />
                 </Button>
             </Grid>
-            <Grid item xs={3} style={{marginTop: 10}}>
-                <Button style={{marginRight: 20}}
+            <Grid className={muisty.walletTypeGrid} item xs={3}>
+                <Button className={muisty.myAlgoBtn} 
                     onClick={() => connectToMyAlgo()}> 
                     <img src="myAlgo.svg" />
                 </Button>
@@ -148,11 +147,10 @@ export default function AlgoConnect(props) {
             :
             <>
             <Grid item xs={12}>
-                <Button 
-                    onClick={() => setOpen(!open)}
-                    style={{padding: 20, float: "left"}}> 
-                    <img src="wallet.svg" style={{paddingRight: 10}} />
-                    <Typography variant="h6" style={{color: "#FFFFFF"}}> Connect </Typography>
+                <Button className={muisty.connectedNavBarBtn}
+                    onClick={() => setOpen(!open)}> 
+                    <img className={muisty.walletGreenSvg} src="wallet.svg" />
+                    <Typography className={muisty.connectbtnt} variant="h6"> Connect </Typography>
                 </Button>
             </Grid>
             

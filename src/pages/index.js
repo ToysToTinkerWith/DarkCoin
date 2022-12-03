@@ -58,12 +58,12 @@ export default class Index extends React.Component {
                 
                 </Head>
 
-                <Grid container>
+                <Grid className={muisty.headerBar} container>
                     <Grid item xs={2} sm={4}>
                     <img className={styles.invertedLogo} src="invDC.svg" />
                     
                     </Grid>
-                    <Grid className={muisty.activeWalletGrid} item xs={10} sm={8}>
+                    <Grid className={muisty.connectWalletGrid} item xs={10} sm={8}>
                         <AlgoConnect activeAddress={this.state.activeAddress} setActiveAddress={(account) => this.setState({activeAddress: account})} setWalletType={(wallet) => this.setState({walletType: wallet})} />
                     </Grid>
 
@@ -113,7 +113,7 @@ export default class Index extends React.Component {
                 <br />
 
                 {this.state.place == "" ? 
-                    <Grid container>
+                    <Grid className={muisty.navBar} container>
                     <Grid item xs={12} sm={4}>
                         <Button className={muisty.navbtn}
                         onClick={() => this.setState({place: "council"})}>
@@ -149,7 +149,7 @@ export default class Index extends React.Component {
                 <br />
                 <br />
 
-                <Grid container alignItems="center">
+                <Grid className={muisty.footerBar} container alignItems="center">
                         <Grid item xs={12} sm={12} md={6}>
                             
                         <Button className={muisty.button} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>

@@ -270,7 +270,8 @@ export default class BuyNft extends React.Component {
                   <br />
                   <Typography color="secondary" align="center" variant="h4"> {this.state.nft.name} </Typography>
                   <br />
-                  <Button className={muisty.buyNftBtn}
+                  <Button 
+                  style={{display: "flex", margin: "auto", borderRadius: 15, backgroundColor: "white"}}
                   onClick={() => this.BuyNft()}>
                       <Typography variant="h6"> Buy </Typography>
                   </Button>

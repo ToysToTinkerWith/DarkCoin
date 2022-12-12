@@ -10,6 +10,7 @@ const AlgoConnect = dynamic(() => import("../components/connect/AlgoConnect"), {
 
 import Mixer from "../components/contracts/Mixer"
 import Market from "../components/contracts/Market"
+import Council from "../components/contracts/Council"
 
 import ActiveWallet from "../components/ActiveWallet"
 const Votes1 = dynamic(() => import("../components/Votes1"), {ssr: false})
@@ -58,33 +59,38 @@ export default class Index extends React.Component {
                 
                 </Head>
 
-                <Grid className={muisty.headerBar} container>
+                <Grid container>
                     <Grid item xs={2} sm={4}>
-                    <img className={styles.invertedLogo} src="invDC.svg" />
+                    <img src="invDC.svg" style={{display: "flex", margin: "auto", width: "30%", minWidth: 100, padding: 20}} />
                     
                     </Grid>
-                    <Grid className={muisty.connectWalletGrid} item xs={10} sm={8}>
+                    <Grid item xs={10} sm={8} style={{padding: 20}}>
                         <AlgoConnect activeAddress={this.state.activeAddress} setActiveAddress={(account) => this.setState({activeAddress: account})} setWalletType={(wallet) => this.setState({walletType: wallet})} />
                     </Grid>
 
                 </Grid>
 
                 {this.state.place == "council" ? 
-                    <Button className={muisty.navbtn}
-                    onClick={() => this.setState({place: ""})}>
-                    <img className={styles.navIcon} src="council.png" />
-                    <Typography align="center" variant="h5" color="secondary">
-                        Council
-                    </Typography>
-                    </Button>
+                    <>
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
+                        onClick={() => this.setState({place: ""})}>
+                        <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Council
+                        </Typography>
+                        </Button>
+                        <Council activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
+                    </>
                     :
                     null
                 }
                 {this.state.place == "market" ? 
                     <>
-                        <Button className={muisty.navbtn}
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
                         onClick={() => this.setState({place: ""})}>
-                        <img className={styles.navIcon} src="market.svg" />
+                        <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
                             Market
                         </Typography>
@@ -96,9 +102,10 @@ export default class Index extends React.Component {
                 }
                 {this.state.place == "mixer" ? 
                     <>
-                        <Button className={muisty.navbtn}
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
                         onClick={() => this.setState({place: ""})}>
-                        <img className={styles.navIcon} src="mixer.svg" />
+                        <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
                             Mixer
                         </Typography>
@@ -113,29 +120,32 @@ export default class Index extends React.Component {
                 <br />
 
                 {this.state.place == "" ? 
-                    <Grid className={muisty.navBar} container>
+                    <Grid container>
                     <Grid item xs={12} sm={4}>
-                        <Button className={muisty.navbtn}
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
                         onClick={() => this.setState({place: "council"})}>
-                        <img className={styles.navIcon} src="council.png" />
+                        <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
                             Council
                         </Typography>
                         </Button>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                        <Button className={muisty.navbtn}
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
                         onClick={() => this.setState({place: "market"})}>
-                        <img className={styles.navIcon} src="market.svg" />
+                        <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
                             Market
                         </Typography>
                         </Button>
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                        <Button className={muisty.navbtn}
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
                         onClick={() => this.setState({place: "mixer"})}>
-                        <img className={styles.navIcon} src="mixer.svg" />
+                        <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
                             Mixer
                         </Typography>
@@ -149,7 +159,7 @@ export default class Index extends React.Component {
                 <br />
                 <br />
 
-                <Grid className={muisty.footerBar} container alignItems="center">
+                <Grid container alignItems="center">
                         <Grid item xs={12} sm={12} md={6}>
                             
                         <Button className={muisty.button} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>

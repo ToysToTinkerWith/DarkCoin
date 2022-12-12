@@ -4,10 +4,6 @@ import algosdk from "algosdk"
 
 import { Grid, Card, Modal, Typography, Button } from "@mui/material"
 
-import muisty from "../../muistyles.module.css"
-
-import styles from "../../index.module.css"
-
 export default class ActiveWallet extends React.Component { 
 
     constructor(props) {
@@ -79,9 +75,9 @@ export default class ActiveWallet extends React.Component {
         return (
             <div>
                 
-                <img className={styles.DCsvg} src="DC.svg" />
+                <img src="DC.svg" style={{display: "flex", margin: "auto", width: 50}} />
                 <br />
-                <Typography className={muisty.dcbalance} align="center" variant="h6"> {(this.state.darkCoin).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} </Typography>
+                <Typography align="center" variant="h6" style={{color: "white"}} > {(this.state.darkCoin).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} </Typography>
                 <br />
             </div>
 

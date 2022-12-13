@@ -20,7 +20,7 @@ Folder containing # all the web components used to process and render the applic
 
 Developed under the Next.js framework, the logic of the appication can be understood through the sequential rendering of the components contained in this folder. A user can see what APIs/SDKs are being used, and how the data from the Algorand Blockchain is processed to create the Dark Coin Application. The goal for this project is to be as open as possible, in ensuring trust, and creating transparency within the community.
 
-# Council.py
+# Council.py (Coming soon!)
 
 The Council is a place where users can propose changes to the Dark Coin Project, and amend existing proposals that are voted on by the Dark Coin DAO.
 To use the Council, one must click the Council Button located in the Dark Coin DApp.

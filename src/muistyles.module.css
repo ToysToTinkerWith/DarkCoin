@@ -230,7 +230,7 @@ div .connectedAddress {
 .contractbtn {
     display: flex;
     margin: auto; 
-    padding: 10px;
+    padding: 15px;
     border-radius: 15px;
     background-color: #FFFFFF;
 }
@@ -338,7 +338,7 @@ div .connectedAddress {
 }
 
 .displaynftname {
-    color: #FFFFFF;
+    color: #000000;
     font-family: Consolas;
     font-weight: 800px;
     padding: 20px;

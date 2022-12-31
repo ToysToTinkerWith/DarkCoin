@@ -12,6 +12,7 @@ const peraWallet = new PeraWalletConnect();
 
 import algosdk from "algosdk"
 
+import DisplayNft from "../../DisplayNft";
 
 import { Grid, Typography, Button, TextField, Modal, Card } from "@mui/material"
 
@@ -22,11 +23,9 @@ export default class Vote extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            proposals: [
-                {proposal: "This is a proposal with some extra added on to it to see how the app handles proposals of long length.",
-                }
-            ],
+            proposals: [],
             daoNFTs: [],
+            walletAssets: [],
             confirm: ""
             
         };
@@ -46,31 +45,12 @@ export default class Vote extends React.Component {
           }
           });
 
-
-
           const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
 
-          
-
           (async () => {
-
-            let response = await fetch('/api/getAllVotes1', {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                }
-                
-                  
-              });
-            
-            let session = await response.json()
-
-            console.log(session)
             
             let assetsDC = await indexerClient.lookupAccountCreatedAssets("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")
             .limit(1000).do();
-
-           console.log(assetsDC)
   
             assetsDC.assets.forEach(async (asset) => {
               if(asset.params["unit-name"].substring(0, 4) == "DCGV") {
@@ -83,8 +63,6 @@ export default class Vote extends React.Component {
   
             let assetsLen = assetsDC.assets.length
             let assetsNext = assetsDC["next-token"]
-
-            console.log(assetsLen)
   
             while (assetsLen == 1000) {
   
@@ -103,10 +81,78 @@ export default class Vote extends React.Component {
               assetsLen = assetsDC.assets.length
               assetsNext = assetsDC["next-token"]
   
-  
             }
 
+            if (this.props.activeAddress) {
 
+              let assetsWallet = await indexerClient.lookupAccountAssets(this.props.activeAddress)
+              .limit(1000).do();
+
+              console.log(assetsWallet)
+              console.log(this.state.daoNFTs)
+    
+              assetsWallet.assets.forEach(async (asset) => {
+                if(this.state.daoNFTs.includes(asset["asset-id"])) {
+                  this.setState(prevState => ({
+                    walletAssets: [...prevState.walletAssets, asset["asset-id"]]
+                  }))
+                }
+                
+              })
+    
+              assetsLen = assetsWallet.assets.length
+              assetsNext = assetsWallet["next-token"]
+    
+              while (assetsLen == 1000) {
+    
+                assetsWallet = await indexerClient.lookupAccountAssets(this.props.activeAddress).nextToken(assetsNext)
+                  .limit(1000).do();
+    
+                  assetsWallet.assets.forEach(async (asset) => {
+                  if(this.state.daoNFTs.includes(asset["asset-id"])) {
+                      this.setState(prevState => ({
+                        walletAssets: [...prevState.walletAssets, asset["asset-id"]]
+                      }))
+                    }
+                  
+                })
+    
+                assetsLen = assetsWallet.assets.length
+                assetsNext = assetsWallet["next-token"]
+
+
+              }
+
+            }
+
+            let global = await indexerClient.lookupApplications(970700116).do();
+
+            let globalState = global.application.params["global-state"]
+
+            let proposalNum
+
+            globalState.forEach((keyVal) => {
+              if (atob(keyVal.key) == "proposalNum") {
+                proposalNum = keyVal.value.uint
+              }
+              
+            })
+
+            const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
+
+            let proposalBegin = proposalNum - 10 < 1 ? 1 : proposalNum - 10
+
+            console.log(proposalBegin)
+
+            for (let i = proposalBegin; i < proposalNum; i++) {
+              let response = await client.getApplicationBoxByName(970700116, "Proposal" + String(i)).do();
+              let string = new TextDecoder().decode(response.value)
+              console.log(i)
+              this.setState(prevState => ({
+                proposals: [...prevState.proposals, {proposal: string, proposalNum: i-1}]
+              }))
+              
+            }
   
           })().catch(e => {
               console.error(e);
@@ -133,7 +179,9 @@ export default class Vote extends React.Component {
       }
 
 
-      async vote() {
+      async vote(proposalNum) {
+
+        
 
         const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
 
@@ -391,22 +439,35 @@ export default class Vote extends React.Component {
         return (
             <div>
               <br />
+              <Typography color="secondary" variant="h6" align="center"> DAO = {this.state.walletAssets.length} </Typography>
+              <br />
+              {this.state.walletAssets.length > 0 ? 
+                this.state.walletAssets.map((daoAsset) => {
+                  return (
+                    <DisplayNft nftId={daoAsset} len={this.state.walletAssets.length} />
+                  )
+                })
+              :
+              null
+              }
+              <br />
               <Typography color="secondary" variant="h6" align="center"> Proposals </Typography>
 
               {this.state.proposals.length > 0 ? 
                 this.state.proposals.map((proposal, index) => {
                     return (
                         <div key={index} style={{border: "1px solid white", borderRadius: 15, padding: 20, margin: 20 }}>
+                            <Typography color="secondary" variant="h6" align="center"> Proposal: {proposal.proposalNum} </Typography>
                             <Typography color="secondary" variant="h6" align="center"> {proposal.proposal} </Typography>
                             <br />
 
                             <div style={{display: "flex", margin: "auto"}}>
-                            <Button className={muisty.mixerbtn} style={{backgroundColor: this.state["vote" + index] == true ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.state["vote" + index] == true ? this.setState({["vote" + index]: "none"}) : this.setState({["vote" + index]: true})}>
-                                <Typography color="secondary" variant="h6" style={{color: this.state["vote" + index] == true ? "#000000" : "#FFFFFF"}}> Accept </Typography>
+                            <Button className={muisty.mixerbtn} style={{backgroundColor: this.state["vote" + (index + 1)] == true ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.state["vote" + (index + 1)] == true ? this.setState({["vote" + (index + 1)]: "none"}) : this.setState({["vote" + (index + 1)]: true})}>
+                                <Typography color="secondary" variant="h6" style={{color: this.state["vote" + (index + 1)] == true ? "#000000" : "#FFFFFF"}}> Accept </Typography>
                             </Button> 
 
-                            <Button className={muisty.mixerbtn} style={{backgroundColor: this.state["vote" + index] == false ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.state["vote" + index] == false ? this.setState({["vote" + index]: "none"}) : this.setState({["vote" + index]: false})}>
-                                <Typography color="secondary" variant="h6" style={{color: this.state["vote" + index] == false ? "#000000" : "#FFFFFF"}}> Reject </Typography>
+                            <Button className={muisty.mixerbtn} style={{backgroundColor: this.state["vote" + (index + 1)] == false ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.state["vote" + (index + 1)] == false ? this.setState({["vote" + (index + 1)]: "none"}) : this.setState({["vote" + (index + 1)]: false})}>
+                                <Typography color="secondary" variant="h6" style={{color: this.state["vote" + (index + 1)] == false ? "#000000" : "#FFFFFF"}}> Reject </Typography>
                             </Button> 
 
                             </div>
@@ -415,29 +476,10 @@ export default class Vote extends React.Component {
                             
                                
 
-                            <TextField                
-                                onChange={this.handleChange}
-                                value={this.state.proposal}
-                                multiline
-                                type="text"
-                                label=""
-                                name="proposal"
-                                autoComplete="false"
-                                InputProps={{ style: { color: "black" } }}
                             
-                                style={{
-                                color: "black",
-                                background: "white",
-                                borderRadius: 15,
-                                display: "flex",
-                                margin: "auto",
-                                width: "80%"
-                            
-                                }}
-                            />
                             <br />
 
-                            <Button className={muisty.mixerbtn} style={{backgroundColor: "#FFFFFF", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.vote()}>
+                            <Button className={muisty.mixerbtn} style={{backgroundColor: "#FFFFFF", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.vote(index + 1)}>
                                 <Typography color="secondary" variant="h6" style={{color: "#000000"}}> Vote </Typography>
                             </Button> 
                         </div>

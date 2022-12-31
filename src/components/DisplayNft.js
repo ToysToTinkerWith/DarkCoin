@@ -21,8 +21,7 @@ export default class DisplayNft extends React.Component {
         super(props);
         this.state = {
             nft: null,
-            nftUrl: null,
-            pinataNftMeta: null,
+            nftUrl: null
             
         };
         
@@ -45,6 +44,10 @@ export default class DisplayNft extends React.Component {
             });
         
         let session = await response.json()
+
+        console.log()
+
+        //nftUrl: "https://ipfs.dark-coin.io/ipfs/" + session.assets[0].params.url.slice(7)
         
         this.setState({
             nft: session.assets[0].params,
@@ -59,11 +62,9 @@ export default class DisplayNft extends React.Component {
 
         if (this.state.nft) {
             return (
-                <div>
-                    <Button onClick={() => this.props.setActiveNft([this.props.nftId, this.state.nft])} >
-                        <Typography className={muisty.displaynftname} align="left" variant="caption"> {this.state.nft.name} </Typography>
-                        <img className={styles.displaynftimg} src={this.state.nftUrl} />
-                    </Button>
+                <div style={{position: "relative", display: "inline-flex", margin: "auto", width: 200, maxWidth: String(100 / this.props.len) + "%", padding: 10}}>
+                    <Typography className={muisty.displaynftname} align="left" variant="caption"> {this.state.nft.name} </Typography>
+                    <img className={styles.displaynftimg} src={this.state.nftUrl} style={{borderRadius: 15}} />
                 </div>
     
             )

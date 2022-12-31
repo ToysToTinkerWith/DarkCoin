@@ -142,7 +142,7 @@ export default class Propose extends React.Component {
 
           let multipleTxnGroups
 
-          if (true) {
+          if (false) {
             const userMnemonic = ""
             const userAccout =  algosdk.mnemonicToSecretKey(userMnemonic)
             // Sign the transaction

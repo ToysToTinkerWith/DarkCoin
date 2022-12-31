@@ -10,15 +10,14 @@ const AlgoConnect = dynamic(() => import("../components/connect/AlgoConnect"), {
 
 import Mixer from "../components/contracts/Mixer"
 import Market from "../components/contracts/Market"
-import Council from "../components/contracts/Council"
+import Council from "../components/contracts/Council/Council"
+import Arena from "../components/contracts/Arena/Arena"
 
-import ActiveWallet from "../components/ActiveWallet"
 const Votes1 = dynamic(() => import("../components/Votes1"), {ssr: false})
 const Votes2 = dynamic(() => import("../components/Votes2"), {ssr: false})
 const DarkCoin = dynamic(() => import("../components/DarkCoin"), {ssr: false})
 
 
-import Socials from "../components/Socials"
 
 import { Grid, Typography, Button } from "@mui/material"
 
@@ -116,6 +115,22 @@ export default class Index extends React.Component {
                     :
                     null
                 }
+                {this.state.place == "arena" ? 
+                    <>
+                        <Button 
+                        style={{display: "grid", margin: "auto"}}
+                        onClick={() => this.setState({place: ""})}>
+                        <img src="arena.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Arena
+                        </Typography>
+                        </Button>
+                        <br />
+                        <Arena activeAddress={this.state.activeAddress} wallet={this.state.walletType} />
+                    </>
+                    :
+                    null
+                }
                 <br />
                 <br />
 
@@ -123,7 +138,7 @@ export default class Index extends React.Component {
                     <Grid container>
                     <Grid item xs={12} sm={4}>
                         <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        style={{display: "grid", margin: "auto", marginBottom: 50}}
                         onClick={() => this.setState({place: "council"})}>
                         <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
@@ -133,7 +148,7 @@ export default class Index extends React.Component {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        style={{display: "grid", margin: "auto", marginBottom: 50}}
                         onClick={() => this.setState({place: "market"})}>
                         <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
@@ -143,11 +158,21 @@ export default class Index extends React.Component {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         <Button 
-                        style={{display: "grid", margin: "auto"}}
+                        style={{display: "grid", margin: "auto", marginBottom: 50}}
                         onClick={() => this.setState({place: "mixer"})}>
                         <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
                         <Typography align="center" variant="h5" color="secondary">
                             Mixer
+                        </Typography>
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                        <Button 
+                        style={{display: "grid", margin: "auto", marginBottom: 50}}
+                        onClick={() => this.setState({place: "arena"})}>
+                        <img src="arena.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                        <Typography align="center" variant="h5" color="secondary">
+                            Arena
                         </Typography>
                         </Button>
                     </Grid>

@@ -1,0 +1,465 @@
+.h1 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    padding: 30;
+}
+
+.headerBar {
+    width: 100%;
+    margin: auto;
+    border-bottom: 3px solid gray;
+}
+
+.connectWalletGrid {
+    padding: 20px 10px 20px 10px;
+}
+
+.algoConnect {
+    border: 1px solid white;
+    border-radius: 15px;
+}
+
+.connectbtn {
+    padding: 20px;
+}
+
+.connectbtnt {
+    color: #FFFFFF;
+}
+
+.walletTypeGrid {
+    margin-top: 10px;
+}
+
+.myAlgoBtn {
+    margin-right: 10px;
+}
+
+.disconnectbtn {
+    background-color: white;
+    border-radius: 15px;
+    margin: 10px;
+    float: right;
+}
+
+.connectedNavBarBtn {
+    padding: 20px;
+    float: left;
+}
+
+.disconnectbtnt {
+    color: black;
+}
+
+.activeWallet {
+    color: #7CFC00;
+}
+
+.navBar {
+    width: 85%;
+    margin: auto;
+}
+
+.navbtn {
+    display: grid;
+    margin: auto;
+}
+
+.navbtn:hover {
+    border-bottom: 1px solid white;
+}
+
+.footerBar {
+    width: 100%;
+    margin: auto;
+    padding-top: 30px;
+    border-top: 3px solid gray;
+}
+
+.button {
+    display: flex;
+    margin: auto;
+    text-transform: none;
+    border: 1px solid white;
+    border-radius: 15px;
+    box-shadow: 5px 5px 10px rgba(255,255,255,.75);
+}
+
+.button:hover {
+    border: 3px solid white;
+    border-radius: 15px;
+    box-shadow: none;
+  }
+
+.h5 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    padding: 10px;
+}
+
+.h5holders {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.holder1 {
+    display: flex;
+    float: left;
+}
+
+.holdermax {
+    display: flex;
+    float: right;
+}
+
+div .connectedAddress {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.connectpera {
+    display: flex;
+    margin: auto;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.connectpera:hover {
+    background-color: #FFFFFF;
+}
+
+.perah6 {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.connectmyalgo {
+    display: flex;
+    margin: auto;
+    border-radius: 15px;
+    
+}
+
+.connectmyalgo:hover {
+    background-color: #FFFFFF;
+}
+
+.myalgoh6 {
+    font-family: Consolas;
+    color: #FFFFFF;
+    border-radius: 15px;
+}
+
+.darkcoinh6 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    margin: 30px;
+}
+
+.dcbalance {
+    color: #FFFFFF;
+}
+
+.bodytab {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+}
+
+.bodytabt {
+    font-family: Consolas;
+}
+
+.buytab {
+    border-radius: 15px; 
+}
+
+.buytabt {
+    font-family: Consolas;
+}
+
+.buyNftBtn {
+    display: flex;
+    margin: auto;
+    border-radius: 15px;
+    background-color: white;
+}
+
+.activenft {
+    display: block; 
+    margin: auto;
+}
+
+.activenftname {
+    color: #FFFFFF;
+    font-family: Consolas;
+    font-weight: 800;
+    padding: 20px;
+}
+
+.activenftgrid {
+    display: flex;
+    padding: 5%;
+}
+
+.nftbuypreview {
+    display: flex;
+    margin: auto;
+}
+
+.nftbuybtn {
+    display: flex;
+    margin: auto;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.nftvoteh6 {
+    font-family: Consolas;
+    color: #FFFFFF;
+    padding: 30px;
+}
+
+.nftbuybtnt {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.contractbtn {
+    display: flex;
+    margin: auto; 
+    padding: 15px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+}
+
+.contractbtn:hover {
+    background-color: #FFFFFF;
+}
+
+.contractbtnt {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.marketbtn {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+}
+
+.marketbtnt {
+    font-family: Consolas;
+}
+
+.nftpricedc {
+    font-family: Consolas;
+    color: #FFFFFF;
+    padding: 20px;
+}
+
+.mixerbtngrid {
+    display: inline-block;
+}
+
+.mixerbtnwrap {
+    display: inline-block;
+}
+
+.mixerbtn {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+}
+
+.mixerbtnt {
+    font-family: Consolas;
+}
+
+.mixergrid {
+    border: 1px solid white;
+    padding: 30px;
+}
+
+.sendmixbtn {
+    padding: 10px;
+    margin: 20px;
+    border-radius: 15px;
+    background-color: #FFFFFF;
+    border: 1px solid white;
+}
+
+.tradebtn {
+    display: flex;
+    margin: auto;
+}
+
+.tradebtnt {
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 15px;
+}
+
+.proposebtn {
+    display: flex;
+    margin: auto;
+    background-color: #FFFFFF;
+    padding: 10px;
+    border-radius: 15px;
+    margin-top: 2%;
+}
+
+.proposebtnt {
+    font-family: Consolas;
+    color: #000000;
+}
+
+.selectoption {
+    display: flex;
+    margin: auto;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    border-radius: 15px;
+    text-transform: none;
+    border: 1px solid white;
+}
+
+.selectoptiont {
+    font-family: Jacques;
+}
+
+.voteresults {
+    color: #FFFFFF;
+    font-family: Vivaldi;
+    padding: 30px;
+}
+
+.displaynftname {
+    color: #000000;
+    font-family: Consolas;
+    font-weight: 800px;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+}
+
+.buyconfirmationtxt {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.buynftidt {
+    color: #FFFFFF;
+    font-family: Consolas;
+    font-weight: 800px;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100px;
+}
+
+.h3 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    padding: 30px;
+}
+
+.h2 {
+   font-family: Consolas;
+   color: #FFFFFF;
+}
+
+.h4 {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.h6 {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.governanceh2 {
+    font-family: Consolas;
+    color: #FFFFFF;
+}
+
+.measurebtn {
+    text-transform: none; 
+    display: flex; 
+    margin: auto; 
+    border: 1px solid white; 
+    border-radius: 15px;
+    box-shadow: 5px 5px 10px rgba(255,255,255,.75);
+}
+
+.measurebtn:hover {
+    border: 3px solid white;
+    border-radius: 15px;
+    box-shadow: none;
+}
+
+.measureh4 {
+    font-family: Vivaldi;
+    color: #FFFFFF;
+    padding: 10px;
+}
+
+.measureh6 {
+    font-family: Consolas;
+    color: #FFFFFF;
+    padding: 20px;
+}
+
+.measureth4 {
+    color: #FFFFFF; 
+    font-family: Jacques; 
+    padding: 30px;
+}
+
+.modal {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.card {
+    background-color: #000000;
+}
+
+.measurebody {
+    font-family: Jacques;
+    border: 1px solid white;
+    border-radius: 15px;
+    color: #FFFFFF;
+    margin: 20px;
+    padding: 20px;
+}
+
+.measurenoteh6 {
+    color: #FFFFFF;
+    font-family: Jacques;
+    padding: 30px;
+}
+
+.measureresult {
+    font-family: jacques; 
+    color: #FFFFFF; 
+    padding: 20px;
+}
+
+.socialsbtn {
+    display: grid;
+    margin: auto;
+}
+
+.socialsh5 {
+    color: #FFFFFF;
+    font-family: Consolas;
+    padding: 30px;
+}

@@ -23,8 +23,8 @@ export default class Create extends React.Component {
             race: "",
             class: "",
 
+            name: "",
             des: null,
-            
             img: null,
            
             imgSelect: null,
@@ -80,7 +80,7 @@ export default class Create extends React.Component {
       async generate(race, clas) {
 
         this.setState({
-          message: "Generating characters..."
+          message: "Generating character..."
         })
 
         let res = await fetch('/api/generateChar', {
@@ -98,11 +98,14 @@ export default class Create extends React.Component {
 
         const sess = await res.json()
 
-        console.log(sess.response)
+        let des = sess.response.text
 
-        let des = sess.response
+        let comma = des.indexOf(",")
+
+        let name = des.substring(0, comma).replace(/(\r\n|\n|\r)/gm,"")
         
         this.setState({
+          name: name,
           des: des,
           message: "Generating Image..."
         })
@@ -113,7 +116,7 @@ export default class Create extends React.Component {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              description: des.Description
+              description: des
             }),
             
               
@@ -126,12 +129,16 @@ export default class Create extends React.Component {
 
           this.setState({
             img: generatedImage,
-            message: "Choose your character:"
+            message: ""
           })
 
       }
 
       async pin() {
+
+        this.setState({
+          confirm: "Pinning..."
+        })
 
         let response = await fetch('/api/pinUrl', {
           method: "POST",
@@ -139,8 +146,9 @@ export default class Create extends React.Component {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-              url: this.state.imgSelect,
-              des: this.state.charSelect
+              url: this.state.img,
+              des: this.state.des,
+              name: this.state.name
           }),
           
             
@@ -148,18 +156,24 @@ export default class Create extends React.Component {
 
         const session = await response.json()
 
-        let ipfs = session.result.IpfsHash
+        console.log(session)
 
-        console.log(ipfs)
+        this.setState({
+          confirm: "Pinned"
+        })
+
+        let ipfs = session.result.IpfsHash
 
         const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
 
         let params = await client.getTransactionParams().do();
 
+        console.log(this.state)
+
         const creator = this.props.activeAddress;
         const defaultFrozen = false;    
         const unitName = "DCCHAR"; 
-        const assetName = this.state.charSelect.Name;
+        const assetName = this.state.name;
         const url = "https://gateway.pinata.cloud/ipfs/" + ipfs;
         const managerAddr = undefined; 
         const reserveAddr = undefined;  
@@ -202,7 +216,10 @@ export default class Create extends React.Component {
 
 
             this.setState({
-              confirm: "Transaction Confirmed, Character Successfully Minted."
+              confirm: "Transaction Confirmed, Character Successfully Minted.",
+              name: "",
+              des: null,
+              img: null
             })
   
             
@@ -232,7 +249,10 @@ export default class Create extends React.Component {
           let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
 
           this.setState({
-            confirm: "Transaction Confirmed, Character Successfully Minted."
+            confirm: "Transaction Confirmed, Character Successfully Minted.",
+            name: "",
+            des: null,
+            img: null
           })
 
         }
@@ -356,8 +376,6 @@ export default class Create extends React.Component {
                     
                 {this.state.race && this.state.class ?
                   <>
-                    <Typography align="center" color="secondary" variant="h6"> Avatar </Typography>
-                    <br />
                     {this.props.activeAddress ? 
                 
                       <Button className={muisty.contractbtn} onClick={() => this.generate(this.state.race, this.state.class)}>
@@ -380,59 +398,17 @@ export default class Create extends React.Component {
                 <br />
                 {this.state.des ? 
                     <>
-                      <Button style={{display: "flex", margin: "auto", width: "100%", padding: 10}} onClick={() => this.setState({imgSelect: null, charSelect: null})}>
-                        <img src={this.state.imgSelect} style={{display: "flex", margin: "auto", width: "100%", maxWidth: 500, borderRadius: 15}} />
-                      </Button>
+                      <img src={this.state.img} style={{display: "flex", margin: "auto", width: "100%", maxWidth: 500, borderRadius: 15}} />
                       <br />
-                      <Typography align="center" color="secondary" variant="h4"> {this.state.charSelect.Name} </Typography>
+                      <Typography align="center" color="secondary" variant="h6" style={{padding: 20}}> {this.state.name} </Typography>
                       <br />
-                      <Typography align="center" color="secondary" variant="h6"> {this.state.charSelect.Description} </Typography>
+                      <Typography align="center" color="secondary" variant="subtitle1" style={{padding: 20}}> {this.state.des} </Typography>
                       <br />
-                      <Grid container style={{padding: 20}}>
-                        
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Health: {this.state.charSelect.Health} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Energy: {this.state.charSelect.Energy} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Melee: {this.state.charSelect.Melee} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Ranged: {this.state.charSelect.Ranged} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Magic: {this.state.charSelect.Magic} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Fire: {this.state.charSelect.Fire} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Water: {this.state.charSelect.Water} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Nature: {this.state.charSelect.Nature} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Electric: {this.state.charSelect.Electric} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Poison: {this.state.charSelect.Poison} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Light: {this.state.charSelect.Light} </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={4} lg={3} xl={2}>
-                          <Typography align="center" color="secondary" variant="h6"> Dark: {this.state.charSelect.Dark} </Typography>
-                          <br />
-                        </Grid>
-                      </Grid>
                         
                       <Button className={muisty.contractbtn} 
                       onClick={() => this.pin() 
                         }>
-                      <Typography  variant="h6"> Create </Typography>
+                      <Typography  variant="h6"> Mint </Typography>
                       </Button>
                       <br />
                       <Typography align="center" color="secondary" variant="h6"> {this.state.confirm} </Typography>

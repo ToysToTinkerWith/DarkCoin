@@ -151,16 +151,21 @@ export default class Index extends React.Component {
                         </Typography>
                         </Button>
                     </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <Button 
-                        style={{display: "grid", margin: "auto", marginBottom: 50}}
-                        onClick={() => this.setState({place: "arena"})}>
-                        <img src="arena.svg" style={{display: "flex", margin: "auto", height: 75}} />
-                        <Typography align="center" variant="h5" color="secondary">
-                            Arena
-                        </Typography>
-                        </Button>
-                    </Grid>
+                    {this.state.activeAddress == "RJWIVWSFCX25TXKZUYAWXQ5DAGFAAG4DBPUQ43VOFDI22FBTEQJYH33NLQ" ?
+                    <Grid item xs={12} sm={12}>
+                    <Button 
+                    style={{display: "grid", margin: "auto", marginBottom: 50}}
+                    onClick={() => this.setState({place: "arena"})}>
+                    <img src="arena.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                    <Typography align="center" variant="h5" color="secondary">
+                        Arena
+                    </Typography>
+                    </Button>
+                </Grid>
+                    :
+                    null
+                    }
+                    
                     </Grid>
                     :
                     null

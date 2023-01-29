@@ -58,6 +58,7 @@ def approval_program():
     handle_creation = Return(
         Seq(
             App.globalPut(Bytes("Address"), Global.current_application_address()),
+            App.globalPut(Bytes("proposalNum"), Int(1)),
             Int(1)
         )
     )
@@ -65,6 +66,7 @@ def approval_program():
     i = ScratchVar(TealType.uint64)
 
     certify = Seq(
+        Assert(Txn.sender() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
         Assert(Global.round() >= App.globalGet(Txn.application_args[1])),
         If(
             Txn.application_args[2] == Bytes("Reject"),
@@ -80,8 +82,8 @@ def approval_program():
     )
 
     apply = Seq(
-        Assert(Len(Txn.application_args[1]) >= Int(50)),
-        Assert(Len(Txn.application_args[1]) <= Int(2000)),
+        Assert(Len(Txn.application_args[1]) >= Int(108)),
+        Assert(Len(Txn.application_args[1]) <= Int(2058)),
         Assert(Gtxn[0].amount() == Int(500000)),
         Assert(Gtxn[0].receiver() == Global.current_application_address()),
         Assert(Gtxn[1].xfer_asset() == Int(601894079)),
@@ -133,6 +135,7 @@ def approval_program():
     )
 
     satisfy = Seq(
+        Assert(Txn.sender() == Addr("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")),
         Assert(Global.round() >= App.globalGet(Txn.application_args[1])),
         InnerTxnBuilder.Begin(),
         InnerTxnBuilder.SetFields({
@@ -149,8 +152,8 @@ def approval_program():
 
 
     propose = Seq(
-        Assert(Len(Txn.application_args[1]) >= Int(50)),
-        Assert(Len(Txn.application_args[1]) <= Int(2000)),
+        Assert(Len(Txn.application_args[1]) >= Int(108)),
+        Assert(Len(Txn.application_args[1]) <= Int(2058)),
         Assert(Gtxn[0].amount() == Int(1000000)),
         Assert(Gtxn[0].receiver() == Global.current_application_address()),
         Assert(Gtxn[1].xfer_asset() == Int(601894079)),
@@ -158,14 +161,14 @@ def approval_program():
         Assert(Gtxn[1].asset_receiver() == Global.current_application_address()),
         App.box_put(Concat(Bytes("Proposal"), itoa(App.globalGet(Bytes("proposalNum")))), Txn.application_args[1]),
         Assert(App.box_create(Concat(Bytes("Votes"), itoa(App.globalGet(Bytes("proposalNum")))), Int(2000))),
-        App.globalPut(itoa(App.globalGet(Bytes("proposalNum"))), Add(Global.round(), Int(10))),
+        App.globalPut(itoa(App.globalGet(Bytes("proposalNum"))), Add(Global.round(), Int(604800))),
         App.globalPut(Bytes("proposalNum"), Add(App.globalGet(Bytes("proposalNum")), Int(1))),
         Int(1)
         )
     
     
     opt_in = Seq(
-        Assert(Txn.sender() == Addr("Z3W4BTN5JQQ76AFQX2B2TGU3NPKGXF7TA7OJ4BYS4BK5FAITCED7AFRZXI")),
+        Assert(Txn.sender() == Addr("TIXJLMZSYOMZDWOLDEEE4VNUW4F3542QSUSFGDYWJGI64L4VTRN5DCGTVA")),
          For(i.store(Int(0)), i.load() < Txn.assets.length(), i.store(i.load() + Int(1))).Do(Seq(
             InnerTxnBuilder.Begin(),
             InnerTxnBuilder.SetFields({
@@ -177,34 +180,6 @@ def approval_program():
             InnerTxnBuilder.Submit()
          )),
          Int(1)
-    )
-
-    assetBalance = AssetHolding.balance(Global.current_application_address(), Txn.assets[0])
-
-    change_state = Seq(
-        App.globalPut(Bytes("proposalNum"), Int(1)),
-        Int(1)
-        )
-
-    clear_assets = Seq(
-        assetBalance,
-        Assert(Txn.sender() == Addr("Z3W4BTN5JQQ76AFQX2B2TGU3NPKGXF7TA7OJ4BYS4BK5FAITCED7AFRZXI")),
-        InnerTxnBuilder.Begin(),
-        InnerTxnBuilder.SetFields({
-            TxnField.type_enum: TxnType.Payment,
-            TxnField.receiver: Txn.sender(),
-            TxnField.amount: Balance(Global.current_application_address()),
-        }),
-        InnerTxnBuilder.Submit(),
-        InnerTxnBuilder.Begin(),
-        InnerTxnBuilder.SetFields({
-            TxnField.type_enum: TxnType.AssetTransfer,
-            TxnField.xfer_asset: Txn.assets[0],
-            TxnField.asset_receiver: Txn.sender(),
-            TxnField.asset_amount: assetBalance.value(),
-        }),
-        InnerTxnBuilder.Submit(),
-        Int(1)
     )
 
     # doesn't need anyone to opt in
@@ -228,8 +203,6 @@ def approval_program():
         [Txn.on_completion() == OnComplete.UpdateApplication, handle_updateapp],
         [Txn.on_completion() == OnComplete.DeleteApplication, handle_deleteapp],
         [Txn.application_args[0] == Bytes("optin"), Return(opt_in)],
-        [Txn.application_args[0] == Bytes("changestate"), Return(change_state)],
-        [Txn.application_args[0] == Bytes("clearassets"), Return(clear_assets)],
         [Txn.application_args[0] == Bytes("propose"), Return(propose)],
         [Txn.application_args[0] == Bytes("apply"), Return(apply)],
         [Txn.application_args[0] == Bytes("vote"), Return(vote)],

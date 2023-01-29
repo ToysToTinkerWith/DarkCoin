@@ -27,12 +27,15 @@ async function pinUrl(req, res) {
 
    
 
-   pinata.testAuthentication().then((result) => {
+   pinata.testAuthentication().then(async (result) => {
         //handle successful authentication here
-        console.log(result);
 
         const url = req.body.url;
-        const fileName = "image.png";
+        const fileName = "./characters/image.png";
+
+        // fs.access(fileName, fs.constants.R_OK | fs.constants.W_OK, (err) => {
+        //     console.log(`${fileName} ${err ? 'is not' : 'is'} readable and writable`);
+        //   });
 
         const downloadStream = got.stream(url);
         const fileWriterStream = createWriteStream(fileName);
@@ -55,7 +58,7 @@ async function pinUrl(req, res) {
             const readableStreamForFile = fs.createReadStream(fileName);
             const options = {
                 pinataMetadata: {
-                    name: req.body.des.Name,
+                    name: req.body.name,
                 },
                 pinataOptions: {
                     cidVersion: 0
@@ -63,7 +66,6 @@ async function pinUrl(req, res) {
             };
             pinata.pinFileToIPFS(readableStreamForFile, options).then((result) => {
                 //handle results here
-                console.log(result);
                 res.json({ result: result });
             }).catch((err) => {
                 //handle error here

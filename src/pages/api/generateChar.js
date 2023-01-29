@@ -18,6 +18,8 @@ async function generateChar(req, res) {
         apiKey: process.env.DALLE_KEY,
     });
     const openai = new OpenAIApi(configuration);
+
+    console.log(openai)
     
     const response = await openai.createCompletion({
         model: "text-davinci-003",
@@ -32,9 +34,7 @@ async function generateChar(req, res) {
         temperature: 0.8,
       });
 
-      console.log(response.data)
-
-      res.json({response: response.data});
+      res.json({response: response.data.choices[0]});
    
 }
 

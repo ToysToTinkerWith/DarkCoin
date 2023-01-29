@@ -61,7 +61,10 @@ export default class Vote extends React.Component {
 
           (async () => {
             
-            let assetsDC = await indexerClient.lookupAccountCreatedAssets("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")
+
+            if (this.props.activeAddress) {
+
+              let assetsDC = await indexerClient.lookupAccountCreatedAssets("AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE")
             .limit(1000).do();
   
             assetsDC.assets.forEach(async (asset) => {
@@ -95,14 +98,12 @@ export default class Vote extends React.Component {
   
             }
 
-            if (this.props.activeAddress) {
-
               let assetsWallet = await indexerClient.lookupAccountAssets(this.props.activeAddress)
               .limit(1000).do();
 
     
               assetsWallet.assets.forEach(async (asset) => {
-                if(this.state.daoNFTs.includes(asset["asset-id"])) {
+                if(this.state.daoNFTs.includes(asset["asset-id"]) && asset.amount == 1) {
                   this.setState(prevState => ({
                     walletAssets: [...prevState.walletAssets, asset["asset-id"]]
                   }))
@@ -153,15 +154,10 @@ export default class Vote extends React.Component {
 
             globalState.forEach((keyVal) => {
 
-              console.log(atob(keyVal.key))
               if (atob(keyVal.key) !== "proposalNum" && atob(keyVal.key) !== "Address" && atob(keyVal.key) !== "5A" && atob(keyVal.key) !== "Reject7" && atob(keyVal.key).length < 58) {
                 proposals.push({key: atob(keyVal.key), value: keyVal.value.uint})
               }
               else if (atob(keyVal.key).length > 58) {
-                console.log(atob(keyVal.key))
-                console.log(atob(keyVal.key).substring(0, 58))
-                console.log(atob(keyVal.key).substring(58, 59))
-                console.log(atob(keyVal.key).substring(59))
                 contracts.push({address: atob(keyVal.key).substring(0, 58), appNum: atob(keyVal.key).substring(58, 59), proposalNum: atob(keyVal.key).substring(59)})
               }
               
@@ -177,14 +173,13 @@ export default class Vote extends React.Component {
             boxesResponse.boxes.forEach((box) => {
               let boxName = new TextDecoder().decode(box.name)
               if (boxName[0] >= '0' && boxName[0] <= '9') {
-                console.log(boxName)
+
                 let costNum = Number(boxName[0])
                 let cost = Number(boxName.substring(1, costNum + 1))
                 let app = boxName[costNum + 1]
                 let proposalCount = Number(boxName[costNum + 2])
                 let proposalNum = Number(boxName.substring(costNum + 3, costNum + 3 + proposalCount))
                 let round = Number(boxName.substring(costNum + 3 + proposalCount))
-                console.log(costNum, cost, app, proposalCount, proposalNum, round)
                 applications.push({boxName: boxName, cost: cost, appNum: app, proposalNum: proposalNum, endRound: round})
               }
               
@@ -232,7 +227,6 @@ export default class Vote extends React.Component {
               })
 
               applications.forEach(async (app) => {
-                console.log(app)
                 if (app.proposalNum == proposal.key) {
                   let application = await client.getApplicationBoxByName(this.props.contract, app.boxName).do();
                   let appString = new TextDecoder().decode(application.value)
@@ -253,7 +247,6 @@ export default class Vote extends React.Component {
                 if (contract.proposalNum == proposal.key) {
                   proposalContracts.push(contract)
                   let satisfaction = await client.getApplicationBoxByName(this.props.contract, "Sat" + contract.proposalNum).do();
-                  console.log(satisfaction.value)
                   satisfaction.value.forEach((vote) => {
                     if (vote != 0) {
                         sat.push({value: vote})
@@ -324,8 +317,6 @@ export default class Vote extends React.Component {
             appBoxes.push(app)
           }
         })
-
-        console.log(appBoxes)
 
         let params = await client.getTransactionParams().do();
 
@@ -631,9 +622,6 @@ export default class Vote extends React.Component {
             let satBox = new Uint8Array(Buffer.from("Sat" + proposalNum))
 
             const boxes = [{appIndex: 0, name: satBox}, {appIndex: 0, name: satBox}]
-
-            console.log()
-
     
             const appArgs = []
               appArgs.push(
@@ -1012,8 +1000,6 @@ export default class Vote extends React.Component {
 
       let date = new Date()
 
-      console.log(this.state)
-
       const RADIAN = Math.PI / 180;
         const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, vote }) => {
         const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -1033,7 +1019,7 @@ export default class Vote extends React.Component {
         return (
             <div>
               <br />
-              <Typography color="secondary" variant="h6" align="center"> DAO = {this.state.walletAssets.length} </Typography>
+              <Typography color="secondary" variant="h6" align="center"> Your DAO = {this.state.walletAssets.length} </Typography>
               <br />
               {sortedProposals.length > 0 ? 
                 sortedProposals.map((proposal, index) => {
@@ -1140,9 +1126,12 @@ export default class Vote extends React.Component {
 
                         {(proposal.endRound - this.state.currRound) < -1000 ?
                           proposal.sat.length > 0 ?
+                          this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ?
                           <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => this.satisfy(proposal.proposalNum, median, contractApp.appNum, contractApp.proposer)}>
                             <Typography color="primary" variant="h6" align="center"> Satisfy </Typography>
                           </Button>
+                          :
+                          null
                           :
                           <Typography color="secondary" variant="subtitle1" align="center"> Need at least one satisfaction vote </Typography>
 
@@ -1274,6 +1263,8 @@ export default class Vote extends React.Component {
                             <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => this.apply(proposal.proposalNum)}>
                               <Typography color="primary" variant="h6" align="center"> Apply {String(this.state[proposal.proposalNum]).length * 50} </Typography>
                               <img src="invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
+                              <Typography  variant="h6"> + 0.5</Typography>
+                              <img src="AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
                             </Button>
                             <br />
                             <Typography color="secondary" variant="h6" align="center"> {this.state.confirm} </Typography>
@@ -1327,6 +1318,8 @@ export default class Vote extends React.Component {
                                         <Typography color="primary" variant="h6" align="center"> {app.proposer.substring(0, 10)} </Typography>
                                       </Button>
                                       <br />
+                                      <Typography color="secondary" variant="h6" align="center" >  {((app.endRound - this.state.currRound) * 3.8 / 60 / 60 / 24).toFixed(2)} days</Typography>
+                                      <br />
                                       <Typography color="secondary" variant="h6" align="center" >  {Number(app.cost).toLocaleString("en-US")} {this.state["vote" + (proposal.proposalNum)] == app.appNum ? <img src="invDC.svg" style={{display: "inline", width: 30, paddingTop: 20}} /> : <img src="DC.svg" style={{display: "inline", width: 30, paddingTop: 20}} />}</Typography>
                                       <br />
                                       <Button className={muisty.mixerbtn} style={{backgroundColor: this.state["vote" + (proposal.proposalNum)] == app.appNum ? "#FFFFFF" : "#000000", border: "1px solid white", display: "grid", margin: "auto"}} onClick={() => this.state["vote" + (proposal.proposalNum)] == app.appNum ? this.setState({["vote" + (proposal.proposalNum)]: null}) : this.setState({["vote" + (proposal.proposalNum)]: app.appNum})}>
@@ -1356,7 +1349,7 @@ export default class Vote extends React.Component {
                         
                         <br />
 
-                      {this.state.currRound >= proposal.endRound && proposal.votes.length ?
+                      {this.state.currRound >= proposal.endRound && proposal.votes.length && this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ?
                         <Button className={muisty.mixerbtn} style={{backgroundColor: "#FFFFFF", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.certify(proposal.proposalNum, proposal.votes)}>
                           <Typography color="secondary" variant="h6" style={{color: "#000000"}}> Certify </Typography>
                         </Button> 

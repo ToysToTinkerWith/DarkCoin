@@ -709,8 +709,8 @@ export default class Trade extends React.Component {
                         InputProps={{ style: { color: "black" } }}
                         sx={{input: {
                           color: "black",
-                          background: "white"
-                    
+                          background: "white",
+                          borderRadius: 15
                         }, "& .MuiOutlinedInput-root":{"& > fieldset": {border: '2px solid #FFFFFF', borderRadius: 15}}}}
                         style={{
                         display: "flex",

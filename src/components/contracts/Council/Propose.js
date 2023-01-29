@@ -47,7 +47,6 @@ export default class Propose extends React.Component {
             currRound: status["last-round"]
           })
 
-          let address = await algosdk.getApplicationAddress(this.props.contract)
 
     }
 
@@ -91,7 +90,6 @@ export default class Propose extends React.Component {
         let proposalNum
 
         globalState.forEach((keyVal) => {
-          console.log(atob(keyVal.key))
           if (atob(keyVal.key) == "proposalNum") {
             proposalNum = keyVal.value.uint
           }
@@ -131,17 +129,10 @@ export default class Propose extends React.Component {
             
           )
 
-          console.log((String(this.props.activeAddress) + " " + this.state.proposal).length)
-          console.log((this.state.proposal).length)
-
-          console.log(appArgs)
-
           const accounts = []
           const foreignApps = []
             
           const foreignAssets = []
-
-          console.log(Buffer.from("Proposal" + String(proposalNum)))
 
           let proposalBox = new Uint8Array(Buffer.from("Proposal" + String(proposalNum)))
           let votesBox = new Uint8Array(Buffer.from("Votes" + String(proposalNum)))
@@ -150,7 +141,6 @@ export default class Propose extends React.Component {
           
           let atxn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, this.props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
           
-          console.log(atxn)
           let txns = [ftxn1, ftxn2, atxn]
 
           let txgroup = algosdk.assignGroupID(txns)
@@ -224,8 +214,6 @@ export default class Propose extends React.Component {
             ];
 
             const myAlgoWallet = new MyAlgo()
-
-            console.log(multipleTxnGroups)
 
             const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
 
@@ -303,9 +291,14 @@ export default class Propose extends React.Component {
                 <Button className={muisty.contractbtn} onClick={() => this.propose()}>
                 <Typography  variant="h6"> Propose {Number(this.state.proposal.length * 50).toLocaleString("en-US")} </Typography>
                 <img src="invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
+                <Typography  variant="h6"> + 1</Typography>
+                <img src="AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
+
 
 
                 </Button>
+
+                
                     
                   
                   :

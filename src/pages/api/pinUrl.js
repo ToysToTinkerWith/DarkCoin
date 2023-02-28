@@ -5,7 +5,9 @@ const pinataSDK = require('@pinata/sdk');
 import got from "got"
 const { createWriteStream } = require("fs");
 const fs = require('fs');
+const fsPromises = require("fs").promises;
 
+import path from 'path'
 
 
 const pinata = new pinataSDK({ pinataApiKey: process.env.PINATA_PUBLIC, pinataSecretApiKey: process.env.PINATA_SECRET });
@@ -27,57 +29,42 @@ async function pinUrl(req, res) {
 
    
 
-   pinata.testAuthentication().then(async (result) => {
+   pinata.testAuthentication().then(() => {
         //handle successful authentication here
 
         const url = req.body.url;
-        const fileName = "./characters/image.png";
 
-        // fs.access(fileName, fs.constants.R_OK | fs.constants.W_OK, (err) => {
-        //     console.log(`${fileName} ${err ? 'is not' : 'is'} readable and writable`);
-        //   });
+        (async () => {
+            try {
+                
+                const reader = got.stream(url)
+                    
+                const options = {
+                    pinataMetadata: {
+                        name: req.body.name,
+                    },
+                    pinataOptions: {
+                        cidVersion: 0
+                    }
+                };
+                pinata.pinFileToIPFS(reader, options).then((result) => {
+                    //handle results here
+                    res.json({ result: result });
+                }).catch((err) => {
+                    //handle error here
+                    res.json({ result: err });
+                });
+                
 
-        const downloadStream = got.stream(url);
-        const fileWriterStream = createWriteStream(fileName);
+                
 
-        downloadStream
-        .on("downloadProgress", ({ transferred, total, percent }) => {
-            const percentage = Math.round(percent * 100);
-            console.error(`progress: ${transferred}/${total} (${percentage}%)`);
-        })
-        .on("error", (error) => {
-            console.error(`Download failed: ${error.message}`);
-        });
-
-        fileWriterStream
-        .on("error", (error) => {
-            console.error(`Could not write file to system: ${error.message}`);
-        })
-        .on("finish", () => {
-            console.log(`File downloaded to ${fileName}`);
-            const readableStreamForFile = fs.createReadStream(fileName);
-            const options = {
-                pinataMetadata: {
-                    name: req.body.name,
-                },
-                pinataOptions: {
-                    cidVersion: 0
-                }
-            };
-            pinata.pinFileToIPFS(readableStreamForFile, options).then((result) => {
-                //handle results here
-                res.json({ result: result });
-            }).catch((err) => {
-                //handle error here
-                console.log(err);
-            });
-        });
-
-        downloadStream.pipe(fileWriterStream);
-
+            } catch (error) {
+                res.json({ result: error });
+            }
+          })();
         
         })
-        .catch(error => console.log(error));
+        .catch(error => res.json({ result: error }));
 
       
    

@@ -19,9 +19,6 @@ import algosdk from "algosdk"
 
 import { Grid, Typography, Button, TextField, Modal, Card } from "@mui/material"
 
-import styles from "../../index.module.css"
-
-import muisty from "../../muistyles.module.css"
 
 export default class Trade extends React.Component { 
 
@@ -597,94 +594,96 @@ export default class Trade extends React.Component {
               
               <Typography color="secondary" variant="h6" align="center"> Select amount to send: </Typography>
               <br />
-                  <Grid className={muisty.mixerbtngrid} container align="center" >
-                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={4} md={4} lg={2} >
+                  <Grid container align="center" spacing={3}>
+                      <Grid item xs={12} sm={4} md={4} lg={2} >
                       <Typography color="secondary" variant="h6"> {this.state.queued5} </Typography>
 
-                          <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "5" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "5" ? this.setState({mixVal: ""}) : this.setState({mixVal: "5"})}>
+                          <Button style={{backgroundColor: this.state.mixVal == "5" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} onClick={() => this.state.mixVal == "5" ? this.setState({mixVal: ""}) : this.setState({mixVal: "5"})}>
                           <Typography  variant="h6" style={{color: this.state.mixVal == "5" ? "#000000" : "#FFFFFF"}}> 5 </Typography>
                           {this.state.mixVal == "5" ?
-                          <img className={styles.algologo} src="/AlgoBlack.svg" />
+                          <img style={{width: 15}} src="/AlgoBlack.svg" />
                           :
-                          <img className={styles.algologo} src="/AlgoWhite.svg" />
+                          <img style={{width: 15}} src="/AlgoWhite.svg" />
                           }
 
                           </Button>
                           
                       </Grid>
-                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={4} md={4} lg={3}>
+                      <Grid item xs={12} sm={4} md={4} lg={3}>
                       <Typography color="secondary" variant="h6"> {this.state.queued20} </Typography>
-                          <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "20" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "20" ? this.setState({mixVal: ""}) : this.setState({mixVal: "20"})}>
+                          <Button style={{backgroundColor: this.state.mixVal == "20" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} onClick={() => this.state.mixVal == "20" ? this.setState({mixVal: ""}) : this.setState({mixVal: "20"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "20" ? "#000000" : "#FFFFFF"}}> 20 </Typography>
                           {this.state.mixVal == "20" ?
-                          <img className={styles.algologo} src="/AlgoBlack.svg" />
+                          <img style={{width: 15}} src="/AlgoBlack.svg" />
                           :
-                          <img className={styles.algologo} src="/AlgoWhite.svg" />
+                          <img style={{width: 15}} src="/AlgoWhite.svg" />
                           }
                           </Button>
                       </Grid>
-                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={4} md={4} lg={2}>
+                      <Grid item xs={12} sm={4} md={4} lg={2}>
                       <Typography color="secondary" variant="h6"> {this.state.queued50} </Typography>
-                          <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "50" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "50" ? this.setState({mixVal: ""}) : this.setState({mixVal: "50"})}>
+                          <Button  style={{backgroundColor: this.state.mixVal == "50" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} onClick={() => this.state.mixVal == "50" ? this.setState({mixVal: ""}) : this.setState({mixVal: "50"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "50" ? "#000000" : "#FFFFFF"}}> 50 </Typography>
                           {this.state.mixVal == "50" ?
-                          <img className={styles.algologo} src="/AlgoBlack.svg" />
+                          <img style={{width: 15}} src="/AlgoBlack.svg" />
                           :
-                          <img className={styles.algologo} src="/AlgoWhite.svg" />
+                          <img style={{width: 15}} src="/AlgoWhite.svg" />
                           }
                           </Button>
                       </Grid>
-                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={3}>
+                      <Grid  item xs={12} sm={6} md={6} lg={3}>
                       <Typography color="secondary" variant="h6"> {this.state.queued100} </Typography>
-                          <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "100" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "100" ? this.setState({mixVal: ""}) : this.setState({mixVal: "100"})}>
+                          <Button  style={{backgroundColor: this.state.mixVal == "100" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} onClick={() => this.state.mixVal == "100" ? this.setState({mixVal: ""}) : this.setState({mixVal: "100"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "100" ? "#000000" : "#FFFFFF"}}> 100 </Typography>
                           {this.state.mixVal == "100" ?
-                          <img className={styles.algologo} src="/AlgoBlack.svg" />
+                          <img style={{width: 15}} src="/AlgoBlack.svg" />
                           :
-                          <img className={styles.algologo} src="/AlgoWhite.svg" />
+                          <img style={{width: 15}} src="/AlgoWhite.svg" />
                           }
                           </Button>
                       </Grid>
-                      <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={2}>
+                      <Grid  item xs={12} sm={6} md={6} lg={2}>
                       <Typography color="secondary" variant="h6"> {this.state.queued500} </Typography>
-                          <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.mixVal == "500" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.mixVal == "500" ? this.setState({mixVal: ""}) : this.setState({mixVal: "500"})}>
+                          <Button  style={{backgroundColor: this.state.mixVal == "500" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} onClick={() => this.state.mixVal == "500" ? this.setState({mixVal: ""}) : this.setState({mixVal: "500"})}>
                           <Typography color="secondary" variant="h6" style={{color: this.state.mixVal == "500" ? "#000000" : "#FFFFFF"}}> 500 </Typography>
                           {this.state.mixVal == "500" ?
-                          <img className={styles.algologo} src="/AlgoBlack.svg" />
+                          <img style={{width: 15}} src="/AlgoBlack.svg" />
                           :
-                          <img className={styles.algologo} src="/AlgoWhite.svg" />
+                          <img style={{width: 15}} src="/AlgoWhite.svg" />
                           }
                           </Button>
                       </Grid>
                       
                   </Grid>
 
+                  <br />
+
                   <Typography color="secondary" variant="h6" align="center"> Select fee options: </Typography>
 
+                  <br />
+                    <Grid container align="center" spacing={3}>
+                        <Grid  item xs={12} sm={6} md={6} lg={6} >
 
-                    <Grid className={muisty.mixerbtngrid} container align="center" >
-                        <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={6} >
-
-                        <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.feeOption == "DC" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "DC" ? this.setState({feeOption: ""}) : this.setState({feeOption: "DC"})}>
+                        <Button  style={{backgroundColor: this.state.feeOption == "DC" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} onClick={() => this.state.feeOption == "DC" ? this.setState({feeOption: ""}) : this.setState({feeOption: "DC"})}>
                             <Typography color="secondary" variant="h6" style={{color: this.state.feeOption == "DC" ? "#000000" : "#FFFFFF"}}> 1% </Typography>
                             {this.state.feeOption == "DC" ?
-                            <img className={styles.algologo} src="/WhiteCoinLogo.svg" />
+                            <img style={{width: 15}} src="/WhiteCoinLogo.svg" />
                             :
-                            <img className={styles.algologo} src="/DarkCoinLogo.png" />
+                            <img style={{width: 15}} src="/DarkCoinLogo.png" />
                             }
                             </Button>
 
                             
                             
                         </Grid>
-                        <Grid className={muisty.mixerbtnwrap} item xs={12} sm={6} md={6} lg={6}>
+                        <Grid  item xs={12} sm={6} md={6} lg={6}>
 
-                        <Button className={muisty.mixerbtn} style={{backgroundColor: this.state.feeOption == "ALGO" ? "#FFFFFF" : "#000000", border: "1px solid white"}} onClick={() => this.state.feeOption == "ALGO" ? this.setState({feeOption: ""}) : this.setState({feeOption: "ALGO"})}>
+                        <Button  style={{backgroundColor: this.state.feeOption == "ALGO" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} onClick={() => this.state.feeOption == "ALGO" ? this.setState({feeOption: ""}) : this.setState({feeOption: "ALGO"})}>
                             <Typography color="secondary" variant="h6" style={{color: this.state.feeOption == "ALGO" ? "#000000" : "#FFFFFF"}}> 2% </Typography>
                             {this.state.feeOption == "ALGO" ?
-                            <img className={styles.algologo} src="/AlgoBlack.svg" />
+                            <img style={{width: 15}} src="/AlgoBlack.svg" />
                             :
-                            <img className={styles.algologo} src="/AlgoWhite.svg" />
+                            <img style={{width: 15}} src="/AlgoWhite.svg" />
                             }
 
                             </Button>
@@ -692,6 +691,8 @@ export default class Trade extends React.Component {
                         </Grid>
                         
                     </Grid>
+
+                    <br />
 
                     <Typography color="secondary" variant="h6" align="center"> Receiving Wallet: </Typography>
 
@@ -727,12 +728,12 @@ export default class Trade extends React.Component {
                 {this.props.activeAddress ? 
                   <>
                     {this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ? 
-                      <>
-                        <Button className={muisty.contractbtn} onClick={() => [this.getReceivers(), this.setState({sendMix: true})]}>
-                          <img className={styles.invMixerIcon} src="invMixer.svg" />
-                          <Typography className={muisty.contractbtnt} variant="h6">  Send Mix </Typography>
+                      <div style={{display: "grid", margin: "auto", width: 200}}>
+                        <Button variant="contained" color="secondary" onClick={() => [this.getReceivers(), this.setState({sendMix: true})]}>
+                          <img style={{}} src="invMixer.svg" />
+                          <Typography  variant="h6">  Send Mix </Typography>
                         </Button>
-                      </>
+                      </div>
                     :
                     <>
   
@@ -745,8 +746,8 @@ export default class Trade extends React.Component {
                       null
                     }
                     
-                    <Button className={muisty.contractbtn} onClick={() => this.mix()}>
-                      <img className={styles.invMixerIcon} src="invMixer.svg" />
+                    <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto", padding: 10}} onClick={() => this.mix()}>
+                      <img style={{paddingRight: 10}} src="invMixer.svg" />
                       <Typography variant="h6"> Mix </Typography>
                     </Button>
                     
@@ -757,7 +758,7 @@ export default class Trade extends React.Component {
                     
                   
                   :
-                  <Button className={muisty.contractbtn} onClick={() => window.scrollTo(0, 0)}>
+                  <Button  onClick={() => window.scrollTo(0, 0)}>
                       <Typography  variant="h6"> Connect Wallet </Typography>
                   </Button>
                 }
@@ -771,30 +772,30 @@ export default class Trade extends React.Component {
 
                 
               {this.state.sendMix ? 
-                <Modal className={muisty.modal}
+                <Modal 
                 open={true} 
                 onClose={() => this.setState({sendMix: false})}
                 onClick={() => this.setState({sendMix: false})}>
-                    <Card className={muisty.card}>
+                    <Card >
                     <Grid container>
-                      <Grid className={muisty.mixergrid} item xs={6} sm={6}>
-                        <Typography className={muisty.h6} variant="h6"> Firebase </Typography>
+                      <Grid item xs={6} sm={6}>
+                        <Typography variant="h6"> Firebase </Typography>
                       </Grid>
-                      <Grid className={muisty.mixergrid} item xs={6} sm={6}>
-                        <Typography className={muisty.h6} variant="h6"> Contract </Typography>
+                      <Grid item xs={6} sm={6}>
+                        <Typography variant="h6"> Contract </Typography>
                       </Grid>
                      {this.state.trans.length > 0 ?
                         this.state.trans.map((tran, index) => {
                           return (
                             <>
-                              <Grid className={muisty.mixergrid} item xs={6} sm={6}>
-                                <Typography className={muisty.h6} variant="h6"> Sender: {tran.sender.substring(0,10)} </Typography>
-                                <Typography className={muisty.h6} variant="h6"> Confirmed: {tran.confirmedRound} </Typography>
+                              <Grid item xs={6} sm={6}>
+                                <Typography  variant="h6"> Sender: {tran.sender.substring(0,10)} </Typography>
+                                <Typography variant="h6"> Confirmed: {tran.confirmedRound} </Typography>
                               </Grid>
                               {contractTrans.length > 0 ?
-                                <Grid className={muisty.mixergrid} item xs={6} sm={6}>
-                                  <Typography className={muisty.h6} variant="h6"> Sender: {contractTrans[index].sender.substring(0,10)} </Typography>
-                                  <Typography className={muisty.h6} variant="h6"> Confirmed: {contractTrans[index].confirmedRound} </Typography>
+                                <Grid item xs={6} sm={6}>
+                                  <Typography  variant="h6"> Sender: {contractTrans[index].sender.substring(0,10)} </Typography>
+                                  <Typography  variant="h6"> Confirmed: {contractTrans[index].confirmedRound} </Typography>
                                 </Grid>
                                 :
                                 null
@@ -808,8 +809,8 @@ export default class Trade extends React.Component {
                       }
                       </Grid>
 
-                      <Button className={muisty.sendmixbtn} onClick={() => this.sendMix()}>
-                          <Typography className={muisty.h6} variant="h6"> Send Mix </Typography>
+                      <Button  onClick={() => this.sendMix()}>
+                          <Typography  variant="h6"> Send Mix </Typography>
                         </Button>
                     </Card>
                 

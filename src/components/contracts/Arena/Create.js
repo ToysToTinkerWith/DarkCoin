@@ -12,7 +12,6 @@ import algosdk from "algosdk"
 
 import { Grid, Typography, Button, TextField, Modal, Card, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
 
-import muisty from "../../../muistyles.module.css"
 
 
 export default class Create extends React.Component { 
@@ -20,10 +19,9 @@ export default class Create extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            race: "",
-            class: "",
-
+            descript: "",
             name: "",
+
             des: null,
             img: null,
            
@@ -77,60 +75,203 @@ export default class Create extends React.Component {
         
       }
 
-      async generate(race, clas) {
+      async generate() {
 
-        this.setState({
-          message: "Generating character..."
-        })
+        const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
 
-        let res = await fetch('/api/generateChar', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-              race: race,
-              clas: clas
-          }),
-          
-            
-        });
+        let params = await client.getTransactionParams().do();
 
-        const sess = await res.json()
+        let ftxn1 = algosdk.makeAssetTransferTxnWithSuggestedParams(
+          this.props.activeAddress, 
+          "5W64M4ZT4ERRI4AW77HMSO63YHYZVJTRGM6WC7RQIM3YJOLOPYPTXHMU6I", 
+          undefined,
+          undefined,
+          5000, 
+          undefined,
+          601894079,
+          params
+        );
 
-        let des = sess.response.text
+        let ftxn2 = algosdk.makeAssetTransferTxnWithSuggestedParams(
+          this.props.activeAddress, 
+          "VWYCYQ3H3PPNIGON4H363DIH7BP33TTZWUUUNMTDXCIHRCDPFOMU7VJ5HM", 
+          undefined,
+          undefined,
+          5000, 
+          undefined,
+          601894079,
+          params
+        );
 
-        let comma = des.indexOf(",")
+        let txns = [ftxn1, ftxn2]
 
-        let name = des.substring(0, comma).replace(/(\r\n|\n|\r)/gm,"")
-        
-        this.setState({
-          name: name,
-          des: des,
-          message: "Generating Image..."
-        })
+          let txgroup = algosdk.assignGroupID(txns)
 
-        let response = await fetch('/api/generateImage', {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              description: des
-            }),
-            
+          let multipleTxnGroups
+
+         
+  
+          if (this.props.wallet == "pera") {
+  
+            try {
+              multipleTxnGroups = [
+                {txn: ftxn1, signers: [this.props.activeAddress]},
+                {txn: ftxn2, signers: [this.props.activeAddress]}
+              ];
+  
+              const signedTxn = await peraWallet.signTransaction([multipleTxnGroups]) 
+
+              let txId = await client.sendRawTransaction(signedTxn).do();
+
+              this.setState({
+                message: "Sending Transaction..."
+              })
+
+              let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
+              this.setState({
+                message: "Generating character..."
+              })
+      
+              let res = await fetch('/api/generateChar', {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    descript: this.state.descript,
+                    name: this.state.name
+                }),
+                
+                  
+              });
+      
+              const sess = await res.json()
+      
+              let des = sess.response.text
               
-          });
+              this.setState({
+                des: des,
+                message: "Generating Image..."
+              })
+      
+              let response = await fetch('/api/generateImage', {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    description: this.state.descript
+                  }),
+                  
+                    
+                });
+      
+                const session = await response.json()
+      
+                let generatedImage = session.image
+                
+      
+                this.setState({
+                  img: generatedImage,
+                  message: ""
+                })
+              
+            }
+  
+            catch (error) {
+              this.setState({
+                message: "Transaction Denied"
+              })
+              console.log(error)
+            }
+            
+  
+          }
+  
+          else if (this.props.wallet == "myalgo") {
 
-          const session = await response.json()
+            try {
 
-          let generatedImage = session.image
+            multipleTxnGroups = [
+              ftxn1.toByte(),
+              ftxn2.toByte()
+            ];
+
+            const myAlgoWallet = new MyAlgo()
+
+            const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
+
+            let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob]).do();
+
+            this.setState({
+              message: "Sending Transaction..."
+            })
+
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+            
+            this.setState({
+              message: "Generating character..."
+            })
+    
+            let res = await fetch('/api/generateChar', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  descript: this.state.descript,
+                  name: this.state.name
+              }),
+              
+                
+            });
+    
+            const sess = await res.json()
+    
+            let des = sess.response.text
+            
+            this.setState({
+              des: des,
+              message: "Generating Image..."
+            })
+    
+            let response = await fetch('/api/generateImage', {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  description: this.state.descript
+                }),
+                
+                  
+              });
+    
+              const session = await response.json()
+    
+              let generatedImage = session.image
+              
+    
+              this.setState({
+                img: generatedImage,
+                message: ""
+              })
+
+          }
+
+          catch (error) {
+            this.setState({
+              message: "Transaction Denied"
+            })
+            console.log(error)
+          }
+  
           
+        }
 
-          this.setState({
-            img: generatedImage,
-            message: ""
-          })
+
+        
 
       }
 
@@ -181,7 +322,7 @@ export default class Create extends React.Component {
         const clawbackAddr = undefined;
         const total = 1;                // NFTs have totalIssuance of exactly 1
         const decimals = 0;             // NFTs have decimals of exactly 0
-        const note = new Uint8Array(Buffer.from(this.state.des))
+        const note = new Uint8Array(Buffer.from("Description: " + this.state.descript + " Moves: " + this.state.des))
         const mtxn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
         from:creator,
         total,
@@ -216,8 +357,9 @@ export default class Create extends React.Component {
 
 
             this.setState({
-              confirm: "Transaction Confirmed, Character Successfully Minted.",
+              message: "Transaction Confirmed, Character Successfully Minted.",
               name: "",
+              descript: "",
               des: null,
               img: null
             })
@@ -240,7 +382,7 @@ export default class Create extends React.Component {
 
           const signedTxn = await myAlgoWallet.signTransaction(mtxn.toByte());
 
-          let txId = await client.sendRawTransaction(signedTxn[0].blob).do();
+          let txId = await client.sendRawTransaction(signedTxn.blob).do();
 
           this.setState({
             confirm: "Sending Transaction..."
@@ -249,8 +391,9 @@ export default class Create extends React.Component {
           let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
 
           this.setState({
-            confirm: "Transaction Confirmed, Character Successfully Minted.",
+            message: "Transaction Confirmed, Character Successfully Minted.",
             name: "",
+            descript: "",
             des: null,
             img: null
           })
@@ -277,135 +420,92 @@ export default class Create extends React.Component {
         return (
             <div>
               <br />
-              <Typography color="secondary" variant="h6" align="center"> Create a character: </Typography>
+              <Typography color="secondary" variant="h6" align="center"> Describe your character: </Typography>
               <br />
-
-              <Grid container>
-                <Grid item xs={12} sm={6}>
-                    <Typography color="secondary" variant="h6" align="center"> Race </Typography>
-
-                    <FormControl fullWidth>
-                    <Select
-                        value={this.state.race}
-                        name="race"
-                        onChange={this.handleChange}
-                        style={{
-                            background: "white",
-                            borderRadius: 5,
-                            display: "flex",
-                            margin: "auto",
-                            width: 200,
-                            marginBottom: 50
-                        
-                        }}
-                    >
-                        <MenuItem value={"Human"}> <Typography color="primary" variant="subtitle1" align="center"> Human </Typography> </MenuItem>
-                        <MenuItem value={"Elf"}> <Typography color="primary" variant="subtitle1" align="center"> Elf </Typography> </MenuItem>
-                        <MenuItem value={"Dwarf"}> <Typography color="primary" variant="subtitle1" align="center"> Dwarf </Typography> </MenuItem>
-                        <MenuItem value={"Halfling"}> <Typography color="primary" variant="subtitle1" align="center"> Halfling </Typography> </MenuItem>
-                        <MenuItem value={"Orc"}> <Typography color="primary" variant="subtitle1" align="center"> Orc </Typography> </MenuItem>
-                        <MenuItem value={"Goblin"}> <Typography color="primary" variant="subtitle1" align="center"> Goblin </Typography> </MenuItem>
-                        <MenuItem value={"Giant"}> <Typography color="primary" variant="subtitle1" align="center"> Giant </Typography> </MenuItem>
-                        <MenuItem value={"Dragonborn"}> <Typography color="primary" variant="subtitle1" align="center"> Dragonborn </Typography> </MenuItem>
-                        <MenuItem value={"Skeleton"}> <Typography color="primary" variant="subtitle1" align="center"> Skeleton </Typography> </MenuItem>
-                        <MenuItem value={"Robot"}> <Typography color="primary" variant="subtitle1" align="center"> Robot </Typography> </MenuItem>
-                        <MenuItem value={"Gnome"}> <Typography color="primary" variant="subtitle1" align="center"> Gnome </Typography> </MenuItem>
-                        <MenuItem value={"Faerie"}> <Typography color="primary" variant="subtitle1" align="center"> Faerie </Typography> </MenuItem>
-                        <MenuItem value={"Ratfolk"}> <Typography color="primary" variant="subtitle1" align="center"> Ratfolk </Typography> </MenuItem>
-                        <MenuItem value={"Catfolk"}> <Typography color="primary" variant="subtitle1" align="center"> Catfolk </Typography> </MenuItem>
-                        <MenuItem value={"Merfolk"}> <Typography color="primary" variant="subtitle1" align="center"> Merfolk </Typography> </MenuItem>
-                        <MenuItem value={"Centaur"}> <Typography color="primary" variant="subtitle1" align="center"> Centaur </Typography> </MenuItem>
-                        <MenuItem value={"Minotaur"}> <Typography color="primary" variant="subtitle1" align="center"> Minotaur </Typography> </MenuItem>
-                        <MenuItem value={"Soltari"}> <Typography color="primary" variant="subtitle1" align="center"> Soltari </Typography> </MenuItem>
-                        <MenuItem value={"Treefolk"}> <Typography color="primary" variant="subtitle1" align="center"> Treefolk </Typography> </MenuItem>
-                        <MenuItem value={"Lizardfolk"}> <Typography color="primary" variant="subtitle1" align="center"> Lizardfolk </Typography> </MenuItem>
-
-                    </Select>
-                    </FormControl>
-
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                <Typography color="secondary" variant="h6" align="center"> Class </Typography>
-
-                    <FormControl fullWidth>
-                    <Select
-                        value={this.state.class}
-                        name="class"
-                        onChange={this.handleChange}
-                        style={{
-                            background: "white",
-                            borderRadius: 5,
-                            display: "flex",
-                            margin: "auto",
-                            width: 200,
-                            marginBottom: 50
-                        
-                        }}
-                    >
-                        <MenuItem value={"Barbarian"}> <Typography color="primary" variant="subtitle1" align="center"> Barbarian </Typography> </MenuItem>
-                        <MenuItem value={"Bard"}> <Typography color="primary" variant="subtitle1" align="center"> Bard </Typography> </MenuItem>
-                        <MenuItem value={"Cleric"}> <Typography color="primary" variant="subtitle1" align="center"> Cleric </Typography> </MenuItem>
-                        <MenuItem value={"Druid"}> <Typography color="primary" variant="subtitle1" align="center"> Druid </Typography> </MenuItem>
-                        <MenuItem value={"Knight"}> <Typography color="primary" variant="subtitle1" align="center"> Knight </Typography> </MenuItem>
-                        <MenuItem value={"Monk"}> <Typography color="primary" variant="subtitle1" align="center"> Monk </Typography> </MenuItem>
-                        <MenuItem value={"Paladin"}> <Typography color="primary" variant="subtitle1" align="center"> Paladin </Typography> </MenuItem>
-                        <MenuItem value={"Ranger"}> <Typography color="primary" variant="subtitle1" align="center"> Ranger </Typography> </MenuItem>
-                        <MenuItem value={"Rogue"}> <Typography color="primary" variant="subtitle1" align="center"> Rogue </Typography> </MenuItem>
-                        <MenuItem value={"Sorcerer"}> <Typography color="primary" variant="subtitle1" align="center"> Sorcerer </Typography> </MenuItem>
-                        <MenuItem value={"Warlock"}> <Typography color="primary" variant="subtitle1" align="center"> Warlock </Typography> </MenuItem>
-                        <MenuItem value={"Battlemage"}> <Typography color="primary" variant="subtitle1" align="center"> Battlemage </Typography> </MenuItem>
-                        <MenuItem value={"Alchemist"}> <Typography color="primary" variant="subtitle1" align="center"> Alchemist </Typography> </MenuItem>
-                        <MenuItem value={"Stormcaller"}> <Typography color="primary" variant="subtitle1" align="center"> Stormcaller </Typography> </MenuItem>
-                        <MenuItem value={"Pyromancer"}> <Typography color="primary" variant="subtitle1" align="center"> Pyromancer </Typography> </MenuItem>
-                        <MenuItem value={"Hunter"}> <Typography color="primary" variant="subtitle1" align="center"> Hunter </Typography> </MenuItem>
-                        <MenuItem value={"Researcher"}> <Typography color="primary" variant="subtitle1" align="center"> Researcher </Typography> </MenuItem>
-                        <MenuItem value={"Geomancer"}> <Typography color="primary" variant="subtitle1" align="center"> Geomancer </Typography> </MenuItem>
-                        <MenuItem value={"Aquamancer"}> <Typography color="primary" variant="subtitle1" align="center"> Aquamancer </Typography> </MenuItem>
-                        <MenuItem value={"Witchdoctor"}> <Typography color="primary" variant="subtitle1" align="center"> Witchdoctor </Typography> </MenuItem>
-
-                    </Select>
-                    </FormControl>
+              <TextField                
+                    onChange={this.handleChange}
+                    value={this.state.descript}
+                    multiline
+                    type="text"
+                    rows={3}
+                    label=""
+                    name="descript"
+                    autoComplete="false"
+                    InputProps={{ style: { color: "black" } }}
+                   
+                    style={{
+                    color: "black",
+                    background: "white",
+                    borderRadius: 15,
+                    display: "flex",
+                    margin: "auto",
+                    width: "80%"
+                   
+                    }}
+                  />
+                <br />
+                <Typography color="secondary" variant="h6" align="center"> Name your character: </Typography>
+              <br />
+                <TextField                
+                    onChange={this.handleChange}
+                    value={this.state.name}
                     
-                </Grid>
-              </Grid>
-
+                    type="text"
+                    label=""
+                    name="name"
+                    autoComplete="false"
+                    InputProps={{ style: { color: "black" } }}
+                   
+                    style={{
+                    color: "black",
+                    background: "white",
+                    borderRadius: 15,
+                    display: "flex",
+                    margin: "auto",
+                    width: "30%"
+                   
+                    }}
+                  />
+                
              
 
               
                        <br />
+                       <Typography align="center" color="secondary" variant="h6"> {this.state.message} </Typography>
+                    <br />
                     
-                {this.state.race && this.state.class ?
-                  <>
                     {this.props.activeAddress ? 
                 
-                      <Button className={muisty.contractbtn} onClick={() => this.generate(this.state.race, this.state.class)}>
-                      <Typography  variant="h6"> Generate 200 </Typography>
+                      <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => this.generate()} >
+                      <Typography  variant="h6"> Generate 10,000 </Typography>
                       <img src="invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
                       </Button>
                       :
-                      <Button className={muisty.contractbtn} onClick={() => window.scrollTo(0, 0)}>
+                      <Button onClick={() => window.scrollTo(0, 0)}>
                           <Typography  variant="h6"> Connect Wallet </Typography>
                       </Button>
                     }
                     <br />
-                    <Typography align="center" color="secondary" variant="h6"> {this.state.message} </Typography>
-                    <br />
                     
-                  </>
-                :
-                  null
-                }
+                    
+               
                 <br />
-                {this.state.des ? 
-                    <>
-                      <img src={this.state.img} style={{display: "flex", margin: "auto", width: "100%", maxWidth: 500, borderRadius: 15}} />
+                {this.state.des && this.state.img ? 
+                    <div style={{position: "relative"}}>
+                      <img src={this.state.img} style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500}} />
                       <br />
-                      <Typography align="center" color="secondary" variant="h6" style={{padding: 20}}> {this.state.name} </Typography>
+                      <Typography align="center" color="secondary" variant="h6" style={{padding: 10}}> {this.state.name} </Typography>
                       <br />
                       <Typography align="center" color="secondary" variant="subtitle1" style={{padding: 20}}> {this.state.des} </Typography>
                       <br />
                         
-                      <Button className={muisty.contractbtn} 
+                      <Button 
+                      variant="contained"
+                      color="secondary"
+                      style={{
+                        display: "flex",
+                        margin: "auto"
+                      }}
                       onClick={() => this.pin() 
                         }>
                       <Typography  variant="h6"> Mint </Typography>
@@ -413,9 +513,10 @@ export default class Create extends React.Component {
                       <br />
                       <Typography align="center" color="secondary" variant="h6"> {this.state.confirm} </Typography>
 
-                    </>
+                    </div>
                     :
-                    null
+                    <img src="CharBack.png" style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500}} />
+
                    
                     }
                 

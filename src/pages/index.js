@@ -14,9 +14,6 @@ import Arena from "../components/contracts/Arena/Arena"
 
 import { Grid, Typography, Button } from "@mui/material"
 
-import styles from "../index.module.css"
-
-import muisty from "../muistyles.module.css"
 
 export default class Index extends React.Component { 
 
@@ -33,7 +30,7 @@ export default class Index extends React.Component {
 
     render() {
         return (
-            <div className={styles.mainbody}>
+            <div >
                 <Head>
                 <title>Dark Coin</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -151,7 +148,10 @@ export default class Index extends React.Component {
                         </Typography>
                         </Button>
                     </Grid>
-                    {this.state.activeAddress == "RJWIVWSFCX25TXKZUYAWXQ5DAGFAAG4DBPUQ43VOFDI22FBTEQJYH33NLQ" ?
+                    {this.state.activeAddress == "RJWIVWSFCX25TXKZUYAWXQ5DAGFAAG4DBPUQ43VOFDI22FBTEQJYH33NLQ" ||
+                    this.state.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ||
+                    this.state.activeAddress == "YZJK76DNXKJFEQGG6SF4MQGDRTM3BN7OIAJK26CH2IYATBSTZA4PCIWSUY" ||
+                    this.state.activeAddress == "6MEL7VBLBTMJSEQA3DMDMA3LRAJQNYR7VQZB3MHGSXGGXDEVMIPGVCNVUM" ?
                     <Grid item xs={12} sm={12}>
                     <Button 
                     style={{display: "grid", margin: "auto", marginBottom: 50}}
@@ -174,23 +174,22 @@ export default class Index extends React.Component {
                 <br />
                 <br />
 
-                <Grid container alignItems="center">
-                        <Grid item xs={12} sm={12} md={6}>
-                            
-                        <Button className={muisty.button} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>
-                            <Typography className={muisty.h5} align="center" variant="h5">
+                <Grid container align="center" spacing={3}>
+                        <Grid item xs={12} sm={12} md={6}> 
+                        <Button style={{border: "1px solid white", padding: 20, borderRadius: 15}} onClick={() => window.open("https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md")}>
+                            <Typography color="secondary" align="center" variant="h5">
                                 Dark Paper
                             </Typography>
-                            <img className={styles.dpicon} src="./DarkPaper.svg"/>
+                            <img style={{paddingLeft: 10}} src="./DarkPaper.svg"/>
                         </Button>
                         <br />
                         </Grid>
                         <Grid item xs={12} sm={12} md={6}>
-                        <Button className={muisty.button} onClick={() => window.open("https://github.com/ToysToTinkerWith/DarkCoin")}>
-                            <Typography className={muisty.h5} align="center" variant="h5">
+                        <Button style={{border: "1px solid white", padding: 20, borderRadius: 15}}  onClick={() => window.open("https://github.com/ToysToTinkerWith/DarkCoin")}>
+                            <Typography color="secondary" align="center" variant="h5">
                                 Dark Repo
                             </Typography>
-                            <img className={styles.dricon} src="./DarkRepo.svg"/>
+                            <img style={{paddingLeft: 10}} src="./DarkRepo.svg"/>
                         </Button>
                         <br />
                         </Grid>

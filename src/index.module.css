@@ -1,4 +1,4 @@
-div .mainbody {
+div.mainbody {
   margin: 0px;
   border: 3px solid grey;
   min-width: 300px;
@@ -42,7 +42,7 @@ img.invertedLogo {
   height: 75px;
 }
 
-div .chart {
+div.chart {
   margin: 30px;
   border: 3px solid white;
   border-radius: 15px;
@@ -50,7 +50,7 @@ div .chart {
   box-shadow: 0 0 15px 5px rgba(211,211,211,.75);
 }
 
-div .holderbalance {
+div.holderbalance {
   background-color: #fff;
   border: 1px solid #999;
   margin: 0;
@@ -67,18 +67,18 @@ div .holderbalance {
   max-width: 100px;
 }
 
-div .innerbody {
+div.innerbody {
   border: 3px solid white;
   border-radius: 15px;
   margin: 30px;
   box-shadow: 0 0 15px 5px rgba(211,211,211,.75);
 }
 
-div .market {
+div.market {
   margin: 30px;
 }
 
-div .mixer {
+div.mixer {
   margin: 30px;
 }
 
@@ -123,29 +123,29 @@ img.activenftzoom {
   width: 100%;
 }
 
-div .nftvotediv {
+div.nftvotediv {
   margin: 30px;
 }
 
-div .DAO {
+div.DAO {
   margin: 30px;
 }
 
-div .DAO2 {
+div.DAO2 {
   margin: 30px;
   display: gridpx;
   margin: auto;
 }
 
-div .trade {
+div.trade {
   margin: auto;
 }
 
-div .bottombody {
+div.bottombody {
   padding: 40px;
 }
 
-div .votes {
+div.votes {
   background-color: #fff;
   border: 1px solid #999;
   margin: 0px;
@@ -156,7 +156,7 @@ div .votes {
   margin: 30px;
 }
 
-div .socials {
+div.socials {
   background-color: #000000;
 }
 

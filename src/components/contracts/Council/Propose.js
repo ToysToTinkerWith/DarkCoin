@@ -12,8 +12,6 @@ import algosdk from "algosdk"
 
 import { Typography, Button, TextField} from "@mui/material"
 
-import muisty from "../../../muistyles.module.css"
-
 export default class Propose extends React.Component { 
 
     constructor(props) {
@@ -102,7 +100,7 @@ export default class Propose extends React.Component {
 
          let ftxn1 = algosdk.makePaymentTxnWithSuggestedParams(
           this.props.activeAddress, 
-          "65PPYUWV74T5TBEWCVPOTUDPHTPWGLMLAFUYZQWSSKD2QAZDU46COXSWMI", 
+          "5W64M4ZT4ERRI4AW77HMSO63YHYZVJTRGM6WC7RQIM3YJOLOPYPTXHMU6I", 
           1000000, 
           undefined,
           undefined,
@@ -111,7 +109,7 @@ export default class Propose extends React.Component {
 
           let ftxn2 = algosdk.makeAssetTransferTxnWithSuggestedParams(
             this.props.activeAddress, 
-            "65PPYUWV74T5TBEWCVPOTUDPHTPWGLMLAFUYZQWSSKD2QAZDU46COXSWMI", 
+            "5W64M4ZT4ERRI4AW77HMSO63YHYZVJTRGM6WC7RQIM3YJOLOPYPTXHMU6I", 
             undefined,
             undefined,
             this.state.proposal.length * 50, 
@@ -147,26 +145,9 @@ export default class Propose extends React.Component {
 
           let multipleTxnGroups
 
-          if (false) {
-            const userMnemonic = ""
-            const userAccout =  algosdk.mnemonicToSecretKey(userMnemonic)
-            // Sign the transaction
-            let signedTxn1 = ftxn1.signTxn(userAccout.sk);
-            let signedTxn2 = ftxn2.signTxn(userAccout.sk);
-            let signedTxn3 = atxn.signTxn(userAccout.sk);
-
-            let signed = []
-            signed.push( signedTxn1 )
-            signed.push( signedTxn2 )
-            signed.push( signedTxn3 )
-        
-            // Submit the transaction
-            await client.sendRawTransaction(signed).do()                           
-                
-        
-          }
+         
   
-          else if (this.props.wallet == "pera") {
+          if (this.props.wallet == "pera") {
   
             try {
               multipleTxnGroups = [
@@ -275,8 +256,8 @@ export default class Propose extends React.Component {
                   />
                 <br />
                 <Typography align="center" color="secondary" variant="subtitle1"> Current Round: {this.state.currRound} </Typography>
-
-                <Typography align="center" color="secondary" variant="subtitle1"> This proposal will be contracted or rejected by round: {this.state.currRound + 604800} (about 2 weeks) </Typography>
+                <br />
+                <Typography align="center" color="secondary" variant="subtitle1"> This proposal will be contracted or rejected by round: {this.state.currRound + 327000} (about 2 weeks) </Typography>
                 <br />
 
 
@@ -288,7 +269,7 @@ export default class Propose extends React.Component {
 
                 {this.props.activeAddress ? 
                 
-                <Button className={muisty.contractbtn} onClick={() => this.propose()}>
+                <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => this.propose()}>
                 <Typography  variant="h6"> Propose {Number(this.state.proposal.length * 50).toLocaleString("en-US")} </Typography>
                 <img src="invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
                 <Typography  variant="h6"> + 1</Typography>
@@ -302,7 +283,7 @@ export default class Propose extends React.Component {
                     
                   
                   :
-                  <Button className={muisty.contractbtn} onClick={() => window.scrollTo(0, 0)}>
+                  <Button  onClick={() => window.scrollTo(0, 0)}>
                       <Typography  variant="h6"> Connect Wallet </Typography>
                   </Button>
                 }

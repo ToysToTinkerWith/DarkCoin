@@ -11,6 +11,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 import theme from "../../theme";
 
 import "../style.css"
+import "../index.module.css"
+import "../muistyles.module.css"
 
 
 export default function MyApp(props) {

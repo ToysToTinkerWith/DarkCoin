@@ -2,25 +2,40 @@ import React from "react"
 
 import algosdk from "algosdk"
 
-import { Typography } from "@mui/material"
+import { Typography, Button } from "@mui/material"
 
-import styles from "../../../index.module.css"
+import MyAlgo from '@randlabs/myalgo-connect';
 
-import muisty from "../../../muistyles.module.css"
+import { PeraWalletConnect } from "@perawallet/connect";
 
-export default class DisplayNft extends React.Component { 
+const peraWallet = new PeraWalletConnect();
+
+
+export default class DisplayChar extends React.Component { 
 
     constructor(props) {
         super(props);
         this.state = {
             nft: null,
-            nftUrl: null
+            nftUrl: null,
+            message: ""
             
         };
-        
+        this.chooseCharacter = this.chooseCharacter.bind(this)
+
     }
 
     async componentDidMount() {
+
+        peraWallet.reconnectSession()
+        .catch((error) => {
+          // You MUST handle the reject because once the user closes the modal, peraWallet.connect() promise will be rejected.
+          // For the async/await syntax you MUST use try/catch
+          if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
+              // log the necessary errors
+              console.log(error)
+          }
+          });
 
         let response = await fetch('/api/getNft', {
             method: "POST",
@@ -36,6 +51,8 @@ export default class DisplayNft extends React.Component {
         
         let session = await response.json()
 
+        console.log(session)
+
         let charStats = null
 
         if (this.props.zoom) {
@@ -49,13 +66,11 @@ export default class DisplayNft extends React.Component {
             .txType("acfg")
             .do();
 
-            //"ewogICAgICAgICAgInN0YW5kYXJkIjogImFyYzY5IiwKICAgICAgICAgICJkZXNjcmlwdGlvbiI6ICJEYXJrIENvaW4gQ2hhcmFjdGVyIE5GVCIsCiAgICAgICAgICAiZXh0ZXJuYWxfdXJsIjogaHR0cHM6Ly9nYXRld2F5LnBpbmF0YS5jbG91ZC9pcGZzL1FtYVhESDU0WnJnaG1waFlRTFZVWjdLb0xWR2lqYXpaTjdENlprTHZtN1FXNDEsCiAgICAgICAgICAibWltZV90eXBlIjogImltZy9wbmciLAogICAgICAgICAgInByb3BlcnRpZXMiOiBbb2JqZWN0IE9iamVjdF0KICAgICAgICB9"
-            //"V0tQVjJhRkVtN3czZE5oaDlBNkVWZ0ZmZWVOTWFrZzdnRmVmcDdTVnE2Y3gsCiAgICAgICAgICAibWltZV90eXBlIjogImltZy9wbmciLAogICAgICAgICAgInByb3BlcnRpZXMiOiB7CiAgICAgICAgICAgICJOYW1lIjogS2VsdmluLAogICAgICAgICAgICAiRW5lcmd5IjogMTAwLAogICAgICAgICAgICAiTWVsZWUiOiAzMywKICAgICAgICAgICAgIlJhbmdlZCI6IDMzLAogICAgICAgICAgICAiTWFnaWMiOiAzNCwKICAgICAgICAgICAgIkZpcmUiOiAxNywKICAgICAgICAgICAgIldhdGVyIjogMTcsCiAgICAgICAgICAgICJOYXR1cmUiOiAzNCwKICAgICAgICAgICAgIkVsZWN0cmljIjogMTcsCiAgICAgICAgICAgICJQb2lzb24iOiAxNywKICAgICAgICAgICAgIkxpZ2h0IjogMTcsCiAgICAgICAgICAgICJEYXJrIjogMTcKICAgICAgICAgIH0KICAgICAgICB9"
             console.log(assetConfig.transactions[0])
 
             console.log(atob(assetConfig.transactions[0].note))
 
-            charStats = JSON.parse(atob(assetConfig.transactions[0].note))
+            charStats = atob(assetConfig.transactions[0].note)
         }
         
         this.setState({
@@ -64,6 +79,124 @@ export default class DisplayNft extends React.Component {
             charStats: charStats
         })
           
+      }
+
+      async chooseCharacter() {
+
+        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+
+        let optedin = false
+
+        let response = await indexerClient.lookupAccountAppLocalStates(this.props.activeAddress).do();
+        response["apps-local-states"].forEach((localstate) => {
+            if (localstate.id == this.props.contract) {
+                optedin = true
+                localstate["key-value"].forEach((kv) => {
+                    if (atob(kv.key) == "name") {
+                        console.log(atob(kv.value.bytes))
+                    }
+                })
+            }
+        })
+
+        let client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
+        
+        let params = await client.getTransactionParams().do()
+
+        const appArgs = []
+        
+
+        const accounts = []
+        const foreignApps = []
+            
+        const foreignAssets = [this.props.nftId]
+
+        const boxes = []
+
+        if (optedin) {
+
+            appArgs.push(
+                new Uint8Array(Buffer.from("select")),
+                new Uint8Array(Buffer.from(this.state.nft.name))
+            )
+
+            let txn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, this.props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+            const singleTxnGroups = [{txn: txn, signers: [this.props.activeAddress]}]
+
+            if (this.props.wallet == "pera") {
+                const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
+                this.setState({message: "Sending Transaction..."})
+
+
+                let txId = await client.sendRawTransaction(signedTxn).do();
+
+                let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
+
+
+                this.setState({message: "Transaction Confirmed, Character Successfully Chosen."})
+
+            }
+            else if (this.props.wallet == "myalgo") {
+                
+                const myAlgoWallet = new MyAlgo()
+
+                const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
+
+                this.setState({message: "Sending Transaction..."})
+
+
+                let txId = await client.sendRawTransaction(signedTxn.blob).do();
+
+                let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
+
+
+                this.setState({message: "Transaction Confirmed, Character Successfully Chosen."})
+            }
+
+        }
+
+        else {
+
+            appArgs.push(
+
+                new Uint8Array(Buffer.from(this.state.nft.name))
+            )
+
+            let txn = algosdk.makeApplicationOptInTxn(this.props.activeAddress, params, this.props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+            const singleTxnGroups = [{txn: txn, signers: [this.props.activeAddress]}]
+
+            if (this.props.wallet == "pera") {
+                const signedTxn = await peraWallet.signTransaction([singleTxnGroups])
+                this.setState({message: "Sending Transaction..."})
+
+
+                let txId = await client.sendRawTransaction(signedTxn).do();
+
+                let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
+
+
+                this.setState({message: "Transaction Confirmed, Character Successfully Chosen."})
+
+            }
+            else if (this.props.wallet == "myalgo") {
+                const myAlgoWallet = new MyAlgo()
+
+                const signedTxn = await myAlgoWallet.signTransaction(txn.toByte());
+                this.setState({message: "Sending Transaction..."})
+
+
+                let txId = await client.sendRawTransaction(signedTxn.blob).do();
+
+                let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
+
+
+                this.setState({message: "Transaction Confirmed, Character Successfully Chosen."})
+            }
+        }
+        
+
+
+
       }
 
    
@@ -75,9 +208,29 @@ export default class DisplayNft extends React.Component {
         if (this.state.nft) {
             if (this.props.zoom) {
                 return (
-                    <div style={{display: "flex", margin: "auto", maxWidth: 400, padding: 10}}>
-                        <img className={styles.displaynftimg} src={this.state.nftUrl} style={{borderRadius: 15}} />
-                        <Typography className={muisty.displaynftname} style={{margin: 20}} align="left" variant="h4"> {this.state.nft.name} </Typography>
+                    <div >
+                            <Typography color="secondary" align="center" style={{margin: 20}} variant="h6"> {this.state.nft.name} </Typography>
+
+                        <Button style={{display: "flex", margin: "auto"}} onClick={() => this.props.setNft(null)}>
+                        <img src={this.state.nftUrl} style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500, borderRadius: 5}} />
+
+
+                        </Button>
+
+
+                        <Typography color="secondary" align="center" style={{margin: 20}} variant="subtitle1"> {this.state.charStats} </Typography>
+                        <br />
+                        <Typography color="secondary" align="center" variant="h6"> {this.state.message} </Typography>
+
+                        <br />
+
+
+                        <Button variant="contained" color="secondary"  style={{display: "flex", margin: "auto"}} onClick={() => this.chooseCharacter()} >
+                            
+                        <Typography color="primary" align="center" variant="h6"> Select </Typography>
+                    </Button>
+
+
                     </div>
         
                 )
@@ -85,10 +238,10 @@ export default class DisplayNft extends React.Component {
             }
             else {
                 return (
-                    <div style={{position: "relative", display: "inline-flex", margin: "auto", width: 200, maxWidth: String(100 / this.props.len) + "%", padding: 10}}>
-                        <Typography className={muisty.displaynftname} align="left" variant="caption"> {this.state.nft.name} </Typography>
-                        <img className={styles.displaynftimg} src={this.state.nftUrl} style={{borderRadius: 15}} />
-                    </div>
+                    <Button  onClick={() => this.props.setNft(this.props.nftId)} >
+                        <Typography color="secondary" style={{position: "absolute", bottom: 10, left: 15}} align="left" variant="caption"> {this.state.nft.name} </Typography>
+                        <img style={{width: "100%", borderRadius: 5}} src={this.state.nftUrl} />
+                    </Button>
         
                 )
             }

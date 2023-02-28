@@ -2,7 +2,7 @@ import NextCors from 'nextjs-cors';
 
 const { Configuration, OpenAIApi } = require("openai");
 
-async function generateChar(req, res) {
+async function generateStory(req, res) {
    // Run the cors middleware
    // nextjs-cors uses the cors package, so we invite you to check the documentation https://github.com/expressjs/cors
 
@@ -24,11 +24,13 @@ async function generateChar(req, res) {
     const response = await openai.createCompletion({
         model: "text-davinci-003",
         prompt: 
-        req.body.descript + ". This character will have the name " + req.body.name +
-        ". Generate 2 moves that this character might have in an rpg game."
+        "There are two characters, the first one is: Name: " + req.body.charName + " " + req.body.charStats +
+        ". The second character is: Name: " + req.body.charNameOther + " " + req.body.charStatsOther +
+        " Spawn these characters in a random setting. In less than 400 characters, tell me a story of a battle between these two characters, in which the first character " + req.body.charName + " wins." +
+        " Make the fight interesting until the very end. At the end of the battle, award " + req.body.charName + " with " + req.body.wager + " Dark Coin."
         ,
         n: 1,
-        max_tokens: 100,
+        max_tokens: 200,
         temperature: 0.8,
       });
 
@@ -36,4 +38,4 @@ async function generateChar(req, res) {
    
 }
 
-export default generateChar
+export default generateStory

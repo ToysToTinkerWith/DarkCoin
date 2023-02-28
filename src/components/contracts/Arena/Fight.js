@@ -1,6 +1,5 @@
 import React from "react"
 
-import MyAlgo from '@randlabs/myalgo-connect';
 
 //43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA
 
@@ -8,28 +7,33 @@ import { PeraWalletConnect } from "@perawallet/connect";
 
 const peraWallet = new PeraWalletConnect();
 
+import MyAlgo from '@randlabs/myalgo-connect';
+
 import algosdk from "algosdk"
 
-import { Grid, Typography, Button } from "@mui/material"
-
+import { Grid, Typography, Button, TextField } from "@mui/material"
 
 import DisplayChar from "./DisplayChar";
+import DisplayBat from "./DisplayBat";
 
 export default class Fight extends React.Component { 
 
     constructor(props) {
         super(props);
         this.state = {
-            accountAssets: [],
-            dcChars: [],
-            charSelect: null
+            battles: [],
+            wager: 10000,
+            charSel: null,
+            charSelect: null,
+            confirm: ""
         };
         this.handleChange = this.handleChange.bind(this)
-        this.chooseCharacter = this.chooseCharacter.bind(this)
+        this.startBattle = this.startBattle.bind(this)
+
     }
 
     async componentDidMount() {
-        
+
         peraWallet.reconnectSession()
         .catch((error) => {
           // You MUST handle the reject because once the user closes the modal, peraWallet.connect() promise will be rejected.
@@ -40,75 +44,61 @@ export default class Fight extends React.Component {
           }
           });
 
-          const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
- 
-          if (this.props.activeAddress) {
-            let accountAssets = await indexerClient.lookupAccountAssets(this.props.activeAddress).do();
+          const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
 
-            accountAssets.assets.forEach((asset) => {
-                if (asset.amount == 1) {
-                    this.setState(prevState => ({
-                        accountAssets: [...prevState.accountAssets, asset["asset-id"]]
-                    }))
+          let responseProposal = await client.getApplicationBoxByName(this.props.contract, "Battle1").do();
+
+          let string = new TextDecoder().decode(responseProposal.value)
+
+          console.log(string)
+
+
+        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+
+        let global = await indexerClient.lookupApplications(this.props.contract).do();
+
+        let globalState = global.application.params["global-state"]
+
+        let battles = []
+
+        globalState.forEach((keyVal) => {
+            if (atob(keyVal.key).length == 58) {
+                let addr = atob(keyVal.key)
+                let wager = keyVal.value.uint
+                battles.push({addr: addr, wager: wager})
+            }
+        })
+
+        this.setState({
+            battles: battles
+        })
+
+
+
+        if (this.props.activeAddress) {
+
+            let optedin = false
+
+            let response = await indexerClient.lookupAccountAppLocalStates(this.props.activeAddress).do();
+            response["apps-local-states"].forEach((localstate) => {
+                if (localstate.id == this.props.contract) {
+                    optedin = true
+                    localstate["key-value"].forEach((kv) => {
+                        if (atob(kv.key) == "assetId") {
+                            console.log(kv)
+                            this.setState({
+                                charSel: kv.value.uint
+                            })
+                        }
+                    })
                 }
             })
 
+        }
 
-            let numAssets = accountAssets.assets.length
-            let nextToken = accountAssets["next-token"]
-
-            while (numAssets == 1000) {
-
-                accountAssets = await indexerClient.lookupAccountAssets(this.props.activeAddress).nextToken(nextToken).do();
-
-                accountAssets.assets.forEach((asset) => {
-                    console.log(asset)
-                    if (asset.amount == 1) {
-                        this.setState(prevState => ({
-                            accountAssets: [...prevState.accountAssets, asset["asset-id"]]
-                        }))
-                    }
-                })
-
-                numAssets = accountAssets.assets.length
-                nextToken = accountAssets["next-token"]
-
-            }
-
-            let dcChars = await indexerClient.searchForAssets().unit("DCCHAR").do();
-            console.log(dcChars)
-
-            dcChars.assets.forEach((asset) => {
-                console.log(asset)
-                this.setState(prevState => ({
-                    dcChars: [...prevState.dcChars, asset.index]
-                }))
-                
-            })
-
-            numAssets = accountAssets.assets.length
-            nextToken = accountAssets["next-token"]
-
-            while (numAssets == 1000) {
-
-                let dcChars = await indexerClient.searchForAssets().unit("DCCHAR").do();
-                console.log(dcChars)
-
-                dcChars.assets.forEach((asset) => {
-                    console.log(asset)
-                    this.setState(prevState => ({
-                        dcChars: [...prevState.dcChars, asset.index]
-                    }))
-                    
-                })
-
-                numAssets = accountAssets.assets.length
-                nextToken = accountAssets["next-token"]
-
-            }
-
-          }
-
+        
+ 
+          
     }
 
 
@@ -126,60 +116,209 @@ export default class Fight extends React.Component {
         
       }
 
-      async chooseCharacter(nftId) {
+      async startBattle() {
 
-        
+        const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
 
+        let params = await client.getTransactionParams().do();
+
+          let wtxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+            this.props.activeAddress, 
+            "DUJSVRJHJ4VPZP2O765VWDPI7BCB2ASLNST5LAOX3ZWNYFHQFAWPOEURLM", 
+            undefined,
+            undefined,
+            this.state.wager, 
+            undefined,
+            601894079,
+            params
+          );
+
+          let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
+            this.props.activeAddress, 
+            "DUJSVRJHJ4VPZP2O765VWDPI7BCB2ASLNST5LAOX3ZWNYFHQFAWPOEURLM", 
+            500000, 
+            undefined,
+            undefined,
+            params
+          );
+
+         
+          const appArgs = []
+          appArgs.push(
+            new Uint8Array(Buffer.from("start")),
+            new Uint8Array(Buffer.from(this.props.activeAddress))
+
+          )
+
+          const accounts = [this.props.activeAddress]
+          const foreignApps = []
+            
+          const foreignAssets = []
+
+          const boxes = []
+          
+          let atxn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, this.props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+          
+          let txns = [wtxn, ftxn, atxn]
+
+          let txgroup = algosdk.assignGroupID(txns)
+
+          let multipleTxnGroups
+  
+          if (this.props.wallet == "pera") {
+  
+            try {
+              multipleTxnGroups = [
+                {txn: wtxn, signers: [this.props.activeAddress]},
+                {txn: ftxn, signers: [this.props.activeAddress]},
+                {txn: atxn, signers: [this.props.activeAddress]}
+              ];
+  
+              const signedTxn = await peraWallet.signTransaction([multipleTxnGroups]) 
+
+              let txId = await client.sendRawTransaction(signedTxn).do();
+
+              this.setState({
+                confirm: "Sending Transaction..."
+              })
+
+              let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+
+
+              this.setState({
+                confirm: "Transaction Confirmed, Battle Init"
+              })
+    
+              
+            }
+  
+            catch (error) {
+              this.setState({
+                confirm: "Transaction Denied"
+              })
+              console.log(error)
+            }
+            
+  
+          }
+  
+          else if (this.props.wallet == "myalgo") {
+
+            try {
+
+            multipleTxnGroups = [
+              wtxn.toByte(),
+              ftxn.toByte(),
+              atxn.toByte()
+            ];
+
+            const myAlgoWallet = new MyAlgo()
+
+            const signedTxn = await myAlgoWallet.signTransaction(multipleTxnGroups);
+
+            let txId = await client.sendRawTransaction([signedTxn[0].blob, signedTxn[1].blob, signedTxn[2].blob]).do();
+
+            this.setState({
+              confirm: "Sending Transaction..."
+            })
+
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);        
+
+            this.setState({
+              confirm: "Transaction Confirmed, Battle Init"
+            })
+
+          }
+
+          catch (error) {
+            this.setState({
+              confirm: "Transaction Denied"
+            })
+            console.log(error)
+          }
+  
+          
+        }
 
       }
 
 
-      
-      
-
     render() {
 
-        let ownedNfts = []
+        console.log(this.state)
 
-        for (var i = 0; i < this.state.accountAssets.length; i++) {
-            if (this.state.dcChars.includes(this.state.accountAssets[i])) {
-                ownedNfts.push(this.state.accountAssets[i])
-            }
-        }
+        return (
+            <div>
 
-        if (this.state.charSelect) {
-            return (
-                <div>
-                    <Button style={{display: "flex", margin: "auto"}} onClick={() => this.setState({charSelect: null})}>
-                        <DisplayChar nftId={this.state.charSelect} zoom={true} />
-                    </Button>        
-                </div>
-            )
-        }
+                {this.state.charSel ?
+                    <>
+                        <Typography color="secondary" align="center" variant="h6"> My Char </Typography>
+                        <div style={{display: "flex", margin: "auto", width: "50%", maxWidth: 300}}>
+                            <DisplayChar contract={this.state.contract} nftId={this.state.charSel} activeAddress={this.props.activeAddress} wallet={this.props.wallet} setNft={(nftId) => this.setState({charSelect: nftId})}/>
+                        </div>
+                        <br />
 
-        else {
-            return (
-                <div>
-                    <Grid container align="center">
-                    {ownedNfts.length > 0 ? 
-                    ownedNfts.map((nft) => {
-                        return (
-                            <Grid item xs={12} sm={6} md={4} lg={2}>
-                            <Button onClick={() => this.setState({charSelect: nft})}>
-                            <DisplayChar nftId={nft} zoom={false} />
-                            </Button>
-                            </Grid>
-                        )
-                    })
+                        <Typography color="secondary" align="center" variant="h6"> Start Battle </Typography>
+
+                        <br />
+                 
+                        <TextField                
+                            onChange={this.handleChange}
+                            value={this.state.wager}
+                            multiline
+                            type="number"
+                            label=""
+                            name="wager"
+                            autoComplete="false"
+                            InputProps={{ style: { color: "black" } }}
+                          
+                            style={{
+                            color: "black",
+                            background: "white",
+                            borderRadius: 15,
+                            display: "flex",
+                            margin: "auto",
+                            width: "50%"
+                          
+                            }}
+                          />
+                    <br />
+                    {this.state.wager >= 10000 ?
+                    <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => this.startBattle()}>
+                        <Typography color="primary" variant="h6" align="center"> Wager {Number(this.state.wager).toLocaleString("en-US")} </Typography>
+                        <img src="invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
+                        <Typography  variant="h6"> + 0.5 </Typography>
+                        <img src="AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
+                    </Button>
                     :
-                    <Grid item sm={12}>
-                        <Typography color="secondary" align="center" variant="h6"> Finding Characters... </Typography>
-                    </Grid>
+                    null
                     }
-                    </Grid>
-                </div>
-            )
-        }
+                    <br />
+                    <Typography color="secondary" align="center" variant="h6"> {this.state.confirm} </Typography>
+                    <br />
+                    </>
+                    :
+                    null
+                }
+                <br />
+                <Typography color="secondary" align="center" variant="h6"> Join Battle </Typography>
+                <br />
+                {this.state.battles.length > 0 ? 
+                this.state.battles.map((battle) => {
+                    console.log(battle)
+                    return (
+                        <DisplayBat address={battle.addr} wager={battle.wager} contract={this.props.contract} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
+                    )
+                })
+                :
+                null
+                }
+
+
+
+            </div>
+        )
     }
+    
     
 }

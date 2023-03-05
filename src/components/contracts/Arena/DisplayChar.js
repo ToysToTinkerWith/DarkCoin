@@ -51,8 +51,6 @@ export default class DisplayChar extends React.Component {
         
         let session = await response.json()
 
-        console.log(session)
-
         let charStats = null
 
         if (this.props.zoom) {
@@ -66,16 +64,12 @@ export default class DisplayChar extends React.Component {
             .txType("acfg")
             .do();
 
-            console.log(assetConfig.transactions[0])
-
-            console.log(atob(assetConfig.transactions[0].note))
-
             charStats = atob(assetConfig.transactions[0].note)
         }
         
         this.setState({
             nft: session.assets[0].params,
-            nftUrl: "https:" + session.assets[0].params.url.slice(7),
+            nftUrl: "https://ipfs.io/ipfs/" + session.assets[0].params.url.slice(34),
             charStats: charStats
         })
           
@@ -91,11 +85,6 @@ export default class DisplayChar extends React.Component {
         response["apps-local-states"].forEach((localstate) => {
             if (localstate.id == this.props.contract) {
                 optedin = true
-                localstate["key-value"].forEach((kv) => {
-                    if (atob(kv.key) == "name") {
-                        console.log(atob(kv.value.bytes))
-                    }
-                })
             }
         })
 
@@ -202,8 +191,6 @@ export default class DisplayChar extends React.Component {
    
 
     render() {
-
-        console.log(this.state)
 
         if (this.state.nft) {
             if (this.props.zoom) {

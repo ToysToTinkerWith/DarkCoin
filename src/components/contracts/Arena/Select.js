@@ -28,7 +28,11 @@ export default class Select extends React.Component {
         
         
 
-          const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+        const token = {
+            'X-API-Key': process.env.indexerKey
+        }
+      
+        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
  
           if (this.props.activeAddress) {
             let accountAssets = await indexerClient.lookupAccountAssets(this.props.activeAddress).do();
@@ -51,7 +55,6 @@ export default class Select extends React.Component {
                 accountAssets = await indexerClient.lookupAccountAssets(this.props.activeAddress).nextToken(nextToken).do();
 
                 accountAssets.assets.forEach((asset) => {
-                    console.log(asset)
                     if (asset.amount == 1) {
                         this.setState(prevState => ({
                             accountAssets: [...prevState.accountAssets, asset["asset-id"]]
@@ -65,10 +68,8 @@ export default class Select extends React.Component {
             }
 
             let dcChars = await indexerClient.searchForAssets().unit("DCCHAR").do();
-            console.log(dcChars)
 
             dcChars.assets.forEach((asset) => {
-                console.log(asset)
                 this.setState(prevState => ({
                     dcChars: [...prevState.dcChars, asset.index]
                 }))
@@ -81,10 +82,8 @@ export default class Select extends React.Component {
             while (numAssets == 1000) {
 
                 let dcChars = await indexerClient.searchForAssets().unit("DCCHAR").do();
-                console.log(dcChars)
 
                 dcChars.assets.forEach((asset) => {
-                    console.log(asset)
                     this.setState(prevState => ({
                         dcChars: [...prevState.dcChars, asset.index]
                     }))
@@ -145,7 +144,6 @@ export default class Select extends React.Component {
                     <Grid container align="center">
                     {ownedNfts.length > 0 ? 
                     ownedNfts.map((nft, index) => {
-                        console.log(nft)
                         return (
                             <Grid key={index} item xs={6} sm={4} md={3} lg={2} style={{position: "relative"}} >
                                 <DisplayChar contract={this.state.contract} style={{position: "absolute"}} nftId={nft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} setNft={(nftId) => this.setState({charSelect: nftId})}/>

@@ -44,16 +44,11 @@ export default class Fight extends React.Component {
           }
           });
 
-          const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
-
-          let responseProposal = await client.getApplicationBoxByName(this.props.contract, "Battle1").do();
-
-          let string = new TextDecoder().decode(responseProposal.value)
-
-          console.log(string)
-
-
-        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
+          const token = {
+            'X-API-Key': process.env.indexerKey
+        }
+      
+        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
 
         let global = await indexerClient.lookupApplications(this.props.contract).do();
 
@@ -77,15 +72,11 @@ export default class Fight extends React.Component {
 
         if (this.props.activeAddress) {
 
-            let optedin = false
-
             let response = await indexerClient.lookupAccountAppLocalStates(this.props.activeAddress).do();
             response["apps-local-states"].forEach((localstate) => {
                 if (localstate.id == this.props.contract) {
-                    optedin = true
                     localstate["key-value"].forEach((kv) => {
                         if (atob(kv.key) == "assetId") {
-                            console.log(kv)
                             this.setState({
                                 charSel: kv.value.uint
                             })
@@ -122,12 +113,14 @@ export default class Fight extends React.Component {
 
         let params = await client.getTransactionParams().do();
 
+        console.log(this.state.wager)
+
           let wtxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
             this.props.activeAddress, 
-            "DUJSVRJHJ4VPZP2O765VWDPI7BCB2ASLNST5LAOX3ZWNYFHQFAWPOEURLM", 
+            "OVPLY5QPDP6QNTNDQ5DF6UZEQ7ACPFZ6BKOXZX6EHFLIZXUQDNJUGKDICQ", 
             undefined,
             undefined,
-            this.state.wager, 
+            Number(this.state.wager), 
             undefined,
             601894079,
             params
@@ -135,7 +128,7 @@ export default class Fight extends React.Component {
 
           let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
             this.props.activeAddress, 
-            "DUJSVRJHJ4VPZP2O765VWDPI7BCB2ASLNST5LAOX3ZWNYFHQFAWPOEURLM", 
+            "OVPLY5QPDP6QNTNDQ5DF6UZEQ7ACPFZ6BKOXZX6EHFLIZXUQDNJUGKDICQ", 
             500000, 
             undefined,
             undefined,
@@ -245,8 +238,6 @@ export default class Fight extends React.Component {
 
     render() {
 
-        console.log(this.state)
-
         return (
             <div>
 
@@ -298,16 +289,18 @@ export default class Fight extends React.Component {
                     <br />
                     </>
                     :
-                    null
+                    <Typography color="secondary" align="center" variant="h6"> Must select a character to battle </Typography>
+
                 }
                 <br />
                 <Typography color="secondary" align="center" variant="h6"> Join Battle </Typography>
                 <br />
                 {this.state.battles.length > 0 ? 
-                this.state.battles.map((battle) => {
-                    console.log(battle)
+                this.state.battles.map((battle, index) => {
                     return (
+                      <div key={index}>
                         <DisplayBat address={battle.addr} wager={battle.wager} contract={this.props.contract} activeAddress={this.props.activeAddress} wallet={this.props.wallet} />
+                      </div>
                     )
                 })
                 :

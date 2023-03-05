@@ -43,8 +43,11 @@ export default class DisplayBat extends React.Component {
           }
           });
       
-          const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
-
+          const token = {
+            'X-API-Key': process.env.indexerKey
+        }
+      
+        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
           
 
 
@@ -75,17 +78,11 @@ export default class DisplayBat extends React.Component {
         
         let session = await response.json()
 
-        console.log(session)
-
         let charStats = null
 
             let assetConfig = await indexerClient.lookupAssetTransactions(nftId)
             .txType("acfg")
             .do();
-
-            console.log(assetConfig.transactions[0])
-
-            console.log(atob(assetConfig.transactions[0].note))
 
             charStats = atob(assetConfig.transactions[0].note)
         
@@ -93,7 +90,7 @@ export default class DisplayBat extends React.Component {
         this.setState({
             nft: session.assets[0].params,
             nftId: nftId,
-            nftUrl: "https:" + session.assets[0].params.url.slice(7),
+            nftUrl: "https://ipfs.io/ipfs/" + session.assets[0].params.url.slice(34),
             charStats: charStats
         })
           
@@ -203,14 +200,38 @@ export default class DisplayBat extends React.Component {
                                     
                                 });
                         
-                                const sess1 = await res1.json()
+                                let sess1 = await res1.json()
                         
                                 let story1 = sess1.response.text
 
-                                console.log(story1)
+
+                                while (story1.length > 800) {
+
+                                    res1 = await fetch('/api/generateStory', {
+                                        method: "POST",
+                                        headers: {
+                                        "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            charName: charName,
+                                            charStats: charStats,
+                                            charNameOther: this.state.nft.name,
+                                            charStatsOther: this.state.charStats,
+                                            wager: this.props.wager
+    
+                                        }),
+                                        
+                                        
+                                    });
+
+                                    sess1 = await res1.json()
+
+                                    story1 = sess1.response.text
+
+                                }
 
                                 this.setState({
-                                    story1: String(kv.value.uint) + " " + this.state.nftId + " " + this.props.wager + " " + story1
+                                    story1: String(kv.value.uint) + ">" + charName + ">" + this.state.nftId + ">" + this.state.nft.name + ">" + this.props.wager + ">" + story1
                                 })
 
                                 let res2 = await fetch('/api/generateStory', {
@@ -230,15 +251,38 @@ export default class DisplayBat extends React.Component {
                                     
                                 });
                         
-                                const sess2 = await res2.json()
+                                let sess2 = await res2.json()
                         
                                 let story2 = sess2.response.text
 
-                                console.log(story2)
 
+                                while (story2.length > 800) {
+
+                                    res2 = await fetch('/api/generateStory', {
+                                        method: "POST",
+                                        headers: {
+                                        "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            charName: this.state.nft.name,
+                                            charStats: this.state.charStats,
+                                            charNameOther: charName,
+                                            charStatsOther: charStats,
+                                            wager: this.props.wager
+    
+                                        }),
+                                        
+                                        
+                                    });
+
+                                    sess2 = await res2.json()
+
+                                    story2 = sess1.response.text
+
+                                }
 
                                 this.setState({
-                                    story2: this.state.nftId + " " + String(kv.value.uint) + " " + this.props.wager + " " + story2
+                                    story2: this.state.nftId + ">" + this.state.nft.name + ">" + String(kv.value.uint) + ">" + charName + ">" + this.props.wager + ">" + story2
                                 })
 
 
@@ -301,14 +345,38 @@ export default class DisplayBat extends React.Component {
                                     
                                 });
                         
-                                const sess1 = await res1.json()
+                                let sess1 = await res1.json()
                         
                                 let story1 = sess1.response.text
 
-                                console.log(story1)
+
+                                while (story1.length > 800) {
+
+                                    res1 = await fetch('/api/generateStory', {
+                                        method: "POST",
+                                        headers: {
+                                        "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            charName: charName,
+                                            charStats: charStats,
+                                            charNameOther: this.state.nft.name,
+                                            charStatsOther: this.state.charStats,
+                                            wager: this.props.wager
+    
+                                        }),
+                                        
+                                        
+                                    });
+
+                                    sess1 = await res1.json()
+
+                                    story1 = sess1.response.text
+
+                                }
 
                                 this.setState({
-                                    story1: String(kv.value.uint) + " " + this.state.nftId + " " + this.props.wager + " " + story1
+                                    story1: String(kv.value.uint) + ">" + charName + ">" + this.state.nftId + ">" + this.state.nft.name + ">" + this.props.wager + ">" + story1
                                 })
 
                                 let res2 = await fetch('/api/generateStory', {
@@ -328,15 +396,38 @@ export default class DisplayBat extends React.Component {
                                     
                                 });
                         
-                                const sess2 = await res2.json()
+                                let sess2 = await res2.json()
                         
                                 let story2 = sess2.response.text
 
-                                console.log(story2)
 
+                                while (story2.length > 800) {
+
+                                    res2 = await fetch('/api/generateStory', {
+                                        method: "POST",
+                                        headers: {
+                                        "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({
+                                            charName: this.state.nft.name,
+                                            charStats: this.state.charStats,
+                                            charNameOther: charName,
+                                            charStatsOther: charStats,
+                                            wager: this.props.wager
+    
+                                        }),
+                                        
+                                        
+                                    });
+
+                                    sess2 = await res2.json()
+
+                                    story2 = sess1.response.text
+
+                                }
 
                                 this.setState({
-                                    story2: this.state.nftId + " " + String(kv.value.uint) + " " + this.props.wager + " " + story2
+                                    story2: this.state.nftId + ">" + this.state.nft.name + ">" + String(kv.value.uint) + ">" + charName + ">" + this.props.wager + ">" + story2
                                 })
 
 
@@ -374,10 +465,10 @@ export default class DisplayBat extends React.Component {
 
         let wtxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
             this.props.activeAddress, 
-            "DUJSVRJHJ4VPZP2O765VWDPI7BCB2ASLNST5LAOX3ZWNYFHQFAWPOEURLM", 
+            "OVPLY5QPDP6QNTNDQ5DF6UZEQ7ACPFZ6BKOXZX6EHFLIZXUQDNJUGKDICQ", 
             undefined,
             undefined,
-            this.props.wager, 
+            Number(this.props.wager), 
             undefined,
             601894079,
             params
@@ -387,7 +478,7 @@ export default class DisplayBat extends React.Component {
 
           let globalState = global.application.params["global-state"]
 
-          let battleNum = 1
+          let battleNum
 
           globalState.forEach((keyVal) => {
             if (atob(keyVal.key) == "battleNum") {
@@ -506,8 +597,6 @@ export default class DisplayBat extends React.Component {
 
     render() {
 
-        console.log(this.state)
-
         if (this.state.nft) {
             if (this.props.zoom) {
                 return (
@@ -554,7 +643,7 @@ export default class DisplayBat extends React.Component {
                         </Button>
                         :
                         <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => this.genStory()}>
-                            <Typography  variant="h6"> Generate 1000 </Typography>
+                            <Typography  variant="h6"> Generate 1,000 </Typography>
                             <img src="invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
                         </Button>
                         }

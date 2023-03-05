@@ -26,8 +26,8 @@ async function generateStory(req, res) {
         prompt: 
         "There are two characters, the first one is: Name: " + req.body.charName + " " + req.body.charStats +
         ". The second character is: Name: " + req.body.charNameOther + " " + req.body.charStatsOther +
-        " Spawn these characters in a random setting. In less than 400 characters, tell me a story of a battle between these two characters, in which the first character " + req.body.charName + " wins." +
-        " Make the fight interesting until the very end. At the end of the battle, award " + req.body.charName + " with " + req.body.wager + " Dark Coin."
+        " Spawn these characters in a random setting. Tell me a story of a battle between these two characters in less than 500 characters, in which the first character " + req.body.charName + " wins." +
+        " Make the fight interesting until the very end. The output should be between 450 and 500 characters."
         ,
         n: 1,
         max_tokens: 200,

@@ -54,10 +54,6 @@ export default class Create extends React.Component {
 
           let address = await algosdk.getApplicationAddress(970700116)
 
-        console.log(address)
- 
-
-
     }
 
 
@@ -66,9 +62,15 @@ export default class Create extends React.Component {
         let value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
 
-        this.setState({
+        console.log(event.nativeEvent.data)
+
+        if (String(event.nativeEvent.data) != ">") {
+          this.setState({
             [name]: value
             });
+        }
+
+       
 
         
     
@@ -297,8 +299,6 @@ export default class Create extends React.Component {
 
         const session = await response.json()
 
-        console.log(session)
-
         this.setState({
           confirm: "Pinned"
         })
@@ -308,8 +308,6 @@ export default class Create extends React.Component {
         const client = new algosdk.Algodv2("", "https://node.algoexplorerapi.io/", "")
 
         let params = await client.getTransactionParams().do();
-
-        console.log(this.state)
 
         const creator = this.props.activeAddress;
         const defaultFrozen = false;    
@@ -322,7 +320,7 @@ export default class Create extends React.Component {
         const clawbackAddr = undefined;
         const total = 1;                // NFTs have totalIssuance of exactly 1
         const decimals = 0;             // NFTs have decimals of exactly 0
-        const note = new Uint8Array(Buffer.from("Description: " + this.state.descript + " Moves: " + this.state.des))
+        const note = new Uint8Array(Buffer.from("Description: " + this.state.descript.substring(0, 100) + " Moves: " + this.state.des))
         const mtxn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
         from:creator,
         total,
@@ -515,8 +513,7 @@ export default class Create extends React.Component {
 
                     </div>
                     :
-                    <img src="CharBack.png" style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500}} />
-
+                    null
                    
                     }
                 

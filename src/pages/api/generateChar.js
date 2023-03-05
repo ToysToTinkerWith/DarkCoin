@@ -25,7 +25,7 @@ async function generateChar(req, res) {
         model: "text-davinci-003",
         prompt: 
         req.body.descript + ". This character will have the name " + req.body.name +
-        ". Generate 2 moves that this character might have in an rpg game."
+        ". Generate 2 damaging moves that this character might have in an rpg game."
         ,
         n: 1,
         max_tokens: 100,

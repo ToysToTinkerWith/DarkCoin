@@ -22,8 +22,7 @@ async function generateImage(req, res) {
     const configuration = new Configuration({
         apiKey: process.env.DALLE_KEY,
     });
-    const openai = new OpenAIApi(configuration);
-    
+    const openai = new OpenAIApi(configuration);    
 
       const response = await openai.createImageEdit(
         fs.createReadStream("./characters/Background.png"),
@@ -33,7 +32,11 @@ async function generateImage(req, res) {
         "1024x1024"
       );
 
+      console.log(response)
+
       let image_url = response.data.data[0].url;
+
+      console.log(image_url)
 
       res.json({ image: image_url });
 

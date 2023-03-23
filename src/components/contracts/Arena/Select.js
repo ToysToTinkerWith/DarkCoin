@@ -19,7 +19,8 @@ export default class Select extends React.Component {
         this.state = {
             accountAssets: [],
             dcChars: [],
-            charSelect: null
+            charSelect: null,
+            message: ""
         };
         this.handleChange = this.handleChange.bind(this)
     }
@@ -35,6 +36,10 @@ export default class Select extends React.Component {
         const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
  
           if (this.props.activeAddress) {
+
+            this.setState({
+                message: "Finding Characters..."
+            })
             let accountAssets = await indexerClient.lookupAccountAssets(this.props.activeAddress).do();
 
         
@@ -95,7 +100,13 @@ export default class Select extends React.Component {
 
             }
 
+            this.setState({
+                message: ""
+            })
+
           }
+
+          
 
     }
 
@@ -147,13 +158,12 @@ export default class Select extends React.Component {
                         return (
                             <Grid key={index} item xs={6} sm={4} md={3} lg={2} style={{position: "relative"}} >
                                 <DisplayChar contract={this.state.contract} style={{position: "absolute"}} nftId={nft} activeAddress={this.props.activeAddress} wallet={this.props.wallet} setNft={(nftId) => this.setState({charSelect: nftId})}/>
-                                
                             </Grid>
                         )
                     })
                     :
-                    <Grid item sm={12}>
-                        <Typography color="secondary" align="center" variant="h6"> Finding Characters... </Typography>
+                    <Grid item xs={12} sm={12}>
+                        <Typography color="secondary" align="center" variant="h6"> {this.state.message} </Typography>
                     </Grid>
                     }
                     </Grid>

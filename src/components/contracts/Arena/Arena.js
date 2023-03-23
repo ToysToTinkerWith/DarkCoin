@@ -6,6 +6,7 @@ import Create from "./Create"
 import Select from "./Select"
 import Fight from "./Fight"
 import History from "./History"
+import Leaderboard from "./Leaderboard"
 
 import algosdk from "algosdk"
 
@@ -14,7 +15,7 @@ export default class Arena extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            contract: 1049960864,
+            contract: 1053328572,
             place: ""
             
         };
@@ -54,6 +55,11 @@ export default class Arena extends React.Component {
                         <Typography color="secondary" variant="h6" style={{color: this.state.place == "history" ? "#000000" : "#FFFFFF"}}> History </Typography>
                     </Button>
                     </Grid>
+                    <Grid item xs={12} sm={12} style={{marginBottom: 50}}>
+                    <Button style={{backgroundColor: this.state.place == "leaderboard" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} onClick={() => this.state.place == "leaderboard" ? this.setState({place: ""}) : this.setState({place: "leaderboard"})}>
+                        <Typography color="secondary" variant="h6" style={{color: this.state.place == "leaderboard" ? "#000000" : "#FFFFFF"}}> Leaderboard </Typography>
+                    </Button>
+                    </Grid>
                   </Grid>
 
                 {this.state.place == "create" ?
@@ -76,6 +82,12 @@ export default class Arena extends React.Component {
 
                 {this.state.place == "history" ?
                     <History activeAddress={this.props.activeAddress} wallet={this.props.wallet} contract={this.state.contract} />
+                    :
+                    null
+                }
+
+                {this.state.place == "leaderboard" ?
+                    <Leaderboard activeAddress={this.props.activeAddress} wallet={this.props.wallet} contract={this.state.contract} />
                     :
                     null
                 }

@@ -785,11 +785,13 @@ export default class Proposals extends React.Component {
                 const accounts = []
                 const foreignApps = []
                     
-                let foreignAssets = [this.state.walletAssets[i]]
+                let foreignAssets = [this.state.walletAssets[i], 601894079]
                 
                 let satBox = new Uint8Array(Buffer.from("Sat" + proposalNum))
+                let proposalBox = new Uint8Array(Buffer.from("Proposal" + proposalNum))
+
       
-                const boxes = [{appIndex: 0, name: satBox}, {appIndex: 0, name: satBox}]
+                const boxes = [{appIndex: 0, name: satBox}, {appIndex: 0, name: satBox}, {appIndex: 0, name: proposalBox}, {appIndex: 0, name: proposalBox}]
                 
                 txn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, this.props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);          
                 

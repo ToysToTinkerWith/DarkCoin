@@ -38,6 +38,7 @@ export default class Create extends React.Component {
         this.handleChange = this.handleChange.bind(this)
         this.generate = this.generate.bind(this)
         this.pin = this.pin.bind(this)
+        this.sendDiscordMessage = this.sendDiscordMessage.bind(this)
     }
 
     async componentDidMount() {
@@ -52,8 +53,6 @@ export default class Create extends React.Component {
           }
           });
 
-          let address = await algosdk.getApplicationAddress(970700116)
-
     }
 
 
@@ -61,8 +60,6 @@ export default class Create extends React.Component {
         const target = event.target;
         let value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
-
-        console.log(event.nativeEvent.data)
 
         if (String(event.nativeEvent.data) != ">") {
           this.setState({
@@ -251,6 +248,8 @@ export default class Create extends React.Component {
               });
     
               const session = await response.json()
+
+              console.log(session)
     
               let generatedImage = session.image
               
@@ -320,7 +319,7 @@ export default class Create extends React.Component {
         const clawbackAddr = undefined;
         const total = 1;                // NFTs have totalIssuance of exactly 1
         const decimals = 0;             // NFTs have decimals of exactly 0
-        const note = new Uint8Array(Buffer.from("Description: " + this.state.descript.substring(0, 100) + " Moves: " + this.state.des))
+        const note = new Uint8Array(Buffer.from("Description: " + this.state.descript.substring(0, 200) + " Moves: " + this.state.des))
         const mtxn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
         from:creator,
         total,
@@ -353,6 +352,7 @@ export default class Create extends React.Component {
 
             let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
 
+            await this.sendDiscordMessage(assetName, url, confirmedTxn["asset-index"])
 
             this.setState({
               message: "Transaction Confirmed, Character Successfully Minted.",
@@ -409,11 +409,30 @@ export default class Create extends React.Component {
       }
 
 
+      async sendDiscordMessage(name, url, assetID) {
+       
+        const response = await fetch(process.env.discordWebhook, {
+          method: "POST",
+          body: JSON.stringify({ 
+            username: "Arena Create",
+            embeds: [{
+              "title" : name + " has appeared!",
+              "url": "https://algoexplorer.io/asset/" + assetID,
+              "image": {
+                "url": String(url)
+              }
+            }]
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
       
       
 
     render() {
-
+console.log(this.state)
 
         return (
             <div>

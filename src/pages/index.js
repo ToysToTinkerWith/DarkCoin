@@ -51,6 +51,7 @@ export default class Index extends React.Component {
 
                 </Grid>
 
+
                 {this.state.place == "council" ? 
                     <>
                         <Button 
@@ -81,7 +82,7 @@ export default class Index extends React.Component {
                     :
                     null
                 }
-                {this.state.place == "mixer" ? 
+                {/* {this.state.place == "mixer" ? 
                     <>
                         <Button 
                         style={{display: "grid", margin: "auto"}}
@@ -96,7 +97,7 @@ export default class Index extends React.Component {
                     </>
                     :
                     null
-                }
+                } */}
                 {this.state.place == "arena" ? 
                     <>
                         <Button 
@@ -138,7 +139,7 @@ export default class Index extends React.Component {
                         </Typography>
                         </Button>
                     </Grid>
-                    <Grid item xs={12} sm={4}>
+                    {/* <Grid item xs={12} sm={4}>
                         <Button 
                         style={{display: "grid", margin: "auto", marginBottom: 50}}
                         onClick={() => this.setState({place: "mixer"})}>
@@ -147,11 +148,8 @@ export default class Index extends React.Component {
                             Mixer
                         </Typography>
                         </Button>
-                    </Grid>
-                    {this.state.activeAddress == "RJWIVWSFCX25TXKZUYAWXQ5DAGFAAG4DBPUQ43VOFDI22FBTEQJYH33NLQ" ||
-                    this.state.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ||
-                    this.state.activeAddress == "YZJK76DNXKJFEQGG6SF4MQGDRTM3BN7OIAJK26CH2IYATBSTZA4PCIWSUY" ||
-                    this.state.activeAddress == "6MEL7VBLBTMJSEQA3DMDMA3LRAJQNYR7VQZB3MHGSXGGXDEVMIPGVCNVUM" ?
+                    </Grid> */}
+                    
                     <Grid item xs={12} sm={12}>
                     <Button 
                     style={{display: "grid", margin: "auto", marginBottom: 50}}
@@ -162,9 +160,7 @@ export default class Index extends React.Component {
                     </Typography>
                     </Button>
                 </Grid>
-                    :
-                    null
-                    }
+                    
                     
                     </Grid>
                     :

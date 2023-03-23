@@ -18,6 +18,7 @@ export default class DisplayChar extends React.Component {
         this.state = {
             nft: null,
             nftUrl: null,
+            svg: null,
             message: ""
             
         };
@@ -188,12 +189,14 @@ export default class DisplayChar extends React.Component {
 
       }
 
-   
 
     render() {
 
         if (this.state.nft) {
             if (this.props.zoom) {
+
+               
+
                 return (
                     <div >
                             <Typography color="secondary" align="center" style={{margin: 20}} variant="h6"> {this.state.nft.name} </Typography>
@@ -216,6 +219,8 @@ export default class DisplayChar extends React.Component {
                             
                         <Typography color="primary" align="center" variant="h6"> Select </Typography>
                     </Button>
+                    <br />
+                   
 
 
                     </div>
@@ -228,6 +233,8 @@ export default class DisplayChar extends React.Component {
                     <Button  onClick={() => this.props.setNft(this.props.nftId)} >
                         <Typography color="secondary" style={{position: "absolute", bottom: 10, left: 15}} align="left" variant="caption"> {this.state.nft.name} </Typography>
                         <img style={{width: "100%", borderRadius: 5}} src={this.state.nftUrl} />
+                       
+
                     </Button>
         
                 )

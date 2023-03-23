@@ -50,7 +50,7 @@ export default function AlgoConnect(props) {
         const addresses = accounts.map(account => account.address);
 
         props.setActiveAddress(addresses[0])
-        props.setWalletType("myalgo")
+        props.setWalletType("blocked")
         
         
         } catch (err) {
@@ -136,12 +136,12 @@ export default function AlgoConnect(props) {
                     <img src="Pera.svg"  />
                 </Button>
             </Grid>
-            <Grid item xs={3} style={{marginTop: 10}}>
+            {/* <Grid item xs={3} style={{marginTop: 10}}>
                 <Button style={{marginRight: 20}}
                     onClick={() => connectToMyAlgo()}> 
                     <img src="myAlgo.svg" />
                 </Button>
-            </Grid>
+            </Grid> */}
             </>
             :
             <>

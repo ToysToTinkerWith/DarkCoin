@@ -117,7 +117,7 @@ export default class Fight extends React.Component {
 
           let wtxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
             this.props.activeAddress, 
-            "OVPLY5QPDP6QNTNDQ5DF6UZEQ7ACPFZ6BKOXZX6EHFLIZXUQDNJUGKDICQ", 
+            "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
             undefined,
             undefined,
             Number(this.state.wager), 
@@ -128,7 +128,7 @@ export default class Fight extends React.Component {
 
           let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
             this.props.activeAddress, 
-            "OVPLY5QPDP6QNTNDQ5DF6UZEQ7ACPFZ6BKOXZX6EHFLIZXUQDNJUGKDICQ", 
+            "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
             500000, 
             undefined,
             undefined,

@@ -24,6 +24,8 @@ export default class MyDocument extends Document {
           "dateModified": "2021-07-20T09:20:00+08:00"
         
         </Script>
+
+
      
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
           <meta name="title" content="Dark Coin | Algorand" />
@@ -41,7 +43,6 @@ export default class MyDocument extends Document {
 
           <link rel="icon" href="/images/favicon.ico"/>
           <link rel="shortcut icon" href="/images/favicon.ico"/>
-
 
           
           

@@ -18,8 +18,6 @@ async function generateChar(req, res) {
         apiKey: process.env.DALLE_KEY,
     });
     const openai = new OpenAIApi(configuration);
-
-    console.log(openai)
     
     const response = await openai.createCompletion({
         model: "text-davinci-003",

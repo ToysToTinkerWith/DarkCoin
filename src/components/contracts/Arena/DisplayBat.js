@@ -1,6 +1,6 @@
 import React from "react"
 
-import algosdk from "algosdk"
+import algosdk, { seedFromMnemonic } from "algosdk"
 
 import { Typography, Button } from "@mui/material"
 
@@ -27,6 +27,7 @@ export default class DisplayBat extends React.Component {
         };
         this.joinBattle = this.joinBattle.bind(this)
         this.genStory = this.genStory.bind(this)
+        this.sendBattle = this.sendBattle.bind(this)
 
 
     }
@@ -101,8 +102,11 @@ export default class DisplayBat extends React.Component {
         let charName
         let charStats
 
-        const indexerClient = new algosdk.Indexer('', 'https://algoindexer.algoexplorerapi.io', '');
-
+        const token = {
+            'X-API-Key': process.env.indexerKey
+        }
+      
+        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
 
         let response = await indexerClient.lookupAccountAppLocalStates(this.props.activeAddress).do();
         response["apps-local-states"].forEach((localstate) => {
@@ -230,6 +234,7 @@ export default class DisplayBat extends React.Component {
 
                                 }
 
+
                                 this.setState({
                                     story1: String(kv.value.uint) + ">" + charName + ">" + this.state.nftId + ">" + this.state.nft.name + ">" + this.props.wager + ">" + story1
                                 })
@@ -280,6 +285,7 @@ export default class DisplayBat extends React.Component {
                                     story2 = sess1.response.text
 
                                 }
+
 
                                 this.setState({
                                     story2: this.state.nftId + ">" + this.state.nft.name + ">" + String(kv.value.uint) + ">" + charName + ">" + this.props.wager + ">" + story2
@@ -375,6 +381,7 @@ export default class DisplayBat extends React.Component {
 
                                 }
 
+
                                 this.setState({
                                     story1: String(kv.value.uint) + ">" + charName + ">" + this.state.nftId + ">" + this.state.nft.name + ">" + this.props.wager + ">" + story1
                                 })
@@ -426,6 +433,7 @@ export default class DisplayBat extends React.Component {
 
                                 }
 
+
                                 this.setState({
                                     story2: this.state.nftId + ">" + this.state.nft.name + ">" + String(kv.value.uint) + ">" + charName + ">" + this.props.wager + ">" + story2
                                 })
@@ -465,7 +473,7 @@ export default class DisplayBat extends React.Component {
 
         let wtxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
             this.props.activeAddress, 
-            "OVPLY5QPDP6QNTNDQ5DF6UZEQ7ACPFZ6BKOXZX6EHFLIZXUQDNJUGKDICQ", 
+            "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
             undefined,
             undefined,
             Number(this.props.wager), 
@@ -535,6 +543,23 @@ export default class DisplayBat extends React.Component {
 
               let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
 
+             let Battle = await client.getApplicationBoxByName(this.props.contract, "Battle" + String(battleNum)).do();
+
+             let string = new TextDecoder().decode(Battle.value)
+
+             let array = string.split(">")
+
+            let winner = Number(array[0])
+            let loser = Number(array[2])
+            let wager = Number(array[4])
+            let story = array[5]
+
+            await this.sendBattle(winner, loser, wager, story, txId.txId)
+
+
+
+
+
 
               this.setState({
                 confirm: "Battle Complete"
@@ -592,6 +617,159 @@ export default class DisplayBat extends React.Component {
 
 
       }
+
+    async sendBattle(winner, loser, wager, story, txId) {
+
+        let responseWinner = await fetch('/api/getNft', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nftId: winner
+              }),
+            
+                
+            });
+        
+        let sessionWinner = await responseWinner.json()
+
+        let nameWinner = sessionWinner.assets[0].params.name
+        let urlWinner = "https://ipfs.io/ipfs/" + sessionWinner.assets[0].params.url.slice(34)
+
+        let responseLoser = await fetch('/api/getNft', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nftId: loser
+              }),
+            
+                
+            });
+        
+        let sessionLoser = await responseLoser.json()
+
+        let nameLoser = sessionLoser.assets[0].params.name
+        let urlLoser = "https://ipfs.io/ipfs/" + sessionLoser.assets[0].params.url.slice(34)
+
+        let randomNumber = Math.floor(Math.random() * 2);
+
+        let embeds = []
+
+        embeds.push({
+            "title": wager.toLocaleString("en-US") + " DC on the line ! FIGHT !",
+            "color": 0
+        })
+        
+        if (randomNumber == 1) {
+            
+            embeds.push({
+                "title" : nameWinner,
+                "url": "https://algoexplorer.io/asset/" + winner,
+                "image": {
+                    "url": String(urlWinner)
+                },
+                "color": 16711680
+            })
+
+            embeds.push({
+                "title" : "VS",
+                "color" : 16777215
+            })
+
+            embeds.push({
+                "title" : nameLoser,
+                "url": "https://algoexplorer.io/asset/" + loser,
+                "image": {
+                    "url": String(urlLoser)
+                },
+                "color": 1376511
+            })
+                
+               
+
+        }
+
+        else {
+
+            embeds.push({
+                "title" : nameLoser,
+                "url": "https://algoexplorer.io/asset/" + loser,
+                "image": {
+                    "url": String(urlLoser)
+                },
+                "color": 1376511
+            })
+
+            embeds.push({
+                "title" : "VS",
+                "color" : 16777215
+            })
+
+        
+            embeds.push({
+                "title" : nameWinner,
+                "url": "https://algoexplorer.io/asset/" + winner,
+                "image": {
+                    "url": String(urlWinner)
+                },
+                "color": 16711680
+            })
+
+        }
+
+        embeds.push({
+            "description": String(story).replace(/["']/g, "'"),
+            "color": 16777215
+        })
+
+        embeds.push({
+            "title": nameWinner + " has won " + wager.toLocaleString("en-US") + " DC !",
+            "url": "https://algoexplorer.io/tx/" + txId,
+            "color": 0
+        })
+
+
+        const response = await fetch(process.env.discordWebhook, {
+            method: "POST",
+            body: JSON.stringify({
+                username: "Arena Fight",
+                embeds: embeds
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+
+
+        
+    }
+
+    // async sendData() {
+
+    //     let embeds = []
+
+    //     embeds.push({
+    //         "title": 10000 + "DC on the line! Combatants, FIGHT!",
+    //         "color": 0
+    //     })
+    //     embeds.push({
+    //         "color": 0
+    //     })
+    //     const response = await fetch(process.env.testDiscordWebhook, {
+    //         method: "POST",
+    //         body: JSON.stringify({ 
+    //           embeds: embeds
+    //         }),
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //       });
+
+    // }
 
    
 

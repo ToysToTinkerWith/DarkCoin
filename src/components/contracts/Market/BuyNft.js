@@ -11,10 +11,6 @@ const peraWallet = new PeraWalletConnect();
 
 import { Card, Typography, Button } from "@mui/material"
 
-import styles from "../../../index.module.css"
-
-import muisty from "../../../muistyles.module.css"
-
 export default class BuyNft extends React.Component { 
 
     constructor(props) {
@@ -258,9 +254,9 @@ export default class BuyNft extends React.Component {
         if (this.props.zoom && this.state.nft && this.state.nftUrl) {
             return (
                 
-              <Card className={muisty.card}>
-                  <Button className={muisty.nftbuypreview} onClick={() => this.props.setNft(null)}>
-                    <img className={styles.nftbuyimg} src={this.state.nftUrl} />
+              <Card>
+                  <Button onClick={() => this.props.setNft(null)}>
+                    <img src={this.state.nftUrl} />
                   </Button>
                   <br />
                   <Typography color="secondary" align="center" variant="h4"> {this.state.nft.name} </Typography>
@@ -294,8 +290,8 @@ export default class BuyNft extends React.Component {
             return (
                 <div>
                     <Button onClick={() => this.props.setNft(this.props.nftId)} >
-                        <Typography className={muisty.buynftidt} align="left" variant="caption"> {this.state.nft.name} </Typography>
-                        <img className={styles.buynftidimg} src={this.state.nftUrl} />
+                        <Typography align="left" variant="caption"> {this.state.nft.name} </Typography>
+                        <img src={this.state.nftUrl} />
                     </Button>
                 </div>
     

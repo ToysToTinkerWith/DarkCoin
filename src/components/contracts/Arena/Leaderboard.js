@@ -1,5 +1,7 @@
 import React from "react"
-
+import gold from '../../../../public/gold.svg';
+import silver from '../../../../public/silver.svg';
+import bronze from '../../../../public/bronze.svg';
 
 //43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA
 
@@ -108,15 +110,15 @@ export default class Leaderboard extends React.Component {
 
 
 
-        leaderboard.sort((a, b)=> {
-        if (a.numWins === b.numWins){
-            return a.earnings < b.earnings ? 1 : -1
-        } else {
-            return a.numWins < b.numWins ? 1 : -1
-        }
-        })
+        let sortedPlayers = leaderboard.sort((a, b)=> {
+                if (a.numWins === b.numWins){
+                    return a.earnings < b.earnings ? 1 : -1
+                } else {
+                    return a.numWins < b.numWins ? 1 : -1
+                }
+            })
 
-        console.log(leaderboard)
+        console.log(sortedPlayers)
 
 
         return (
@@ -124,6 +126,108 @@ export default class Leaderboard extends React.Component {
                 <br />
                 <Typography color="secondary" align="center" variant="h6"> Leaderboard </Typography>
                 <br />
+                <>
+    <h1 style={{
+        display: 'flex',
+        margin: 'auto',
+        justifyContent: 'center',
+        color: 'white',
+        marginTop: '30px',
+        whiteSpace: 'nowrap',
+        minWidth: '732px'
+    }}>
+        Dark Coin Arena Leaderboard
+    </h1>
+    <ol
+      style={{
+        backgroundColor: 'black',
+        color: 'white',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '5px solid white',
+        borderRadius: '15px',
+        marginLeft: '15%',
+        marginRight: '15%',
+        marginTop: '5%',
+        padding: '20px',
+        flexDirection: 'column',
+        paddingLeft: '20px',
+        minWidth: '550px'
+      }}
+    >
+      <h1 style={{
+        display: 'flex',
+        margin: 'auto',
+        justifyContent: 'center',
+        marginBottom: '20px'
+    }}>
+        BATTLE RANK
+      </h1>
+
+      {sortedPlayers.map((player, index) => (
+        <li 
+          key={index}
+          style={{
+            border: index % 2 === 0 ? '2px solid white' : 'none',
+            borderRadius: '15px',
+            marginBottom: '10px',
+            padding: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            maxWidth: '90%',
+            position: 'relative'
+          }}
+        >
+          {index === 0 && (
+          <img 
+            src={gold} 
+            alt="gold" 
+            style={{
+              position: 'absolute',
+              top: '-10px',
+              left: 'calc(50% - 118px)'
+            }} 
+          />
+        )} {/* display gold crown icon above the first player */}
+        {index === 1 && (
+          <img 
+            src={silver} 
+            alt="silver" 
+            style={{
+              position: 'absolute',
+              top: '-10px',
+              left: 'calc(50% - 118px)'
+            }} 
+        />
+        )} {/* display silver crown icon above the second player */}
+        {index === 2 && (
+          <img 
+            src={bronze} 
+            alt="bronze" 
+            style={{
+              position: 'absolute',
+              top: '15px',
+              left: 'calc(50% - 118px)'
+            }} 
+          />
+        )} {/* display bronze crown icon above the third player */}
+          <div style={{ marginRight: '20px', fontSize: "35px" }}>{index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'}</div> {/* display rank */}
+          <img src={player.assetId} alt="character" 
+            style={{ 
+              height: '200px', 
+              flex: '0 0 200px', 
+              marginRight: '20px'
+            }} /> {/* display character image */}
+          <div style={{ flex: '1', fontSize: '30px' }}>
+            <div>Name: {player.characterName}</div> {/* display character name */}
+            <div>Wins: {player.numWins}</div> {/* display wins */}
+            <div>Total Earned: {player.earnings} DC</div> {/* display total earned */}
+          </div>
+        </li>
+      ))}
+    </ol>
+    </>
                 
 
             </div>

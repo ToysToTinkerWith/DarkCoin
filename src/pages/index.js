@@ -176,7 +176,7 @@ export default class Index extends React.Component {
                             <Typography color="secondary" align="center" variant="h5">
                                 Dark Paper
                             </Typography>
-                            <img style={{paddingLeft: 10}} src="./DarkPaper.svg"/>
+                            <img style={{paddingLeft: 10, height: 50}} src="./DarkPaper.svg"/>
                         </Button>
                         <br />
                         </Grid>
@@ -185,7 +185,7 @@ export default class Index extends React.Component {
                             <Typography color="secondary" align="center" variant="h5">
                                 Dark Repo
                             </Typography>
-                            <img style={{paddingLeft: 10}} src="./DarkRepo.svg"/>
+                            <img style={{paddingLeft: 10, height: 50}} src="./DarkRepo.svg"/>
                         </Button>
                         <br />
                         </Grid>

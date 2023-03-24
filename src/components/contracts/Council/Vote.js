@@ -18,8 +18,6 @@ import { Grid, Typography, Button, TextField, Slider } from "@mui/material"
 
 import { PieChart, Pie, LabelList, Tooltip, ResponsiveContainer, ScatterChart, XAxis, YAxis, ZAxis, Scatter } from 'recharts';
 
-import muisty from "../../../muistyles.module.css"
-
 export default class Vote extends React.Component { 
 
     constructor(props) {
@@ -1322,7 +1320,7 @@ export default class Vote extends React.Component {
                                       <br />
                                       <Typography color="secondary" variant="h6" align="center" >  {Number(app.cost).toLocaleString("en-US")} {this.state["vote" + (proposal.proposalNum)] == app.appNum ? <img src="invDC.svg" style={{display: "inline", width: 30, paddingTop: 20}} /> : <img src="DC.svg" style={{display: "inline", width: 30, paddingTop: 20}} />}</Typography>
                                       <br />
-                                      <Button className={muisty.mixerbtn} style={{backgroundColor: this.state["vote" + (proposal.proposalNum)] == app.appNum ? "#FFFFFF" : "#000000", border: "1px solid white", display: "grid", margin: "auto"}} onClick={() => this.state["vote" + (proposal.proposalNum)] == app.appNum ? this.setState({["vote" + (proposal.proposalNum)]: null}) : this.setState({["vote" + (proposal.proposalNum)]: app.appNum})}>
+                                      <Button style={{backgroundColor: this.state["vote" + (proposal.proposalNum)] == app.appNum ? "#FFFFFF" : "#000000", border: "1px solid white", display: "grid", margin: "auto"}} onClick={() => this.state["vote" + (proposal.proposalNum)] == app.appNum ? this.setState({["vote" + (proposal.proposalNum)]: null}) : this.setState({["vote" + (proposal.proposalNum)]: app.appNum})}>
                                         <Typography color="secondary" variant="h6" style={{color: this.state["vote" + (proposal.proposalNum)] == app.appNum ? "#000000" : "#FFFFFF"}}> Accept {app.appNum} </Typography>
                                       </Button> 
                                   <br />
@@ -1337,7 +1335,7 @@ export default class Vote extends React.Component {
 
                          <div style={{display: "flex", margin: "auto"}}>
                           <br />
-                          <Button className={muisty.mixerbtn} style={{backgroundColor: this.state["vote" + (proposal.proposalNum)] == "@" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.state["vote" + (proposal.proposalNum)] == "@" ? this.setState({["vote" + (proposal.proposalNum)]: null}) : this.setState({["vote" + (proposal.proposalNum)]: "@"})}>
+                          <Button style={{backgroundColor: this.state["vote" + (proposal.proposalNum)] == "@" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.state["vote" + (proposal.proposalNum)] == "@" ? this.setState({["vote" + (proposal.proposalNum)]: null}) : this.setState({["vote" + (proposal.proposalNum)]: "@"})}>
                               <Typography color="secondary" variant="h6" style={{color: this.state["vote" + (proposal.proposalNum)] == "@" ? "#000000" : "#FFFFFF"}}> Reject </Typography>
                           </Button> 
 
@@ -1350,7 +1348,7 @@ export default class Vote extends React.Component {
                         <br />
 
                       {this.state.currRound >= proposal.endRound && proposal.votes.length && this.props.activeAddress == "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE" ?
-                        <Button className={muisty.mixerbtn} style={{backgroundColor: "#FFFFFF", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.certify(proposal.proposalNum, proposal.votes)}>
+                        <Button style={{backgroundColor: "#FFFFFF", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.certify(proposal.proposalNum, proposal.votes)}>
                           <Typography color="secondary" variant="h6" style={{color: "#000000"}}> Certify </Typography>
                         </Button> 
                       :
@@ -1361,7 +1359,7 @@ export default class Vote extends React.Component {
 
                       {this.state["vote" + (proposal.proposalNum)] ?
                         this.state.walletAssets.length > 0 ?
-                        <Button className={muisty.mixerbtn} style={{backgroundColor: "#FFFFFF", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.vote(proposal.proposalNum)}>
+                        <Button style={{backgroundColor: "#FFFFFF", border: "1px solid white", display: "flex", margin: "auto"}} onClick={() => this.vote(proposal.proposalNum)}>
                           <Typography color="secondary" variant="h6" style={{color: "#000000"}}> Vote </Typography>
                         </Button> 
                         :

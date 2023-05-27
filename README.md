@@ -8,7 +8,7 @@ https://discord.com/invite/xdZ6V5ybmq
 
 # Dark Paper
 
-https://github.com/elborracho420/Dark-Coin-ASA-601894079/blob/main/darkpaper.md
+https://github.com/claudebaxter/Dark-Coin-ASA-601894079/blob/main/darkpaper.md
 
 # Dark DApp
 

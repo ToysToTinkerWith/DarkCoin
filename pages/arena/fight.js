@@ -161,11 +161,11 @@ export default function Fight(props) {
     
           })
 
-          props.setMessage("Sign transation...")
+          props.setMessage("Sign transaction...")
     
           const signedTransactions = await signTransactions(encodedTxns)
 
-          props.setMessage("Sending transation...")
+          props.setMessage("Sending transaction...")
 
           const { id } = await sendTransactions(signedTransactions)
 

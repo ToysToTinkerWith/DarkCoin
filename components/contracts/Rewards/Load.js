@@ -62,11 +62,11 @@ export default function Load(props) {
             'X-API-Key': process.env.indexerKey
           }
       
-          const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+          const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
       
           let params = await client.getTransactionParams().do()
       
-          const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+          const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
       
       
           let accountAppLocalStates = await indexerClient.lookupAccountAppLocalStates(activeAccount.address).do();
@@ -265,7 +265,7 @@ export default function Load(props) {
           'X-API-Key': process.env.indexerKey
         }
     
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
     
         let params = await client.getTransactionParams().do()
     
@@ -277,7 +277,7 @@ export default function Load(props) {
         let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
           activeAccount.address, 
           "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE", 
-          props.notify ? Number(props.quote.length * 100000) : Number(props.quote.length * 50000), 
+          props.notify ? Number(props.quote.length * 50000) : Number(props.quote.length * 20000), 
           undefined,
           undefined,
           params
@@ -291,7 +291,7 @@ export default function Load(props) {
             "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", 
             undefined, 
             undefined,
-            Math.ceil(Number(props.maxAmount)) * (10**props.assetSendInfo.params.decimals),  
+            Math.ceil(Number(props.quote[0].sendAmountAtomic)) * (10**props.assetSendInfo.params.decimals),  
             undefined,
             Number(props.sendAsset), 
             params
@@ -417,6 +417,18 @@ export default function Load(props) {
         
         
             }
+
+            
+
+            let txgroup = algosdk.assignGroupID(txns)
+            let signedTxn
+            txns.forEach((txn) => {
+              signedTxn = txn.signTxn(DCAccount.sk);
+              signedTxns.push(signedTxn)
+            })
+            const { txId } = await client.sendRawTransaction(signedTxns).do()
+    
+            let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
         
             props.setMessage("Airdrop complete")
     
@@ -505,6 +517,7 @@ export default function Load(props) {
       setCredits(session)
       }
       catch(error) {
+        props.setMessage(String(error))
         await props.sendDiscordMessage(error, "Send Quote", activeAccount.address)
        }
     
@@ -539,11 +552,11 @@ export default function Load(props) {
                 <br />
                 <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => sendQuote()}>
                   <Typography align="center" color="primary" variant="h6" > Send quote </Typography>
-                  <Typography style={{margin: 10}} variant="h6"> {props.notify ? Number(props.quote.length * 0.1).toFixed(2) : Number(props.quote.length * 0.05).toFixed(2)}</Typography>
+                  <Typography style={{margin: 10}} variant="h6"> {props.notify ? Number(props.quote.length * 0.05).toFixed(2) : Number(props.quote.length * 0.02).toFixed(2)}</Typography>
                   <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
                   {props.notify ?
                   <div style={{display: "flex", margin: "auto"}}>
-                  <Typography style={{margin: 10}} variant="h6"> {Math.ceil(Number(props.maxAmount))}</Typography>
+                  <Typography style={{margin: 10}} variant="h6"> {Math.ceil(Number(props.quote[0].sendAmountAtomic))}</Typography>
                   <Typography style={{margin: 10}} variant="h6"> {props.assetSendInfo.params["unit-name"]}</Typography>
       
                   </div>
@@ -645,11 +658,11 @@ export default function Load(props) {
             <br />
             <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => sendQuote()}>
               <Typography align="center" color="primary" variant="h6" > Send quote </Typography>
-              <Typography style={{margin: 10}} variant="h6"> {props.notify ? Number(props.quote.length * 0.1).toFixed(2) : Number(props.quote.length * 0.05).toFixed(2)}</Typography>
+              <Typography style={{margin: 10}} variant="h6"> {props.notify ? Number(props.quote.length * 0.05).toFixed(2) : Number(props.quote.length * 0.02).toFixed(2)}</Typography>
               <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
               {props.notify ?
               <div style={{display: "flex", margin: "auto"}}>
-              <Typography style={{margin: 10}} variant="h6"> {Math.ceil(Number(props.maxAmount))}</Typography>
+              <Typography style={{margin: 10}} variant="h6"> {Math.ceil(Number(props.quote[0].sendAmountAtomic))}</Typography>
               <Typography style={{margin: 10}} variant="h6"> {props.assetSendInfo.params["unit-name"]}</Typography>
   
               </div>

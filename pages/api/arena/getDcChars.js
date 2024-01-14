@@ -21,7 +21,7 @@ async function getCreatedChars(req, res) {
         'X-API-Key': process.env.indexerKey
     }
   
-    const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+    const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
     let accountAssets = await indexerClient.lookupAccountAssets(req.body.address).limit(1000).do();
     

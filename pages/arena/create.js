@@ -92,7 +92,7 @@ export default function Create(props) {
         }
 
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
         
         const accountAssets = await indexerClient.lookupAccountAssets(activeAccount.address).assetId(1088771340).do();
 
@@ -101,7 +101,7 @@ export default function Create(props) {
         if (accountDC >= 10000) {
 
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let params = await client.getTransactionParams().do();
 
@@ -150,6 +150,8 @@ export default function Create(props) {
 
         let generatedImage = session.image
 
+        console.log(generatedImage)
+
         if (generatedImage) {
 
           props.setMessage("Sending Transaction...")
@@ -176,7 +178,8 @@ export default function Create(props) {
   
           const sess = await res.json()
   
-          let generatedDes = sess.response.text
+          let generatedDes = sess
+          console.log(generatedDes)
 
           setDes(generatedDes)
           props.setMessage("Minting Asset...")
@@ -233,7 +236,7 @@ export default function Create(props) {
             'X-API-Key': process.env.indexerKey
         }
   
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
         
           let params = await client.getTransactionParams().do();
   

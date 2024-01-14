@@ -62,7 +62,7 @@ export default class Mixer extends React.Component {
             'X-API-Key': process.env.indexerKey
         }
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         (async () => {
 
@@ -146,7 +146,7 @@ export default class Mixer extends React.Component {
           'X-API-Key': process.env.indexerKey
       }
 
-      const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+      const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let params = await client.getTransactionParams().do();
 
@@ -224,7 +224,7 @@ const token = {
             'X-API-Key': process.env.indexerKey
         }
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         let appState = await indexerClient.lookupApplications(this.state.contract).do();
 
@@ -313,7 +313,7 @@ const token = {
             'X-API-Key': process.env.indexerKey
         }
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         let response = await indexerClient.lookupApplications(this.state.contract).do();
 
@@ -356,7 +356,7 @@ const token = {
         }
     
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let params = await client.getTransactionParams().do();
 

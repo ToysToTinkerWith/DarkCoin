@@ -27,7 +27,7 @@ export default class Council extends React.Component {
             'X-API-Key': process.env.indexerKey
         }
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
                 
         let accountInfo = await indexerClient.lookupAccountAssets(address).do();
 

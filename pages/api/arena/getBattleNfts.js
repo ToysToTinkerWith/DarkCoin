@@ -18,7 +18,7 @@ async function getBattleNfts(req, res) {
     'X-API-Key': process.env.indexerKey
     }
     
-    const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+    const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
     let nftId
     

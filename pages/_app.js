@@ -45,7 +45,7 @@ export default function MyApp(props) {
 
   //council: 1225804311
 
-  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649}
+  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1397879621}
 
 
   const router = useRouter()
@@ -118,27 +118,25 @@ export default function MyApp(props) {
 
       <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Grid container>
-        
-        <Grid item xs={10} sm={8} style={{padding: 20}}>
-        </Grid>
-
-    </Grid>
-      <Grid container>
-      <Grid item xs={2} sm={4}>
+      {router.pathname.substring(0,11) != "/ASAblaster" ? 
         <Button 
         style={{marginLeft: "10vw"}}
-        onClick={() => window.open("https://dark-coin.io/")}>
+        href="/">
           <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: "30%", minWidth: 100, padding: 20}} />
         </Button>
         
-        </Grid>
+        :
+        null
+        }
+      
+      <Grid container >
+       
+      
         <Grid item xs={10} sm={8}>
           <Connect setWallet={setWallet} />
         </Grid>
-        <Grid item xs={12}>
       {router.pathname.substring(0,8) == "/council" ? 
-            <>
+            <Grid xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/"
@@ -160,12 +158,12 @@ export default function MyApp(props) {
                     </Button>
                     </Grid>
                   </Grid>
-            </>
+            </Grid>
             :
             null
         }
         {router.pathname.substring(0,7) == "/market" ? 
-            <>
+            <Grid xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/">
@@ -202,12 +200,12 @@ export default function MyApp(props) {
                   </Grid>
                   
                 </Grid>
-            </>
+            </Grid>
             :
             null
         }
         {router.pathname == "mixer" ? 
-            <>
+            <Grid xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 onClick={() => this.setState({place: ""})}>
@@ -217,12 +215,12 @@ export default function MyApp(props) {
                 </Typography>
                 </Button>
                 <br />
-            </>
+            </Grid>
             :
             null
         }
         {router.pathname.substring(0,6) == "/arena" ? 
-            <>
+            <Grid xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/">
@@ -259,12 +257,12 @@ export default function MyApp(props) {
                     </Button>
                     </Grid>
                   </Grid>
-            </>
+            </Grid>
             :
             null
         }
           {router.pathname.substring(0,8) == "/rewards" ? 
-            <>
+            <Grid xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/">
@@ -288,13 +286,11 @@ export default function MyApp(props) {
                    
                   </Grid>
                 <br />
-            </>
+            </Grid>
             :
             null
         }
-        <br />
-        <br />
-        </Grid>
+      
         </Grid>
         <Component {...pageProps} setMessage={setMessage} setProgress={setProgress} contracts={contracts} sendDiscordMessage={sendDiscordMessage} wallet={wallet} />
       </ThemeProvider>

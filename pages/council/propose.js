@@ -23,7 +23,7 @@ export default function Propose(props) {
         'X-API-Key': process.env.indexerKey
       }
 
-      const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+      const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
     
       let status = await client.status().do();
 
@@ -81,7 +81,7 @@ export default function Propose(props) {
               'X-API-Key': process.env.indexerKey
             }
 
-            const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+            const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
             let params = await client.getTransactionParams().do();
 
@@ -137,7 +137,7 @@ export default function Propose(props) {
           
             const sessionProposal = await responseProposal.json()
     
-            console.log(sessionProposal.text)
+            console.log(sessionProposal)
 
             props.setMessage("Creating proposal slogan...")
 
@@ -146,7 +146,7 @@ export default function Propose(props) {
             const responseSlogan = await fetch('/api/council/getSlogan', {
               method: "POST",
               body: JSON.stringify({
-                proposal: sessionProposal.text,
+                proposal: sessionProposal,
               }),
               headers: {
                 "Content-Type": "application/json",
@@ -156,7 +156,7 @@ export default function Propose(props) {
           
             const sessionSlogan = await responseSlogan.json()
     
-            console.log(sessionSlogan.text)
+            console.log(sessionSlogan)
 
             props.setMessage("Creating proposal contract...")
 
@@ -790,7 +790,7 @@ export default function Propose(props) {
             let appArgs = []
             appArgs.push(
               new Uint8Array(Buffer.from("propose")),
-              new Uint8Array(Buffer.from(sessionSlogan.text))
+              new Uint8Array(Buffer.from(sessionSlogan))
               
             )
 
@@ -801,7 +801,7 @@ export default function Propose(props) {
 
             //get global state
 
-            const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+            const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
               let global = await indexerClient.lookupApplications(props.contracts.council).do();
 
@@ -817,7 +817,7 @@ export default function Propose(props) {
 
               console.log(proposalNum)
 
-            let proposalNumBox = new Uint8Array(Buffer.from("Proposal" + String(proposalNum) + " " + String(sessionSlogan.text)))
+            let proposalNumBox = new Uint8Array(Buffer.from("Proposal" + String(proposalNum) + " " + String(sessionSlogan)))
 
             let boxes = [{appIndex: 0, name: proposalNumBox}]
             
@@ -838,7 +838,7 @@ export default function Propose(props) {
             appArgs = []
             appArgs.push(
               new Uint8Array(Buffer.from("propose")),
-              new Uint8Array(Buffer.from(sessionProposal.text)),
+              new Uint8Array(Buffer.from(sessionProposal)),
             )
 
             accounts = []
@@ -862,7 +862,7 @@ export default function Propose(props) {
           
           
 
-            updateDiscord(sessionProposal.text, sessionSlogan.text, appId)
+            updateDiscord(sessionProposal, sessionSlogan, appId)
 
             props.setMessage("Proposal Creation Complete")
             props.setProgress(100)

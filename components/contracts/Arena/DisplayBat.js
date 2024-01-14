@@ -75,7 +75,7 @@ export default function DisplayBat(props) {
             'X-API-Key': process.env.indexerKey
         }
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         let response = await indexerClient.lookupAccountAppLocalStates(activeAccount.address).do();
         response["apps-local-states"].forEach((localstate) => {
@@ -102,7 +102,7 @@ export default function DisplayBat(props) {
                         'X-API-Key': process.env.indexerKey
                     }
             
-                    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+                    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
                     let params = await client.getTransactionParams().do();
 
@@ -162,7 +162,7 @@ export default function DisplayBat(props) {
         
                 let sess1 = await res1.json()
         
-                let story1 = sess1.response.text
+                let story1 = sess1.response
 
                 while (story1.length > 800) {
 
@@ -185,7 +185,7 @@ export default function DisplayBat(props) {
 
                     sess1 = await res1.json()
 
-                    story1 = sess1.response.text
+                    story1 = sess1.response
 
 
                 }
@@ -214,7 +214,7 @@ export default function DisplayBat(props) {
         
                 let sess2 = await res2.json()
         
-                let story2 = sess2.response.text
+                let story2 = sess2.response
 
 
                 while (story2.length > 800) {
@@ -238,7 +238,7 @@ export default function DisplayBat(props) {
 
                     sess2 = await res2.json()
 
-                    story2 = sess1.response.text
+                    story2 = sess1.response
 
 
 
@@ -276,9 +276,9 @@ export default function DisplayBat(props) {
             'X-API-Key': process.env.indexerKey
         }
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let params = await client.getTransactionParams().do();
 
@@ -356,6 +356,8 @@ export default function DisplayBat(props) {
 
             let array = string.split(">")
 
+            console.log(array)
+
             let winner = Number(array[0])
             let loser = Number(array[2])
             let wager = Number(array[4] / 1000000)
@@ -390,8 +392,8 @@ export default function DisplayBat(props) {
         
         let sessionWinner = await responseWinner.json()
 
-        let nameWinner = sessionWinner.assets[0].params.name
-        let urlWinner = "https://gateway.pinata.cloud/ipfs/" + sessionWinner.assets[0].params.url.slice(34)
+        let nameWinner = sessionWinner.nft.assets[0].params.name
+        let urlWinner = "https://gateway.pinata.cloud/ipfs/" + sessionWinner.nft.assets[0].params.url.slice(34)
 
         let responseLoser = await fetch('/api/getNft', {
             method: "POST",
@@ -404,11 +406,12 @@ export default function DisplayBat(props) {
             
                 
             });
+
         
         let sessionLoser = await responseLoser.json()
 
-        let nameLoser = sessionLoser.assets[0].params.name
-        let urlLoser = "https://gateway.pinata.cloud/ipfs/" + sessionLoser.assets[0].params.url.slice(34)
+        let nameLoser = sessionLoser.nft.assets[0].params.name
+        let urlLoser = "https://gateway.pinata.cloud/ipfs/" + sessionLoser.nft.assets[0].params.url.slice(34)
 
         let randomNumber = Math.floor(Math.random() * 2);
 

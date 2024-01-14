@@ -19,6 +19,7 @@ export default class Airdrop extends React.Component {
             loadAmount: "",
             loadAsset: "",
             basedAsset: "",
+            flat: false,
             sendAmount: "",
             sendAsset: "",
             freq: "once",
@@ -28,7 +29,6 @@ export default class Airdrop extends React.Component {
             notify: false,
             accounts: [],
             quote: [],
-            maxAmount: 0,
             assetBasedInfo: null,
             assetSendInfo: null,
             update: ""
@@ -74,7 +74,7 @@ export default class Airdrop extends React.Component {
         'X-API-Key': process.env.indexerKey
       }
   
-      const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+      const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
       const assetInfo = await indexerClient.lookupAssetByID(this.state.basedAsset).do();
 
@@ -140,7 +140,7 @@ export default class Airdrop extends React.Component {
       'X-API-Key': process.env.indexerKey
     }
 
-    const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+    const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
     let senderOpted = []
 
@@ -188,7 +188,6 @@ export default class Airdrop extends React.Component {
     let numRemoved = 0
 
     let found = true
-    let maxAmount = 0
 
     if (this.state.startFrom.length == 58) {
       found = false
@@ -197,21 +196,16 @@ export default class Airdrop extends React.Component {
     this.state.accounts.forEach((account) => {
       if (senderOpted.includes(account.address) && !darkList.includes(account.address)) {
         if (found) {
-          if ((account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals) > maxAmount) {
-            
-            maxAmount = (account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals)
-          }
+          
           this.setState(prevState => ({
-            quote: [...prevState.quote, {address: account.address, basedAmount: account.amount, basedAmountAtomic: account.amountAtomic, sendAmount: Math.floor(account.amountAtomic * div * Number(this.state.sendAmount)), sendAmountAtomic: (account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals)}]
+            quote: [...prevState.quote, {address: account.address, basedAmount: account.amount, basedAmountAtomic: account.amountAtomic, sendAmount: this.state.flat ? (div * Number(this.state.sendAmount)) : Math.floor(account.amountAtomic * div * Number(this.state.sendAmount)), sendAmountAtomic: this.state.flat ? Number(this.state.sendAmount) : (account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals)}]
           }))
         }
         else if (account.address == this.state.startFrom) {
           found = true
-          if ((account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals) > maxAmount) {
-            maxAmount = (account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals)
-          }
+          
           this.setState(prevState => ({
-            quote: [...prevState.quote, {address: account.address, basedAmount: account.amount, basedAmountAtomic: account.amountAtomic, sendAmount: Math.floor(account.amountAtomic * div * Number(this.state.sendAmount)), sendAmountAtomic: (account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals)}]
+            quote: [...prevState.quote, {address: account.address, basedAmount: account.amount, basedAmountAtomic: account.amountAtomic, sendAmount: this.state.flat ? (div * Number(this.state.sendAmount)) : Math.floor(account.amountAtomic * div * Number(this.state.sendAmount)), sendAmountAtomic: this.state.flat ? Number(this.state.sendAmount) : (account.amountAtomic * Number(this.state.sendAmount)).toFixed(decimals)}]
           }))
         }
         else {
@@ -226,8 +220,7 @@ export default class Airdrop extends React.Component {
     })
 
     this.setState({
-      numRemoved: numRemoved,
-      maxAmount: maxAmount
+      numRemoved: numRemoved
     })
 
   }
@@ -276,6 +269,8 @@ export default class Airdrop extends React.Component {
 
 
     render() {
+
+      console.log(this.state.quote)
 
       let accountHeaders = [
         { label: "address", key: "address" },
@@ -373,8 +368,27 @@ export default class Airdrop extends React.Component {
                         <Typography color="secondary" style={{display: "flex", float: "right"}}> {sortedAccounts.length} </Typography>
                       </Grid>
                       <Grid item xs={12} sm={12} md={12} >
+                      <Typography align="center" color="secondary" variant="subtitle1" > Flat Amount? </Typography>
+
+                        <Checkbox
+                          value={this.state.flat}
+                          name="flat"
+                          onChange={this.handleChange}
+                          color="secondary"
+                          sx={{
+                            color: "white",
+                            '&.Mui-checked': {
+                            color: "white",
+                            },
+                          }}
+                        />
                         <br />
-                      <Typography color="secondary" variant="h6" align="center"> Based on this account data, for every {this.state.assetBasedInfo.params.name} ({this.state.assetBasedInfo.params["unit-name"]}) an account has, I would like to send:  </Typography>
+                        {this.state.flat ?
+                        <Typography color="secondary" variant="h6" align="center"> Based on this account data, I would like to send:  </Typography>
+
+                        :
+                        <Typography color="secondary" variant="h6" align="center"> Based on this account data, for every {this.state.assetBasedInfo.params.name} ({this.state.assetBasedInfo.params["unit-name"]}) an account has, I would like to send:  </Typography>
+                        }
 
                     
                         
@@ -548,7 +562,7 @@ export default class Airdrop extends React.Component {
                         />
                         <br />
                         </Grid>
-                        <Grid item xs={12} sm={12} md={12} >
+                        {/* <Grid item xs={12} sm={12} md={12} >
 
                         <Typography align="center" color="secondary" variant="subtitle1" > Notify? </Typography>
 
@@ -564,7 +578,7 @@ export default class Airdrop extends React.Component {
                              },
                            }}
                         />
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} sm={12} md={12} >
 
                         {this.state.sendAmount && this.state.sendAsset && this.state.freq ? 
@@ -629,7 +643,7 @@ export default class Airdrop extends React.Component {
 
               <Grid container spacing={3} align="center" style={{padding: 20, borderRadius: 15}}>
                 <Grid item xs={12} sm={12} md={12} >
-                  <Load contract={this.props.contracts.airdrop} sendDiscordMessage={this.props.sendDiscordMessage} sendAmount={this.state.sendAmount} sendAsset={this.state.sendAsset} basedAsset={this.state.basedAsset} freq={this.state.freq} quote={this.state.quote} quoteTotal={quoteTotal} notify={this.state.notify} note={this.state.note} maxAmount={this.state.maxAmount} assetSendInfo={this.state.assetSendInfo} setMessage={this.props.setMessage}/>
+                  <Load contract={this.props.contracts.airdrop} sendDiscordMessage={this.props.sendDiscordMessage} sendAmount={this.state.sendAmount} sendAsset={this.state.sendAsset} basedAsset={this.state.basedAsset} freq={this.state.freq} quote={this.state.quote} quoteTotal={quoteTotal} notify={this.state.notify} note={this.state.note}  assetSendInfo={this.state.assetSendInfo} setMessage={this.props.setMessage}/>
                  
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} >

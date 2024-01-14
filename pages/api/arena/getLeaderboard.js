@@ -54,7 +54,7 @@ async function getLeaderboard(req, res) {
 
 
   
-    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
     for (let i = lastBox; i < battleNum; i++) {
         if (i > 0) {

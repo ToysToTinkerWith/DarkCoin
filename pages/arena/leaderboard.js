@@ -106,7 +106,7 @@ export default class Leaderboard extends React.Component {
         'X-API-Key': process.env.indexerKey
     }
 
-    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
             
       let params = await client.getTransactionParams().do()
 
@@ -307,7 +307,7 @@ export default class Leaderboard extends React.Component {
           'X-API-Key': process.env.indexerKey
         }
   
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
         
         let params = await client.getTransactionParams().do()
 

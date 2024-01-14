@@ -37,7 +37,7 @@ export default function Accept(props) {
             'X-API-Key': process.env.indexerKey
         }
 
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         
 
@@ -73,7 +73,7 @@ export default function Accept(props) {
         setNFT([])
 
         const boxes = await indexerClient
-       .searchForApplicationBoxes(contract)
+       .searchForApplicationBoxes(1103370576)
        .do();
 
 
@@ -90,7 +90,7 @@ export default function Accept(props) {
           }
        })
       
-    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         const pk = algosdk.decodeAddress(props.activeAddress);
         const addrArray = pk.publicKey
@@ -100,7 +100,7 @@ export default function Accept(props) {
 
         try {
 
-        let accountBoxDC = await client.getApplicationBoxByName(contract, accountDC).do();
+        let accountBoxDC = await client.getApplicationBoxByName(1103370576, accountDC).do();
         var lengthDC = accountBoxDC.value.length;
 
         let bufferDC = Buffer.from(accountBoxDC.value);
@@ -115,7 +115,7 @@ export default function Accept(props) {
 
         try {
 
-          let accountBoxLP = await client.getApplicationBoxByName(contract, accountLP).do();
+          let accountBoxLP = await client.getApplicationBoxByName(1103370576, accountLP).do();
           var lengthLP = accountBoxLP.value.length;
   
           let bufferLP = Buffer.from(accountBoxLP.value);
@@ -145,7 +145,7 @@ export default function Accept(props) {
         'X-API-Key': process.env.indexerKey
       }
 
-      const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+      const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
       const accountAppLocalStates = await indexerClient.lookupAccountAppLocalStates(props.activeAddress).do();
 
@@ -156,7 +156,7 @@ export default function Accept(props) {
       })
 
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
       if (!opted) {
         try{
@@ -287,7 +287,7 @@ export default function Accept(props) {
         'X-API-Key': process.env.indexerKey
       }
 
-      const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+      const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
       const accountAppLocalStates = await indexerClient.lookupAccountAppLocalStates(props.activeAddress).do();
 
@@ -299,7 +299,7 @@ export default function Accept(props) {
       })
 
 
-    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
       if (!opted) {
         try{
@@ -430,7 +430,7 @@ export default function Accept(props) {
         'X-API-Key': process.env.indexerKey
       }
 
-      const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+      const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
       const accountAppLocalStates = await indexerClient.lookupAccountAppLocalStates(props.activeAddress).do();
 
@@ -442,7 +442,7 @@ export default function Accept(props) {
 
 
 
-    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
       if (!opted) {
         try{
@@ -592,7 +592,7 @@ export default function Accept(props) {
           'X-API-Key': process.env.indexerKey
         }
 
-      const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+      const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
       const accountAssets = await indexerClient.lookupAccountAssets(props.activeAddress).do();
 
@@ -614,7 +614,7 @@ export default function Accept(props) {
      
 
 
-    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
     
     let params = await client.getTransactionParams().do()
 

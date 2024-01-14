@@ -1,8 +1,12 @@
 import NextCors from 'nextjs-cors';
 
-const { Configuration, OpenAIApi } = require("openai");
+import fs from "fs";
+import OpenAI from "openai";
 
-const fs = require('fs');
+const openai = new OpenAI({
+    apiKey: "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"
+});
+
 
 
 async function generateImage(req, res) {
@@ -18,28 +22,23 @@ async function generateImage(req, res) {
 
    try {
 
-   // Rest of the API logic
-    const configuration = new Configuration({
-        apiKey: process.env.DALLE_KEY,
-    });
-    const openai = new OpenAIApi(configuration);    
 
-      const response = await openai.createImageEdit(
-        fs.createReadStream("./characters/Background.png"),
-        fs.createReadStream("./characters/Mask.png"),
-        req.body.description + ". Make the image colorful.",
-        1,
-        "1024x1024"
-      );
+      const response = await openai.images.edit({
+        image: fs.createReadStream("./characters/Background.png"),
+        mask: fs.createReadStream("./characters/Mask.png"),
+        prompt: req.body.description + ". Make the image colorful.",
+        n: 1,
+        size: "1024x1024"
+        });
 
-      let image_url = response.data.data[0].url;
+      
 
-      res.json({ image: image_url });
+      res.json({ image: response.data[0].url });
 
    }
 
    catch (error) {
-    res.json({ result: error });
+    res.json({ result: String(error) });
   }
    
 }

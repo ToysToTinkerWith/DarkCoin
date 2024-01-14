@@ -30,7 +30,7 @@ export default class DarkCoin extends React.Component {
         };
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         
         peraWallet.reconnectSession()
         .catch((error) => {
@@ -46,9 +46,8 @@ export default class DarkCoin extends React.Component {
             'X-API-Key': process.env.indexerKey
         }
       
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
         
-        (async () => {
 
           let assets = await indexerClient.lookupAccountAssets("A563R3UMXKXK5C6CSBM5OA4NQRKMQJACAG75TPX3RDVWGBCKJNHLXHECSU").do();
 
@@ -148,10 +147,7 @@ export default class DarkCoin extends React.Component {
           }
 
 
-        })().catch(e => {
-            console.error(e);
-            console.trace();
-        })
+   
 
       }
 

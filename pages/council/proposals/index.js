@@ -67,7 +67,7 @@ export default function Proposals(props) {
           'X-API-Key': process.env.indexerKey
         }
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
       
         let responseProposal = await client.getApplicationBoxByName(props.contracts.council, boxName).do();

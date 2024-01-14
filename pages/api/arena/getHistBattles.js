@@ -18,7 +18,7 @@ async function getHistBattles(req, res) {
         'X-API-Key': process.env.indexerKey
     }
   
-    const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+    const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
     let global = await indexerClient.lookupApplications(req.body.contract).do();
 
@@ -33,7 +33,7 @@ async function getHistBattles(req, res) {
     })
 
 
-    const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
     
       
     let responseProposal = await client.getApplicationBoxByName(req.body.contract, "Battle" + String(battleNum - req.body.i - 1)).do();

@@ -1,6 +1,11 @@
 import NextCors from 'nextjs-cors';
 
-const { Configuration, OpenAIApi } = require("openai");
+import OpenAI from "openai";
+
+
+const openai = new OpenAI({
+    apiKey: process.env.DALLE_KEY
+});
 
 async function sanitizeProposal(req, res) {
    // Run the cors middleware
@@ -13,24 +18,23 @@ async function sanitizeProposal(req, res) {
       optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
    });
 
-   // Rest of the API logic
-    const configuration = new Configuration({
-        apiKey: process.env.DALLE_KEY,
-    });
-    const openai = new OpenAIApi(configuration);
-    
-    const response = await openai.createCompletion({
-        model: "text-davinci-003",
-        prompt: 
-        "The Dark Coin DAO is called the Council. Dark Coin is a community that uses the Algorand Blockchain for data storage and finance. This is a proposal submitted to the Council: \"" + req.body.proposal +
-        "\" Sanitize and clarify this proposal. Make sure the proposal doesn't have any dates in it. Exclude all salutations and complementary closes."
-        ,
-        n: 1,
-        max_tokens: 100,
-        temperature: 0,
-      });
+   let messages = [
+    {"role": "user", "content": "The Dark Coin DAO is called the Council. Dark Coin is a community that uses the Algorand Blockchain for data storage and finance. This is a proposal submitted to the Council: Proposal = \"" + req.body.proposal},
+    {"role": "user", "content": "Sanitize this proposal. Make sure the proposal doesn't have any dates in it. Exclude all salutations and complementary closes. Don't include the word <Proposal> in the response. Only mention the essence of the proposal."},       
+  ]
 
-      res.json(response.data.choices[0]);
+    let response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: messages
+    })
+
+  console.log(response.choices[0].message.content)
+
+    let chat = response.choices[0].message.content
+
+
+
+    res.json(chat);
    
 }
 

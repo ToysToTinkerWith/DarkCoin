@@ -50,7 +50,7 @@ export default function Proposal(props) {
             'X-API-Key': process.env.indexerKey
           }
 
-          const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+          const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
           let status = await client.status().do();
 
@@ -92,7 +92,7 @@ export default function Proposal(props) {
           setAmendments([])
           setAssets([])
 
-          const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+          const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
 
           const accountInfo = await indexerClient.lookupAccountByID(address).do();
@@ -187,7 +187,7 @@ export default function Proposal(props) {
           'X-API-Key': process.env.indexerKey
         }
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let params = await client.getTransactionParams().do();
 
@@ -209,7 +209,7 @@ export default function Proposal(props) {
           txns.push(ftxn)
         }
         else {
-          const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+          const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
           const assetInfo = await indexerClient.lookupAssetByID(fundAsset).do();
 
@@ -275,7 +275,7 @@ export default function Proposal(props) {
 
         setAssets([])
 
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
 
         const accountInfo = await indexerClient.lookupAccountByID(address).do();
@@ -310,7 +310,7 @@ export default function Proposal(props) {
           'X-API-Key': process.env.indexerKey
         }
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let txns = []
 
@@ -359,7 +359,6 @@ export default function Proposal(props) {
         const responseAmend = await fetch('/api/council/sanitizeAmend', {
           method: "POST",
           body: JSON.stringify({
-            proposal: proposal,
             amend: amend
           }),
           headers: {
@@ -370,7 +369,7 @@ export default function Proposal(props) {
       
         const sessionAmend = await responseAmend.json()
 
-        const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         let global = await indexerClient.lookupApplications(Number(router.query.id)).do();
 
@@ -387,7 +386,7 @@ export default function Proposal(props) {
         let appArgs = []
         appArgs.push(
           new Uint8Array(Buffer.from("amend")),
-          new Uint8Array(Buffer.from(sessionAmend.text)),
+          new Uint8Array(Buffer.from(sessionAmend)),
         )
 
         let accounts = []
@@ -421,9 +420,9 @@ export default function Proposal(props) {
 
         props.setProgress(100)
 
-        setAmendments(amendments => [...amendments, {amendment: sessionAmend.text, votes: null, amendNum: amendNum}])
+        setAmendments(amendments => [...amendments, {amendment: sessionAmend, votes: null, amendNum: amendNum}])
 
-        updateDiscord(sessionAmend.text)
+        updateDiscord(sessionAmend)
 
 
 
@@ -454,7 +453,7 @@ export default function Proposal(props) {
           'X-API-Key': process.env.indexerKey
         }
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
             
         let params = await client.getTransactionParams().do();
 
@@ -491,6 +490,7 @@ export default function Proposal(props) {
               let foreignAssets = [daos[i]]
 
               let voteBox
+              let amend0 = new Uint8Array(Buffer.from("Amend0"))
 
               if (type == "amend") {
                 voteBox = new Uint8Array(Buffer.from("Votes" + String(num)))
@@ -501,6 +501,10 @@ export default function Proposal(props) {
               }
     
               const boxes = [{appIndex: 0, name: voteBox}, {appIndex: 0, name: voteBox}]
+
+              if (type == "prop") {
+                boxes.push({appIndex: 0, name: amend0})
+              }
               
               txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, Number(router.query.id), appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);          
               
@@ -542,7 +546,7 @@ export default function Proposal(props) {
           if (type == "amend") {
             setAmendments([])
 
-            const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '');
+            const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
             let global = await indexerClient.lookupApplications(Number(router.query.id)).do();
 
@@ -619,6 +623,9 @@ export default function Proposal(props) {
 
         try {
 
+          props.setMessage("Drafting...")
+
+
         let accepted
 
         if (votes[0].count > votes[1].count) {
@@ -642,36 +649,45 @@ export default function Proposal(props) {
 
         console.log(acceptedAmendments)
 
-        const response = await fetch('/api/council/getDraft', {
-          method: "POST",
-          body: JSON.stringify({
-            proposal: proposal,
-            amendments: acceptedAmendments
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          }
-            
-        });
-      
-        const session = await response.json()
+        let draft
 
-        console.log(session.text)
+        if (acceptedAmendments.length > 0) {
+          const response = await fetch('/api/council/getDraft', {
+            method: "POST",
+            body: JSON.stringify({
+              proposal: proposal,
+              amendments: acceptedAmendments
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            }
+              
+          });
+        
+          const session = await response.json()
+          draft = session
+        }
+        else {
+          draft = proposal
+        }
 
+        
         const token = {
           'X-API-Key': process.env.indexerKey
         }
 
-        const client = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '')
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
             
         let params = await client.getTransactionParams().do();
 
         let appArgs = []
 
+        appArgs.push(new Uint8Array(Buffer.from("draft")))
+
         if (accepted) {
           appArgs.push(
             new Uint8Array(Buffer.from("accept")),
-            new Uint8Array(Buffer.from(session.text)),
+            new Uint8Array(Buffer.from(draft)),
           )
         }
         appArgs.push(
@@ -688,9 +704,12 @@ export default function Proposal(props) {
         let draftBox = new Uint8Array(Buffer.from("Draft"))
 
         if (accepted) {
-          boxes = [{appIndex: 0, name: draftBox}, {appIndex: 0, name: draftBox}, {appIndex: 0, name: draftBox}, {appIndex: 0, name: draftBox}]
+          boxes = [{appIndex: 0, name: draftBox}, {appIndex: 0, name: draftBox}, {appIndex: 0, name: draftBox}]
         }
 
+        let amend0 = new Uint8Array(Buffer.from("Amend0"))
+       
+        boxes.push({appIndex: 0, name: amend0})
         
         let wtxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, Number(router.query.id), appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
 
@@ -707,11 +726,11 @@ export default function Proposal(props) {
         // Submit the transaction
         await client.sendRawTransaction(signedTxn).do()                           
         // Wait for transaction to be confirmed
-        confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
+        let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
 
         props.setMessage("Draft successfully written")
 
-        updateDraft(session.text)
+        updateDraft(draft)
 
       }
       catch(error) {
@@ -865,7 +884,8 @@ export default function Proposal(props) {
      parsedAmendments = amendments.sort((a,b) => b.amendNum - a.amendNum)
 
      console.log(currRound)
-     console.log(propRound)
+     console.log(propRound + 183000)
+     console.log((amendments.length == 0 && (currRound > (propRound + 366000))))
 
         return (
             <div >
@@ -956,8 +976,9 @@ export default function Proposal(props) {
 
 
               
-                {(amendments.length > 1 && currRound > (propRound + 549000)) || (amendments.length == 0 && currRound > (propRound + 366000)) ? 
+                {(amendments.length > 1 && currRound > (propRound + 366000)) || (amendments.length == 0 && (currRound > (propRound + 183000))) ? 
                 <Grid container justifyContent="center" alignItems="center" style={{display: "flex", margin: "auto", padding: 40}}>
+                  {(amendments.length > 1 && currRound > (propRound + 549000)) || (amendments.length == 0 && (currRound > (propRound + 366000))) && !finalDraft ? 
                   <Grid item xs={12} sm={12}>
 
                   <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => draft()}>
@@ -965,6 +986,9 @@ export default function Proposal(props) {
                   </Button>
                   <br />
                   </Grid>
+                  :
+                  null
+                  }
                     <Grid item sm={12}>
                     <Typography variant="h6" align="center" style={{color: "white"}}>
                       {proposal}
@@ -986,29 +1010,32 @@ export default function Proposal(props) {
                     null
                     }
                     </Grid>
-                    {daos ?
-                    <Grid item sm={12}>
+
+                    {daos && !finalDraft ?
+                    <div>
+                      <Grid item sm={12}>
                       <Typography variant="subtitle1" align="center" style={{color: "white", padding: 10}}>
                         My DAO = {daos}
                       </Typography>
-                    </Grid>
+                      </Grid>
+                      <Grid item sm={6} md={4}>
+                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "prop", -1)}>
+                        Accept
+                      </Button>
+                      </Grid>
+                      
+                      <Grid item >
+                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "prop", -1)}>
+                        Reject
+                      </Button>
+                      </Grid>
                     
+                    </div>
                     :
                     null
                     }
-                    
-                    <Grid item sm={6} md={4}>
-                    <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "prop", -1)}>
-                      Accept
-                    </Button>
                     </Grid>
                     
-                    <Grid item >
-                    <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "prop", -1)}>
-                      Reject
-                    </Button>
-                    </Grid>
-                  </Grid>
                   :
                   <Typography variant="h6" align="center" style={{color: "white", padding: 40}}>
                   {proposal}
@@ -1045,19 +1072,33 @@ export default function Proposal(props) {
                     null
                     }
                     </Grid>
+
+                    {daos && !finalDraft ?
+                    <div>
+                      <Grid item sm={12}>
+                      <Typography variant="subtitle1" align="center" style={{color: "white", padding: 10}}>
+                        My DAO = {daos}
+                      </Typography>
+                      </Grid>
+                      <Grid item sm={6} md={4}>
+                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "amend", amendment.amendNum)}>
+                        Accept
+                      </Button>
+                      </Grid>
+                      
+                      <Grid item >
+                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "amend", amendment.amendNum)}>
+                        Reject
+                      </Button>
+                      </Grid>
+                    
+                    </div>
+                    :
+                    null
+                    }
                     
                     
-                    <Grid item sm={6} md={4}>
-                    <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "amend", amendment.amendNum)}>
-                      Accept
-                    </Button>
-                    </Grid>
                     
-                    <Grid item >
-                    <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "amend", amendment.amendNum)}>
-                      Reject
-                    </Button>
-                    </Grid>
                     
 
                   </Grid>
@@ -1076,7 +1117,9 @@ export default function Proposal(props) {
               :
               null
               }
-
+              
+              {(currRound < (propRound + 183000)) ?
+              <div>
               <br />
               <Typography color="secondary" variant="h6" align="center"> Amend this proposal </Typography>
               <br />
@@ -1106,7 +1149,11 @@ export default function Proposal(props) {
                   <Typography  variant="h6"> Amend 10 </Typography>
                   <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
                 </Button>
-
+                </div>
+              :
+              null
+              }
+              
             </div>
         )
     

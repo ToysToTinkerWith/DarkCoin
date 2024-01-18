@@ -8,7 +8,7 @@ import algosdk from "algosdk"
 import { Typography, Button, TextField, Grid} from "@mui/material"
 
 
-function index(props) {
+export default function ASAblasters(props) {
 
   const { activeAccount, signTransactions, sendTransactions } = useWallet()
 
@@ -62,7 +62,7 @@ function index(props) {
           let div = 10**decimals
           let indexOf = accepted.indexOf(asset["asset-id"])
           console.log(indexOf)
-          if (indexOf >= 0) {
+          if (indexOf >= 0 && asset.amount > 0) {
             setAssets(assets => [...assets, {assetId: accepted[indexOf], amount: asset.amount / div, unitName: unitName, acceptedImg: acceptedImg[indexOf]}])
           }
           
@@ -203,6 +203,8 @@ function index(props) {
       const houseAccount =  algosdk.mnemonicToSecretKey(houseMnemonic)
 
       console.log(totalScore)
+      console.log(DARKCOIN)
+      console.log(TRTS)
 
     const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
     
@@ -211,7 +213,7 @@ function index(props) {
       let appArgs = []
       appArgs.push(
         new Uint8Array(Buffer.from("score")),
-        algosdk.encodeUint64(totalScore)
+        algosdk.encodeUint64(Number(totalScore))
 
       )
 
@@ -234,7 +236,7 @@ function index(props) {
       if (DARKCOIN > 0) {
         appArgs = [
           new Uint8Array(Buffer.from("reward")),
-          algosdk.encodeUint64(DARKCOIN)
+          algosdk.encodeUint64(Number(DARKCOIN))
         ]
         foreignAssets = [1088771340]
         boxes = []
@@ -249,7 +251,7 @@ function index(props) {
       if (TRTS > 0) {
         appArgs = [
           new Uint8Array(Buffer.from("reward")),
-          algosdk.encodeUint64(TRTS)
+          algosdk.encodeUint64(Number(Math.ceil(TRTS)))
         ]
         foreignAssets = [1000870705]
         boxes = []
@@ -345,7 +347,7 @@ function index(props) {
   })
   console.log(sortedAssets)
   return (
-  <React.Fragment>
+  <div>
         <div style={{
             position: 'absolute',
             display: "grid",
@@ -388,10 +390,10 @@ function index(props) {
 
                 <h1 style={{ fontSize: '16px', color: 'black', marginBottom: '0', marginTop: '8px' }}>Contract contains</h1>
                 <Grid container style={{padding: 10}}>
-                {sortedAssets.map((asset) => {
+                {sortedAssets.map((asset, index) => {
                     console.log(asset)
                     return(
-                        <Grid item xs={12} sm={6} style={{border: "1px solid black", borderRadius: 15, padding: 10}}>
+                        <Grid key={index} item xs={12} sm={6} style={{border: "1px solid black", borderRadius: 15, padding: 10}}>
                             <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.amount} </h1>
                             <img src={"/ASAblasters/enemies/" + asset.acceptedImg} style={{width: 50}}/>
                             <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.unitName} </h1>
@@ -418,11 +420,10 @@ function index(props) {
         </div>
         }
         
-    </React.Fragment>
+    </div>
   )
 
 
 
 }
 
-export default index;

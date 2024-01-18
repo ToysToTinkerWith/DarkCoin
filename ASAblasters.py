@@ -32,7 +32,7 @@ def approval_program():
             TxnField.type_enum: TxnType.AssetTransfer,
             TxnField.xfer_asset: Txn.assets[0],
             TxnField.asset_receiver: Txn.accounts[1],
-            TxnField.asset_amount: Mul(Btoi(Txn.application_args[1]), Exp(Int(10), decimals.value())),
+            TxnField.asset_amount: amount.load()
         }),
         InnerTxnBuilder.Submit(),
         Int(1)

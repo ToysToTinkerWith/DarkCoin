@@ -433,7 +433,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
         canvas.height = window.innerHeight;
 
         const image = new Image();
-        image.src = './ASAblasters/icon.png';
+        image.src = './ASAblasters/icon.svg';
 
         const player = new Player(
             canvas.width / 2, 
@@ -706,7 +706,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
     }, [newGame]);
 
     return (
-        <React.Fragment>
+        <div>
         {restartModal && (
             <div id="modal" style={{
                     display: 'block',
@@ -819,7 +819,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
             </div>
         )}
         <canvas ref={canvasRef} />
-        </React.Fragment>
+        </div>
     )
 };
 

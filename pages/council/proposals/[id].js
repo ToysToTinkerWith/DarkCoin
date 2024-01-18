@@ -117,11 +117,11 @@ export default function Proposal(props) {
 
           let globalState = global.application.params["global-state"]
 
-          let amendNum
+          let amendNumber
 
           globalState.forEach((keyVal) => {
             if (atob(keyVal.key) == "amendNum") {
-              amendNum = keyVal.value.uint
+              amendNumber = keyVal.value.uint
             }
             else if (atob(keyVal.key) == "round") {
               setPropRound(keyVal.value.uint)
@@ -129,11 +129,13 @@ export default function Proposal(props) {
           })
 
 
-          for (let i = 0; i < amendNum; i++) {
+          for (let i = 0; i < amendNumber; i++) {
             responseProposal = await client.getApplicationBoxByName(Number(router.query.id), "Amend" + String(i)).do();
             string = new TextDecoder().decode(responseProposal.value)
 
             responseProposal = await client.getApplicationBoxByName(Number(router.query.id), "Votes" + String(i)).do();
+
+            let thisAmend = String(i)
 
             let accept = 0
             let reject = 0
@@ -150,7 +152,7 @@ export default function Proposal(props) {
               votes = [{vote: "Accept", count: accept}, {vote: "Reject", count: reject}]
             }
 
-            setAmendments(amendments => [...amendments, {amendment: string, votes: votes, amendNum: i}])
+            setAmendments(amendments => [...amendments, {amendment: string, votes: votes, amendNum: thisAmend}])
           }
   
           }
@@ -483,6 +485,8 @@ export default function Proposal(props) {
               appArgs.push(
                 new Uint8Array(Buffer.from(String(vote)))
               )
+
+              console.log(appArgs)
   
               const accounts = []
               const foreignApps = []
@@ -499,6 +503,8 @@ export default function Proposal(props) {
               else {
                 voteBox = new Uint8Array(Buffer.from("Votes"))
               }
+
+              console.log(voteBox)
     
               const boxes = [{appIndex: 0, name: voteBox}, {appIndex: 0, name: voteBox}]
 
@@ -883,9 +889,7 @@ export default function Proposal(props) {
 
      parsedAmendments = amendments.sort((a,b) => b.amendNum - a.amendNum)
 
-     console.log(currRound)
-     console.log(propRound + 183000)
-     console.log((amendments.length == 0 && (currRound > (propRound + 366000))))
+     console.log(amendments)
 
         return (
             <div >
@@ -1046,6 +1050,7 @@ export default function Proposal(props) {
 
               {parsedAmendments.length > 0 ? 
               parsedAmendments.map((amendment, index) => {
+                console.log(amendment.amendNum)
                 if ((currRound > (propRound + 183000)) && (currRound < (propRound + 366000))) {
                 return (
                   <div key={index}>

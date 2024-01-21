@@ -62,7 +62,7 @@ export default function ASAblasters(props) {
           let div = 10**decimals
           let indexOf = accepted.indexOf(asset["asset-id"])
           console.log(indexOf)
-          if (indexOf >= 0 && asset.amount > 0) {
+          if (indexOf >= 0) {
             setAssets(assets => [...assets, {assetId: accepted[indexOf], amount: asset.amount / div, unitName: unitName, acceptedImg: acceptedImg[indexOf]}])
           }
           
@@ -155,11 +155,11 @@ export default function ASAblasters(props) {
 
     })
 
-    props.setMessage("Sign transation...")
+    props.setMessage("Sign transaction...")
 
     const signedTransactions = await signTransactions(encodedTxns)
 
-    props.setMessage("Sending transation...")
+    props.setMessage("Sending transaction...")
 
     const { id } = await sendTransactions(signedTransactions)
 
@@ -357,6 +357,7 @@ export default function ASAblasters(props) {
             userSelect: 'none'}}>
                Score: 
                <span id="scoreEl"> TOTAL {totalScore}  </span>
+               
               <span id="scoreEl"> DARKCOIN {DARKCOIN}  </span>
               <span id="scoreE2"> TRTS {TRTS}  </span>
              

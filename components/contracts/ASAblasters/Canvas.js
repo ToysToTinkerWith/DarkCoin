@@ -388,7 +388,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
     }
 
     useEffect(() => {
-        const music = new Audio('./Lexica-Tiger-Tracks.mp3');
+        const music = new Audio('./ASAblasters/Lexica-Tiger-Tracks.mp3');
         music.loop = true;
         music.oncanplaythrough = () => {
             // Set state to indicate that background music is loaded
@@ -404,7 +404,9 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
         const enemyFiles = [];
 
         sortedAssets.forEach((asset) => {
-            enemyFiles.push(asset.acceptedImg)
+            if (asset.amount > 0) {
+                enemyFiles.push(asset.acceptedImg)
+            }
         })
 
         const enemySprite = enemyFiles.map(file => enemyDir + file);
@@ -779,16 +781,18 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
 
                 <h1 style={{ fontSize: '16px', color: 'black', marginBottom: '0', marginTop: '8px' }}>Contract contains</h1>
                 <Grid container style={{padding: 10}}>
-                {sortedAssets.map((asset) => {
+                {sortedAssets.map((asset, index) => {
                     console.log(asset)
-                    return(
-                        <Grid item xs={12} sm={6} style={{border: "1px solid black", borderRadius: 15, padding: 10}}>
-                            <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.amount} </h1>
-                            <img src={"/ASAblasters/enemies/" + asset.acceptedImg} style={{width: 50}}/>
-                            <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.unitName} </h1>
-
-                        </Grid>
-                    )
+                    if (asset.amount > 0) {
+                        return(
+                            <Grid item key={index} xs={12} sm={6} style={{border: "1px solid black", borderRadius: 15, padding: 10}}>
+                                <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.amount} </h1>
+                                <img src={"/ASAblasters/enemies/" + asset.acceptedImg} style={{width: 50}}/>
+                                <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.unitName} </h1>
+    
+                            </Grid>
+                        )
+                    }
                 })}
                 </Grid>
                 <button id="startButton" style={{

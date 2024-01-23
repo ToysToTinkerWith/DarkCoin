@@ -400,7 +400,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
 
         playBackgroundMusic();
 
-        const enemyDir = "./ASAblasters/enemies/";
+        const enemyDir = "./enemies/";
         const enemyFiles = [];
 
         sortedAssets.forEach((asset) => {
@@ -411,15 +411,12 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
 
         const enemySprite = enemyFiles.map(file => enemyDir + file);
 
-        const upgradeDir = "./ASAblasters/upgrades/";
+        const upgradeDir = "./upgrades/";
         const upgradeFiles = [
-            "icon-afd.svg",
-            "icon-algo.svg",
-            "icon-dc.svg",
-            "icon-grad.svg",
-            "icon-ogs.svg",
-            "icon-puddin.svg",
-            "icon-trts.svg"
+            "rapidfire.png",
+            "scattershot.png",
+            "shield.png",
+            "bombshot.png"
         ];
 
         const upgradeSprite = upgradeFiles.map(file => upgradeDir + file);
@@ -435,7 +432,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
         canvas.height = window.innerHeight;
 
         const image = new Image();
-        image.src = './ASAblasters/icon.svg';
+        image.src = './DC.svg';
 
         const player = new Player(
             canvas.width / 2, 
@@ -572,27 +569,18 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                             upgrade.setAcquired(false);
                             console.log('Upgrade acquired!');
                             //updateScore(25, enemy.assetId, enemy.score);
-                            if (acquiredUpgrade === "icon-afd") {
+                            if (acquiredUpgrade === "scattershot") {
                                 console.log('Scatter Shot Acquired!', upgrade.upgradeImage);
                                 startScatterShot();
-                            } else if (acquiredUpgrade === "icon-algo") {
+                            } else if (acquiredUpgrade === "shield") {
                                 console.log('Shield Acquired!', upgrade.upgradeImage);
                                 startShield(player, context);
-                            } else if (acquiredUpgrade === "icon-dc") {
+                            } else if (acquiredUpgrade === "rapidfire") {
                                 console.log('Rapid Fire Acquired!', upgrade.upgradeImage);
                                 startRapidFire();
-                            } else if (acquiredUpgrade === "icon-grad") {
+                            } else if (acquiredUpgrade === "bombshot") {
                                 console.log('Bombs Acquired!', upgrade.upgradeImage);
                                 startBombShot();
-                            } else if (acquiredUpgrade === "icon-ogs") {
-                                console.log('Gnomes Acquired!', upgrade.upgradeImage);
-                                startScatterShot();
-                            } else if (acquiredUpgrade === "icon-puddin") {
-                                console.log('Rear Cannons Acquired!', upgrade.upgradeImage);
-                                startShield(player, context);
-                            } else if (acquiredUpgrade === "icon-trts") {
-                                console.log('Treats acquired:', upgrade.upgradeImage);
-                                startRapidFire();
                             }
                         }
                     })   
@@ -787,7 +775,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                         return(
                             <Grid item key={index} xs={12} sm={6} style={{border: "1px solid black", borderRadius: 15, padding: 10}}>
                                 <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.amount} </h1>
-                                <img src={"/ASAblasters/enemies/" + asset.acceptedImg} style={{width: 50}}/>
+                                <img src={"/enemies/" + asset.acceptedImg} style={{width: 50}}/>
                                 <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.unitName} </h1>
     
                             </Grid>

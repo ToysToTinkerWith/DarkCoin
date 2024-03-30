@@ -408,7 +408,32 @@ export default class Leaderboard extends React.Component {
                     return a.numWins < b.numWins ? 1 : -1
                 }
             })
-
+        const initValue = [ 0, [] ] // offset, items
+        const withPlaces =
+          sortedPlayers.reduce(
+            ([ offset, items ], currentValue) => {
+              if (items.length === 0) {  
+                items.push({ place: 1, item: currentValue })
+                return [ 1, items ]
+              }
+              else {
+                const prevItem = items[items.length - 1]
+                let newPlace = 0
+                let newOffset = 0
+                if (currentValue.numWins === prevItem.item.numWins && 
+                    currentValue.earnings === prevItem.item.earnings) { 
+                  newPlace = prevItem.place
+                  newOffset = offset + 1
+                }
+                else { 
+                  newPlace = prevItem.place + offset
+                  newOffset = 1
+                }
+                items.push({ place: newPlace, item: currentValue })
+                return [ newOffset, items ]
+              }
+            }, initValue)[1]
+        
         if (this.state.currBattle >= this.state.battleNum) {
           if (this.state.currBattle >= this.state.rewardBattle) {
            
@@ -466,7 +491,7 @@ export default class Leaderboard extends React.Component {
         BATTLE RANK
       </h1>
 
-      {sortedPlayers.slice(0, 10).map((player, index) => (
+      {withPlaces.slice(0, 10).map((player, index) => (
         
         <li 
           key={index}
@@ -481,7 +506,7 @@ export default class Leaderboard extends React.Component {
             position: 'relative'
           }}
         >
-          {index === 0 && (
+          {player.place === 1 && (
           <img 
             src={"/gold.svg"} 
             alt="gold" 
@@ -492,7 +517,7 @@ export default class Leaderboard extends React.Component {
             }} 
           />
         )} {/* display gold crown icon above the first player */}
-        {index === 1 && (
+        {player.place === 2 && (
           <img 
             src={"/silver.svg"} 
             alt="silver" 
@@ -503,7 +528,7 @@ export default class Leaderboard extends React.Component {
             }} 
         />
         )} {/* display silver crown icon above the second player */}
-        {index === 2 && (
+        {player.place === 3 && (
           <img 
             src={"/bronze.svg"} 
             alt="bronze" 
@@ -514,12 +539,12 @@ export default class Leaderboard extends React.Component {
             }} 
           />
         )} {/* display bronze crown icon above the third player */}
-          <div style={{ marginRight: '20px', fontSize: "35px" }}>{index + 1}{index === 0 ? 'st' : index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'}</div> {/* display rank */}
-          <DisplayChar contract={this.state.contract} leaderboard={true} style={{position: "absolute"}} nftId={player.assetId} activeAddress={this.props.activeAddress} wallet={this.props.wallet} setNft={(nftId) => this.setState({charSelect: player.assetId})} sendDiscordMessage={this.props.sendDiscordMessage}/>
+          <div style={{ marginRight: '20px', fontSize: "35px" }}>{player.place}{player.place === 1 ? 'st' : player.place === 2 ? 'nd' : player.place === 3 ? 'rd' : 'th'}</div> {/* display rank */}
+          <DisplayChar contract={this.state.contract} leaderboard={true} style={{position: "absolute"}} nftId={player.item.assetId} activeAddress={this.props.activeAddress} wallet={this.props.wallet} setNft={(nftId) => this.setState({charSelect: player.item.assetId})} sendDiscordMessage={this.props.sendDiscordMessage}/>
           <div style={{ flex: '1', fontSize: '30px', marginLeft: 20 }}>
-            <div>Name: {player.characterName}</div> {/* display character name */}
-            <div>Wins: {player.numWins}</div> {/* display wins */}
-            <div>Total Earned: {player.earnings} DC</div> {/* display total earned */}
+            <div>Name: {player.item.characterName}</div> {/* display character name */}
+            <div>Wins: {player.item.numWins}</div> {/* display wins */}
+            <div>Total Earned: {player.item.earnings} DC</div> {/* display total earned */}
           </div>
         </li>
       ))}

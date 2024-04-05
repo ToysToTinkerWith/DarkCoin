@@ -16,6 +16,7 @@ async function getCreatedChars(req, res) {
 
     let account = []
     let charsDC = []
+    let warriors = []
 
     const token = {
         'X-API-Key': process.env.indexerKey
@@ -75,10 +76,37 @@ async function getCreatedChars(req, res) {
 
     }
 
+    let assets = await indexerClient.lookupAccountAssets("L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY").do();
+
+    
+    assets.assets.forEach(async (asset) => {
+        if (account.includes(asset["asset-id"])) {
+            warriors.push(asset["asset-id"])
+        }
+    })
+
+    numAssets = assets.assets.length
+    nextToken = assets["next-token"]
+
+    while (numAssets == 1000) {
+
+        assets = await indexerClient.lookupAccountAssets("L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY").nextToken(nextToken).do();
+
+        assets.assets.forEach(async (asset) => {
+            if (account.includes(asset["asset-id"])) {
+                warriors.push(asset["asset-id"])
+            }
+        })
+
+        numAssets = assets.assets.length
+        nextToken = assets["next-token"]
+
+    }
+
     let ownedNfts = []
 
         for (var i = 0; i < account.length; i++) {
-            if (charsDC.includes(account[i])) {
+            if (charsDC.includes(account[i]) || warriors.includes(account[i])) {
                 ownedNfts.push(account[i])
             }
         }

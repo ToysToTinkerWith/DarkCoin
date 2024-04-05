@@ -12,8 +12,6 @@ export default function Proposals(props) {
 
   const { activeAccount, signTransactions, sendTransactions } = useWallet()
 
-  const [ contract, setContract ] = useState(1025341912)
-
   const [ proposals, setProposals ] = useState([])
   
 
@@ -36,15 +34,11 @@ export default function Proposals(props) {
         
           const session = await response.json()
   
-          console.log(session)
-
           setProposals([])
 
           session.boxes.forEach((box) => {
             let temp = ""
-            console.log(box)
             Object.values(box.name).forEach((int) => {
-              console.log(int)
               let char = String.fromCharCode(int)
               temp += char
             })
@@ -63,17 +57,13 @@ export default function Proposals(props) {
 
       const getProposal = async (boxName) => {
         
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
+ 
 
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
       
         let responseProposal = await client.getApplicationBoxByName(props.contracts.council, boxName).do();
-        console.log(responseProposal)
         let string = new TextDecoder().decode(responseProposal.value)
-        console.log(string)
 
         window.location.href = "/council/proposals/" + string
           
@@ -86,17 +76,13 @@ export default function Proposals(props) {
       proposals.forEach((proposal) => {
         let split = proposal.split(" ")
         let proposalNum = Number(split[0].substring(8, split[0].length))
-        console.log(proposalNum)
         let slogan = proposal.substring(split[0].length + 1)
-        console.log(slogan)
         parsedProposals.push({box: proposal, proposalNum: proposalNum, slogan: slogan})
       })
 
       parsedProposals = parsedProposals.sort((a,b) => b.proposalNum - a.proposalNum)
 
       
-console.log(proposals)
-
         return (
             <div>
               <Grid container>
@@ -124,3 +110,4 @@ console.log(proposals)
     
     
 }
+

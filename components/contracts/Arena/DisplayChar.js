@@ -6,6 +6,13 @@ import { Typography, Button, TextField } from "@mui/material"
 
 import { useWallet } from '@txnlab/use-wallet'
 
+
+import { CID } from 'multiformats/cid'
+
+
+import * as mfsha2 from 'multiformats/hashes/sha2'
+import * as digest from 'multiformats/hashes/digest'
+
 export default function DisplayChar(props) {
 
     const { activeAccount, signTransactions, sendTransactions } = useWallet()
@@ -38,12 +45,32 @@ export default function DisplayChar(props) {
             });
         
         let session = await response.json()
-    
-            
 
-        setNft(session.nft.assets[0].params)
-        setNftUrl("https://gateway.pinata.cloud/ipfs/" + session.nft.assets[0].params.url.slice(34))
-        setCharStats(session.charStats)
+        
+    
+        if (session.nft.assets[0].params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
+            const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
+
+            const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+            const ocid = CID.create(0, 0x70, mhdigest)
+
+            let char = JSON.parse(session.charStats)
+            
+            let properties = JSON.stringify(char.properties)
+            console.log(properties)
+            setNft(session.nft.assets[0].params)
+            setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
+            setCharStats(properties)
+            
+        }
+        else {
+            setNft(session.nft.assets[0].params)
+            setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
+            setCharStats(session.charStats)
+        }
+
+        
     
             }
             catch(error) {
@@ -70,9 +97,6 @@ export default function DisplayChar(props) {
 
         try {
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
       
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -175,9 +199,8 @@ export default function DisplayChar(props) {
 
         try {
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
+            props.setMessage("Sign Transaction...")
+
 
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
@@ -193,8 +216,6 @@ export default function DisplayChar(props) {
           );
 
           let encoded = algosdk.encodeUnsignedTransaction(ftxn)
-
-          console.log(encoded)
         
         const signedTransactions = await signTransactions([encoded])
 
@@ -204,82 +225,27 @@ export default function DisplayChar(props) {
 
         let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
 
-          let appArgs = []
-        
+        props.setMessage("Listing in marketplace...")
 
-          let accounts = []
-          let foreignApps = []
+
+        const response = await fetch('/api/arena/sellChar', {
+            method: "POST",
+            body: JSON.stringify({
+              address: activeAccount.address,
+              nftId: props.nftId,
+              price: price
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            }
               
-          let foreignAssets = [props.nftId]
+          });
+        
+          const session = await response.json()
     
-          let boxes = []
-  
-          appArgs.push(
-              new Uint8Array(Buffer.from("optin"))
-          )
-  
-          let otxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, 1035432580, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+          console.log(session)
 
-          let userMnemonic = process.env.DCwallet
-        let userAccout =  algosdk.mnemonicToSecretKey(userMnemonic)
-        // Sign the transaction
-        let signedTxn = otxn.signTxn(userAccout.sk);
-
-        props.setMessage("Opting contract into asset...")
-
-        // Submit the transaction
-        let { txId } = await client.sendRawTransaction(signedTxn).do()
-
-
-        confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-
-        let stxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", 
-            "VI66S7AN2G4HKUD7DXJUSVEP54MDJ42NGDOUUD3LQJSCU7WT5UU2KAIHAU", 
-            undefined,
-            undefined,
-            1, 
-            undefined,
-            props.nftId,
-            params
-          );
-
-        appArgs = []
-        
-
-        accounts = []
-        foreignApps = []
-            
-        foreignAssets = [props.nftId]
-
-        let sellBox = new Uint8Array(Buffer.from(String(props.nftId) + ">" + String(price)))
-
-        boxes = [{appIndex: 0, name: sellBox}]
-
-        appArgs.push(
-            new Uint8Array(Buffer.from("sell")),
-            new Uint8Array(Buffer.from(String(props.nftId) + ">" + String(price))),
-            new Uint8Array(Buffer.from(activeAccount.address)),
-        )
-
-        let atxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, 1035432580, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-        
-        let txns = [stxn, atxn]
-
-        let txGroup = algosdk.assignGroupID(txns);
-        
-        let signedTxn1 = stxn.signTxn(userAccout.sk);
-        let signedTxn2 = atxn.signTxn(userAccout.sk);
-
-        let signed = [signedTxn1, signedTxn2]
-
-        props.setMessage("Sending asset to contract..")
-
-    
-        // Submit the transaction
-        txId = await client.sendRawTransaction(signed).do()
-
-        confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
+         
 
         props.setMessage("Asset listed in marketplace.")
         }
@@ -293,60 +259,53 @@ export default function DisplayChar(props) {
 
         try {
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
+            props.setMessage("Sign Transaction...")
 
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
-        let params = await client.getTransactionParams().do()
+            const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
-        let otxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            activeAccount.address, 
-            activeAccount.address, 
-            undefined,
-            undefined,
-            0, 
-            undefined,
-            props.nftId,
-            params
-          );
+            let params = await client.getTransactionParams().do()
 
-          let encoded = algosdk.encodeUnsignedTransaction(otxn)
+            let otxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+                activeAccount.address, 
+                activeAccount.address, 
+                undefined,
+                undefined,
+                0, 
+                undefined,
+                props.nftId,
+                params
+            );
+
+            let encoded = algosdk.encodeUnsignedTransaction(otxn)
+            
+            const signedTransactions = await signTransactions([encoded])
+
+            props.setMessage("Sending Transaction...")
+
+            const { id } = await sendTransactions(signedTransactions)
+
+            let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+
+            props.setMessage("Transfering Asset...")
+
+
+            const response = await fetch('/api/arena/claimChar', {
+                method: "POST",
+                body: JSON.stringify({
+                  address: activeAccount.address,
+                  nftId: props.nftId
+                }),
+                headers: {
+                  "Content-Type": "application/json",
+                }
+                  
+              });
+            
+              const session = await response.json()
         
-        const signedTransactions = await signTransactions([encoded])
-
-        props.setMessage("Sending Transaction...")
-
-        const { id } = await sendTransactions(signedTransactions)
-
-        let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-          
+              console.log(session)
         
-
-        let ttxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", 
-            activeAccount.address, 
-            undefined,
-            undefined,
-            1, 
-            undefined,
-            props.nftId,
-            params
-          );
-
-          const userMnemonic = process.env.DCwallet
-          const userAccout =  algosdk.mnemonicToSecretKey(userMnemonic)
-          // Sign the transaction
-          let signedTxn = ttxn.signTxn(userAccout.sk);
-  
-          // Submit the transaction
-          const { txId } = await client.sendRawTransaction(signedTxn).do()
-
-          props.setMessage("Transfering Asset...")
-
-  
-          confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
 
           props.setMessage("Asset Transfered.")
         }

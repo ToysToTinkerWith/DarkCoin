@@ -24,9 +24,6 @@ export default function fund(props) {
 
     const fetchData = async () => {
 
-      const token = {
-        'X-API-Key': process.env.indexerKey
-      }
 
       const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
@@ -39,8 +36,6 @@ export default function fund(props) {
       setAddress(contractAccount)
 
       const accountInfo = await indexerClient.lookupAccountAssets(contractAccount).do();
-
-      console.log(accountInfo)
 
       setAssetNum(accountInfo.assets.length)
 
@@ -88,9 +83,6 @@ export default function fund(props) {
   const fund = async () => {
 
     try {
-    const token = {
-      'X-API-Key': process.env.indexerKey
-    }
 
     const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
@@ -202,8 +194,7 @@ export default function fund(props) {
       sortedAssets.push(asset)
     }
   })
-  console.log(sortedAssets)
-  console.log(assetNum)
+ 
 
   return (
   <React.Fragment>

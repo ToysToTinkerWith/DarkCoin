@@ -76,7 +76,7 @@ class Particle {
 };
 
 class Enemy {
-    constructor(x, y, radius, color, velocity, enemyImage, context, score, assetId, unit) {
+    constructor(x, y, radius, color, velocity, enemyImage, context, assetId, unit) {
         this.x = x;
         this.y = y;
         this.radius = radius;
@@ -84,7 +84,6 @@ class Enemy {
         this.velocity = velocity;
         this.enemyImage = enemyImage;
         this.context = context;
-        this.score = score;
         this.assetId = assetId;
         this.unit = unit
     }
@@ -240,7 +239,7 @@ const clickHandler = (event, context, canvas, enemies, projectiles, particles, u
                                 }, 
                                 context))
                     }
-                    updateScore(25, enemy.assetId, enemy.score);
+                    updateScore(25, enemy.assetId);
                     enemies.splice(i, 1);
                 }
             }
@@ -262,7 +261,7 @@ const clickHandler = (event, context, canvas, enemies, projectiles, particles, u
     
 };
 
-const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransaction, setReady, highScore, totalScore, DARKCOIN, TRTS }) => {
+const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransaction, setReady, totalScore, AO, chip, DARKCOIN, Gold, GoldDAO, META, PRSMS, Tacos, THC, TRTS, Vote, YARN }) => {
     const [restartModal, setRestartModal] = useState(false);
     const [startModal, setStartModal] = useState(true);
     const [newGame, setNewGame] = useState(0);
@@ -388,8 +387,9 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
     }
 
     useEffect(() => {
-        const music = new Audio('./ASAblasters/Lexica-Tiger-Tracks.mp3');
+        const music = new Audio('./Lexica-Tiger-Tracks.mp3');
         music.loop = true;
+        music.volume = 0.1;
         music.oncanplaythrough = () => {
             // Set state to indicate that background music is loaded
             setBackgroundMusicLoaded(true);
@@ -401,15 +401,6 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
         playBackgroundMusic();
 
         const enemyDir = "./enemies/";
-        const enemyFiles = [];
-
-        sortedAssets.forEach((asset) => {
-            if (asset.amount > 0) {
-                enemyFiles.push(asset.acceptedImg)
-            }
-        })
-
-        const enemySprite = enemyFiles.map(file => enemyDir + file);
 
         const upgradeDir = "./upgrades/";
         const upgradeFiles = [
@@ -466,26 +457,16 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                     y: Math.sin(angle)
                 };
 
+
                 const enemyImages = new Image();
-                enemyImages.src = enemySprite[Math.floor(Math.random() * enemySprite.length)];
+                let randEnemy = sortedAssets[Math.floor(Math.random() * sortedAssets.length)];
+                enemyImages.src = enemyDir + randEnemy.acceptedImg
 
-                let score
-                let assetId
-                let name
-                let split1 = enemyImages.src.split("/")
-                let split2 = split1[5].split(".")
-                console.log(split2[0])
+                let assetId = randEnemy.assetId
+                let unit = randEnemy.unitName
+                
 
-                if (split2[0] == "DARKCOIN") {
-                    score = 1
-                    assetId = 1088771340
-                }
-                else if (split2[0] == "TRTS") {
-                    score = 0.5
-                    assetId = 1000870705
-                }
-
-                enemies.push(new Enemy(x, y, radius, color, velocity, enemyImages, canvas.getContext('2d'), score, assetId, split2[0]));
+                enemies.push(new Enemy(x, y, radius, color, velocity, enemyImages, canvas.getContext('2d'), assetId, unit));
             }, 1000);
         };
 
@@ -581,6 +562,15 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                             } else if (acquiredUpgrade === "bombshot") {
                                 console.log('Bombs Acquired!', upgrade.upgradeImage);
                                 startBombShot();
+                            } else if (acquiredUpgrade === "icon-ogs") {
+                                console.log('Gnomes Acquired!', upgrade.upgradeImage);
+                                startScatterShot();
+                            } else if (acquiredUpgrade === "icon-puddin") {
+                                console.log('Rear Cannons Acquired!', upgrade.upgradeImage);
+                                startShield(player, context);
+                            } else if (acquiredUpgrade === "icon-trts") {
+                                console.log('Treats acquired:', upgrade.upgradeImage);
+                                startRapidFire();
                             }
                         }
                     })   
@@ -618,13 +608,13 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                             )
                         }
                         if (enemy.radius - 10 > 5) {
-                            updateScore(10, enemy.assetId, enemy.score);
+                            updateScore(10, enemy.assetId);
                             gsap.to(enemy, {
                                 radius: enemy.radius - enemy.radius
                             })
                         } else {
                             //remove enemy if destroyed by shield
-                            updateScore(25, enemy.assetId, enemy.score);
+                            updateScore(25, enemy.assetId);
                             enemies.splice(index, 1);
                         }
                     }
@@ -650,14 +640,14 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                                     canvas.getContext('2d')))
                         }
                         if (enemy.radius - 10 > 5) {
-                            updateScore(10, enemy.assetId, enemy.score);
+                            updateScore(10, enemy.assetId);
                             gsap.to(enemy, {
                                 radius: enemy.radius - 10
                             });
                             projectiles.splice(projectilesIndex, 1);
                         } else {
                             //update score & remove enemies when shot
-                            updateScore(15, enemy.assetId, enemy.score);
+                            updateScore(15, enemy.assetId);
                             enemies.splice(index, 1);
                             projectiles.splice(projectilesIndex, 1);
                         }
@@ -733,7 +723,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                     }} 
                     onClick={() => {
                         
-                        sendRewardTransaction(totalScore, DARKCOIN, TRTS),
+                        sendRewardTransaction(totalScore, AO, chip, DARKCOIN, Gold, GoldDAO, META, PRSMS, Tacos, THC, TRTS, Vote, YARN),
                         setReady(false),
                         setRestartModal(false),
                         setStartModal(true)
@@ -764,25 +754,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                 textAlign: 'center',
                 borderRadius: '15px'
             }}>
-                <h1 style={{ fontSize: '24px', color: 'red', marginBottom: '0', marginTop: '8px' }}>ASA Blasters </h1>
-                <h1 style={{ fontSize: '16px', color: 'black', marginBottom: '0', marginTop: '8px' }}>Highscore = {highScore} </h1>
-
-                <h1 style={{ fontSize: '16px', color: 'black', marginBottom: '0', marginTop: '8px' }}>Contract contains</h1>
-                <Grid container style={{padding: 10}}>
-                {sortedAssets.map((asset, index) => {
-                    console.log(asset)
-                    if (asset.amount > 0) {
-                        return(
-                            <Grid item key={index} xs={12} sm={6} style={{border: "1px solid black", borderRadius: 15, padding: 10}}>
-                                <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.amount} </h1>
-                                <img src={"/enemies/" + asset.acceptedImg} style={{width: 50}}/>
-                                <h1 style={{ fontSize: '16px', color: 'black'}}> {asset.unitName} </h1>
-    
-                            </Grid>
-                        )
-                    }
-                })}
-                </Grid>
+                
                 <button id="startButton" style={{
                     marginTop: '12px',
                     backgroundColor: 'blue',

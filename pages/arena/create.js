@@ -12,7 +12,6 @@ export default function Create(props) {
 
   const { activeAccount, signTransactions, sendTransactions } = useWallet()
 
-
   const [ descript, setDescript ] = useState("")
   const [ name, setName ] = useState("")
 
@@ -87,10 +86,6 @@ export default function Create(props) {
 
         try {
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-
       
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
         
@@ -150,8 +145,6 @@ export default function Create(props) {
 
         let generatedImage = session.image
 
-        console.log(generatedImage)
-
         if (generatedImage) {
 
           props.setMessage("Sending Transaction...")
@@ -179,7 +172,6 @@ export default function Create(props) {
           const sess = await res.json()
   
           let generatedDes = sess
-          console.log(generatedDes)
 
           setDes(generatedDes)
           props.setMessage("Minting Asset...")
@@ -220,72 +212,31 @@ export default function Create(props) {
           body: JSON.stringify({
               url: generatedImage,
               des: generatedDes,
-              name: name
+              name: name,
+              addr: activeAccount.address,
+              descript: descript
           }),
           
             
         });
 
-        const session = await response.json()
+        let session = await response.json()
 
-        let ipfs = session.result.IpfsHash
+        console.log(session)
 
-        if (ipfs) {
+        setMinted([...minted, session.assetId])
 
-          const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-  
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+
+        await sendDiscordMessage(name, session.ipfs)
+
+        props.setMessage("Character Created.")
+
+
         
-          let params = await client.getTransactionParams().do();
-  
-          const creator = "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE";
-          const defaultFrozen = false;    
-          const unitName = "DCCHAR"; 
-          const assetName = name;
-          const url = "https://gateway.pinata.cloud/ipfs/" + ipfs;
-          const managerAddr = "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE";
-          const reserveAddr = activeAccount.address;  
-          const freezeAddr = undefined;
-          const clawbackAddr = undefined;
-          const total = 1;                // NFTs have totalIssuance of exactly 1
-          const decimals = 0;             // NFTs have decimals of exactly 0
-          const note = new Uint8Array(Buffer.from("Description: " + descript.substring(0, 500) + " Moves: " + generatedDes))
-          const mtxn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({
-          from:creator,
-          total,
-          decimals,
-          assetName,
-          unitName,
-          assetURL: url,
-          assetMetadataHash: undefined,
-          defaultFrozen,
-          freeze: freezeAddr,
-          manager: managerAddr,
-          clawback: clawbackAddr,
-          reserve: reserveAddr,
-          note: note,
-          suggestedParams: params});
-  
-          const userMnemonic = process.env.DCwallet
-          const userAccout =  algosdk.mnemonicToSecretKey(userMnemonic)
-          // Sign the transaction
-          let signedTxn = mtxn.signTxn(userAccout.sk);
-  
-      
-          // Submit the transaction
-          const { txId } = await client.sendRawTransaction(signedTxn).do()
-  
-          let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-  
-          setMinted([...minted, confirmedTxn["asset-index"]])
-  
-          await sendDiscordMessage(assetName, url)
-
-        }
       }
       catch(error) {
+        props.setMessage(error)
+
         await props.sendDiscordMessage(error, "Pin", activeAccount.address)
        }
 
@@ -318,7 +269,7 @@ export default function Create(props) {
       
       if (char) {
         return(
-          <DisplayChar create={true} style={{position: "absolute"}} nftId={char} setNft={(nftId) => setChar(nftId)} setMessage={(message) => props.setMessage(message)} sendDiscordMessage={props.sendDiscordMessage}/>
+          <DisplayChar create={true} style={{position: "absolute"}} nftId={char} setNft={(nftId) => setChar(nftId)} setMessage={(message) => props.setMessage(message)} sendDiscordMessage={props.sendDiscordMessage} />
         )
       }
 
@@ -431,3 +382,4 @@ export default function Create(props) {
     
     
 }
+

@@ -454,8 +454,6 @@ const token = {
   
           let DCalgo = algoDC/DC
 
-          console.log(DCalgo)
-
 
             if (this.state.mixVal == "5") {
               fee = 0.05 / DCalgo
@@ -474,8 +472,6 @@ const token = {
             }
 
             fee = Math.floor(fee)
-
-            console.log(fee)
 
             ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
               this.props.activeAddress, 

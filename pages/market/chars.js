@@ -32,8 +32,6 @@ export default class Daos extends React.Component {
           });
         
           const session = await response.json()
-
-          console.log(session)
     
           this.setState({
             chars: session

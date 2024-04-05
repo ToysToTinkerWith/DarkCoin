@@ -45,11 +45,6 @@ export default function Proposal(props) {
 
       const fetchData = async () => {
 
-
-          const token = {
-            'X-API-Key': process.env.indexerKey
-          }
-
           const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
           let status = await client.status().do();
@@ -185,10 +180,7 @@ export default function Proposal(props) {
       const fund = async () => {
 
         try {
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
-
+       
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let params = await client.getTransactionParams().do();
@@ -308,10 +300,6 @@ export default function Proposal(props) {
 
         try {
 
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
-
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let txns = []
@@ -385,38 +373,24 @@ export default function Proposal(props) {
           }
         })
 
-        let appArgs = []
-        appArgs.push(
-          new Uint8Array(Buffer.from("amend")),
-          new Uint8Array(Buffer.from(sessionAmend)),
-        )
+        props.setMessage("Sending Amendment...")
 
-        let accounts = []
-        let foreignApps = []
-          
-        let foreignAssets = []
 
-        let amendBox = new Uint8Array(Buffer.from("Amend" + String(amendNum)))
-        let votesBox = new Uint8Array(Buffer.from("Votes" + String(amendNum)))
-
-        let boxes = [{appIndex: 0, name: amendBox}, {appIndex: 0, name: amendBox}, {appIndex: 0, name: votesBox}, {appIndex: 0, name: votesBox}]
+        const response = await fetch('/api/council/sendAmend', {
+          method: "POST",
+          body: JSON.stringify({
+            sessionAmend: sessionAmend,
+            amendNum: amendNum,
+            contract: Number(router.query.id)
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          }
+            
+        });
+      
+        const session = await response.json()
         
-        let wtxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, Number(router.query.id), appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-
-        const houseMnemonic = process.env.DCwallet
-        const houseAccount =  algosdk.mnemonicToSecretKey(houseMnemonic)
-
-        let signedTxn = wtxn.signTxn(houseAccount.sk);
-        props.setProgress(80)
-
-        props.setMessage("Sending amendment...")
-
-        let txId = wtxn.txID().toString();
-
-        // Submit the transaction
-        await client.sendRawTransaction(signedTxn).do()                           
-        // Wait for transaction to be confirmed
-        confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
 
         props.setMessage("Amendment successfully sent")
 
@@ -451,10 +425,6 @@ export default function Proposal(props) {
          }
         })
 
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
-
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
             
         let params = await client.getTransactionParams().do();
@@ -485,8 +455,6 @@ export default function Proposal(props) {
               appArgs.push(
                 new Uint8Array(Buffer.from(String(vote)))
               )
-
-              console.log(appArgs)
   
               const accounts = []
               const foreignApps = []
@@ -503,8 +471,6 @@ export default function Proposal(props) {
               else {
                 voteBox = new Uint8Array(Buffer.from("Votes"))
               }
-
-              console.log(voteBox)
     
               const boxes = [{appIndex: 0, name: voteBox}, {appIndex: 0, name: voteBox}]
 
@@ -634,26 +600,22 @@ export default function Proposal(props) {
 
         let accepted
 
-        if (votes[0].count > votes[1].count) {
+        if (votes[0].count >= votes[1].count) {
           accepted = true
         }
         else {
           accepted = false
         }
 
-        console.log(accepted)
 
         let acceptedAmendments = []
 
         amendments.forEach((amendment) => {
-          console.log(amendment)
           if (amendment.votes[0].count > amendment.votes[1].count) {
             acceptedAmendments.push(amendment.amendment)
           }
         })
         
-
-        console.log(acceptedAmendments)
 
         let draft
 
@@ -678,61 +640,22 @@ export default function Proposal(props) {
         }
 
         
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
+        const response = await fetch('/api/council/draftProposal', {
+          method: "POST",
+          body: JSON.stringify({
+            draft: draft,
+            contract: Number(router.query.id),
+            accepted: accepted
 
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          }
             
-        let params = await client.getTransactionParams().do();
-
-        let appArgs = []
-
-        appArgs.push(new Uint8Array(Buffer.from("draft")))
-
-        if (accepted) {
-          appArgs.push(
-            new Uint8Array(Buffer.from("accept")),
-            new Uint8Array(Buffer.from(draft)),
-          )
-        }
-        appArgs.push(
-          new Uint8Array(Buffer.from("reject")),
-        )
-
-        let accounts = []
-        let foreignApps = []
-          
-        let foreignAssets = []
-
-        let boxes
-
-        let draftBox = new Uint8Array(Buffer.from("Draft"))
-
-        if (accepted) {
-          boxes = [{appIndex: 0, name: draftBox}, {appIndex: 0, name: draftBox}, {appIndex: 0, name: draftBox}]
-        }
-
-        let amend0 = new Uint8Array(Buffer.from("Amend0"))
-       
-        boxes.push({appIndex: 0, name: amend0})
+        });
+      
+        const session = await response.json()
         
-        let wtxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, Number(router.query.id), appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-
-        const houseMnemonic = process.env.DCwallet
-        const houseAccount =  algosdk.mnemonicToSecretKey(houseMnemonic)
-
-        let signedTxn = wtxn.signTxn(houseAccount.sk);
-        props.setProgress(80)
-
-        props.setMessage("Writing draft...")
-
-        let txId = wtxn.txID().toString();
-
-        // Submit the transaction
-        await client.sendRawTransaction(signedTxn).do()                           
-        // Wait for transaction to be confirmed
-        let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
 
         props.setMessage("Draft successfully written")
 
@@ -889,278 +812,288 @@ export default function Proposal(props) {
 
      parsedAmendments = amendments.sort((a,b) => b.amendNum - a.amendNum)
 
-     console.log(amendments)
-
-        return (
-            <div >
-              {/* <Button  style={{color: "white", display: "flex", margin: "auto"}} onClick={() => window.open("https://algoexplorer.io/address/" + address)}>
-                  {address}
-                </Button> */}
-                {currRound > (propRound + 366000) && finalDraft ? 
-                <Grid container justifyContent="center" alignItems="center" style={{display: "flex", margin: "auto", padding: 40}}>
-                <Grid item xs={12} sm={12} md={12} >
-                {assets.length > 0 ? 
-                assets.map((asset, index) => {
-                  return (
-                    <Typography key={index} color="secondary" variant="h6" align="center"> {asset.unitName} | {asset.amount} </Typography>
-                    )
-                })
-                :
-                null
-                }
-                </Grid>
-                
-             
-                <Grid item xs={12} sm={6}>
-                
-                <br />
-                  
-                  <TextField                
-                      onChange={handleChange}
-                      value={fundAsset}
-                      multiline
-                      type="number"
-                      label={<Typography color="primary" variant="caption" align="center" style={{backgroundColor: "white", padding: 20, borderRadius: 50}}> Asset Id (Algo = 0) </Typography>}
-                      name="fundAsset"
-                      autoComplete="false"
-                      InputProps={{ style: { color: "black" } }}
-                    
-                      style={{
-                      color: "black",
-                      background: "white",
-                      borderRadius: 15,
-                      display: "flex",
-                      margin: "auto",
-                      width: "80%"
-                    
-                      }}
-                    />
-
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                
-                <br />
-                  
-                  <TextField                
-                      onChange={handleChange}
-                      value={fundAmount}
-                      multiline
-                      type="number"
-                      label={<Typography color="primary" variant="caption" align="center" style={{backgroundColor: "white", padding: 20, borderRadius: 50}}> Asset Amount </Typography>}
-                      name="fundAmount"
-                      autoComplete="false"
-                      InputProps={{ style: { color: "black" } }}
-                    
-                      style={{
-                      color: "black",
-                      background: "white",
-                      borderRadius: 15,
-                      display: "flex",
-                      margin: "auto",
-                      width: "80%"
-                    
-                      }}
-                    />
-
-                </Grid>
-                <Grid item xs={12} sm={6}>
-
-                <br />
-                <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => fund()}>
-                  <Typography  variant="h6"> Fund </Typography>
-                </Button>
-                </Grid>
-                </Grid>
-                :
-                null
-                }
+     if (currRound && propRound) {
+      return (
+        <div >
+          {/* <Button  style={{color: "white", display: "flex", margin: "auto"}} onClick={() => window.open("https://algoexplorer.io/address/" + address)}>
+              {address}
+            </Button> */}
+            {currRound > (propRound + 366000) && finalDraft ? 
+            <Grid container justifyContent="center" alignItems="center" style={{display: "flex", margin: "auto", padding: 40}}>
+            <Grid item xs={12} sm={12} md={12} >
+            {assets.length > 0 ? 
+            assets.map((asset, index) => {
+              return (
+                <Typography key={index} color="secondary" variant="h6" align="center"> {asset.unitName} | {asset.amount} </Typography>
+                )
+            })
+            :
+            null
+            }
+            </Grid>
+            
+         
+            <Grid item xs={12} sm={6}>
+            
+            <br />
               
+              <TextField                
+                  onChange={handleChange}
+                  value={fundAsset}
+                  multiline
+                  type="number"
+                  label={<Typography color="primary" variant="caption" align="center" style={{backgroundColor: "white", padding: 20, borderRadius: 50}}> Asset Id (Algo = 0) </Typography>}
+                  name="fundAsset"
+                  autoComplete="false"
+                  InputProps={{ style: { color: "black" } }}
+                
+                  style={{
+                  color: "black",
+                  background: "white",
+                  borderRadius: 15,
+                  display: "flex",
+                  margin: "auto",
+                  width: "80%"
+                
+                  }}
+                />
 
+            </Grid>
+            <Grid item xs={12} sm={6}>
+            
+            <br />
               
+              <TextField                
+                  onChange={handleChange}
+                  value={fundAmount}
+                  multiline
+                  type="number"
+                  label={<Typography color="primary" variant="caption" align="center" style={{backgroundColor: "white", padding: 20, borderRadius: 50}}> Asset Amount </Typography>}
+                  name="fundAmount"
+                  autoComplete="false"
+                  InputProps={{ style: { color: "black" } }}
+                
+                  style={{
+                  color: "black",
+                  background: "white",
+                  borderRadius: 15,
+                  display: "flex",
+                  margin: "auto",
+                  width: "80%"
+                
+                  }}
+                />
+
+            </Grid>
+            <Grid item xs={12} sm={6}>
+
+            <br />
+            <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => fund()}>
+              <Typography  variant="h6"> Fund </Typography>
+            </Button>
+            </Grid>
+            </Grid>
+            :
+            null
+            }
+          
+
+          
 
 
-              
-                {(amendments.length > 1 && currRound > (propRound + 366000)) || (amendments.length == 0 && (currRound > (propRound + 183000))) ? 
-                <Grid container justifyContent="center" alignItems="center" style={{display: "flex", margin: "auto", padding: 40}}>
-                  {(amendments.length > 1 && currRound > (propRound + 549000)) || (amendments.length == 0 && (currRound > (propRound + 366000))) && !finalDraft ? 
-                  <Grid item xs={12} sm={12}>
+          
+            {(amendments.length >= 1 && currRound > (propRound + 366000)) || (amendments.length == 0 && (currRound > (propRound + 183000))) ? 
+            <Grid container justifyContent="center" alignItems="center" style={{display: "flex", margin: "auto", padding: 40}}>
+              {(amendments.length >= 1 && currRound > (propRound + 549000)) || (amendments.length == 0 && (currRound > (propRound + 366000))) && !finalDraft ? 
+              <Grid item xs={12} sm={12}>
 
-                  <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => draft()}>
-                    <Typography  variant="h6"> Draft </Typography>
-                  </Button>
-                  <br />
-                  </Grid>
-                  :
-                  null
-                  }
-                    <Grid item sm={12}>
-                    <Typography variant="h6" align="center" style={{color: "white"}}>
-                      {proposal}
-                    </Typography>
-                    <br />             
-                    {votes ? 
-                    <ResponsiveContainer aspect={2} width="100%">
-                    <PieChart >
-                    <Pie
-                        dataKey="count"
-                        data={votes}
-                        label={renderCustomizedLabel}
-                        fill="#000000"
-                    />
-
-                    </PieChart>
-                    </ResponsiveContainer>
-                    :
-                    null
-                    }
-                    </Grid>
-
-                    {daos && !finalDraft ?
-                    <div>
-                      <Grid item sm={12}>
-                      <Typography variant="subtitle1" align="center" style={{color: "white", padding: 10}}>
-                        My DAO = {daos}
-                      </Typography>
-                      </Grid>
-                      <Grid item sm={6} md={4}>
-                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "prop", -1)}>
-                        Accept
-                      </Button>
-                      </Grid>
-                      
-                      <Grid item >
-                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "prop", -1)}>
-                        Reject
-                      </Button>
-                      </Grid>
-                    
-                    </div>
-                    :
-                    null
-                    }
-                    </Grid>
-                    
-                  :
-                  <Typography variant="h6" align="center" style={{color: "white", padding: 40}}>
+              <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => draft()}>
+                <Typography  variant="h6"> Draft </Typography>
+              </Button>
+              <br />
+              </Grid>
+              :
+              null
+              }
+                <Grid item sm={12}>
+                <Typography variant="h6" align="center" style={{color: "white"}}>
                   {proposal}
                 </Typography>
+                <br />             
+                {votes ? 
+                <ResponsiveContainer aspect={2} width="100%">
+                <PieChart >
+                <Pie
+                    dataKey="count"
+                    data={votes}
+                    label={renderCustomizedLabel}
+                    fill="#000000"
+                />
+
+                </PieChart>
+                </ResponsiveContainer>
+                :
+                null
                 }
-              
+                </Grid>
 
-
-              {parsedAmendments.length > 0 ? 
-              parsedAmendments.map((amendment, index) => {
-                console.log(amendment.amendNum)
-                if ((currRound > (propRound + 183000)) && (currRound < (propRound + 366000))) {
-                return (
-                  <div key={index}>
-                  <Grid container justifyContent="center" alignItems="center" style={{display: "flex", margin: "auto", padding: 40}}>
-                    <Grid item sm={12}>
-                    <Typography variant="subtitle1" align="center" style={{color: "white"}}>
-                      {amendment.amendment}
-                    </Typography>
-                    <br />             
-                    {amendment.votes ? 
-                    <ResponsiveContainer aspect={2} width="100%">
-                    <PieChart >
-                    <Pie
-                        dataKey="count"
-                        data={amendment.votes}
-                        label={renderCustomizedLabel}
-                        fill="#000000"
-                    />
-        
-                    </PieChart>
-                    
-                    </ResponsiveContainer>
-                    :
-                    null
-                    }
-                    </Grid>
-
-                    {daos && !finalDraft ?
-                    <div>
-                      <Grid item sm={12}>
-                      <Typography variant="subtitle1" align="center" style={{color: "white", padding: 10}}>
-                        My DAO = {daos}
-                      </Typography>
-                      </Grid>
-                      <Grid item sm={6} md={4}>
-                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "amend", amendment.amendNum)}>
-                        Accept
-                      </Button>
-                      </Grid>
-                      
-                      <Grid item >
-                      <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "amend", amendment.amendNum)}>
-                        Reject
-                      </Button>
-                      </Grid>
-                    
-                    </div>
-                    :
-                    null
-                    }
-                    
-                    
-                    
-                    
-
+                {daos && !finalDraft ?
+                <div>
+                  <Grid item sm={12}>
+                  <Typography variant="subtitle1" align="center" style={{color: "white", padding: 10}}>
+                    My DAO = {daos}
+                  </Typography>
                   </Grid>
-                  <hr />
-                  </div>
-                )
-                }
-                else {
-                  return (
-                    <Typography variant="subtitle1" align="center" style={{color: "white", padding: 20}}>
-                      {amendment.amendment}
-                    </Typography>
-                  )
-                }
-              })
-              :
-              null
-              }
-              
-              {(currRound < (propRound + 183000)) ?
-              <div>
-              <br />
-              <Typography color="secondary" variant="h6" align="center"> Amend this proposal </Typography>
-              <br />
-                 
-                <TextField                
-                    onChange={handleChange}
-                    value={amend}
-                    multiline
-                    type="text"
-                    label=""
-                    name="amend"
-                    autoComplete="false"
-                    InputProps={{ style: { color: "black" } }}
-                   
-                    style={{
-                    color: "black",
-                    background: "white",
-                    borderRadius: 15,
-                    display: "flex",
-                    margin: "auto",
-                    width: "80%"
-                   
-                    }}
-                  />
-                <br />
-                <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => amendSend()}>
-                  <Typography  variant="h6"> Amend 10 </Typography>
-                  <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
-                </Button>
+                  <Grid item sm={6} md={4}>
+                  <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "prop", -1)}>
+                    Accept
+                  </Button>
+                  </Grid>
+                  
+                  <Grid item >
+                  <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "prop", -1)}>
+                    Reject
+                  </Button>
+                  </Grid>
+                
                 </div>
+                :
+                null
+                }
+                </Grid>
+                
               :
-              null
-              }
-              
+              <Typography variant="h6" align="center" style={{color: "white", padding: 40}}>
+              {proposal}
+            </Typography>
+            }
+          
+
+
+          {parsedAmendments.length > 0 ? 
+          parsedAmendments.map((amendment, index) => {
+            if ((currRound > (propRound + 183000)) && !finalDraft) {
+            return (
+              <div key={index}>
+              <Grid container justifyContent="center" alignItems="center" style={{display: "flex", margin: "auto", padding: 40}}>
+                <Grid item sm={12}>
+                <Typography variant="subtitle1" align="center" style={{color: "white"}}>
+                  {amendment.amendment}
+                </Typography>
+                <br />             
+                {amendment.votes ? 
+                <ResponsiveContainer aspect={2} width="100%">
+                <PieChart >
+                <Pie
+                    dataKey="count"
+                    data={amendment.votes}
+                    label={renderCustomizedLabel}
+                    fill="#000000"
+                />
+    
+                </PieChart>
+                
+                </ResponsiveContainer>
+                :
+                null
+                }
+                </Grid>
+
+                {daos && !finalDraft && (currRound < (propRound + 366000)) ?
+                <div>
+                  <Grid item sm={12}>
+                  <Typography variant="subtitle1" align="center" style={{color: "white", padding: 10}}>
+                    My DAO = {daos}
+                  </Typography>
+                  </Grid>
+                  <Grid item sm={6} md={4}>
+                  <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(1, "amend", amendment.amendNum)}>
+                    Accept
+                  </Button>
+                  </Grid>
+                  
+                  <Grid item >
+                  <Button variant="contained" style={{color: "white", border: "1px solid white"}} onClick={() => vote(2, "amend", amendment.amendNum)}>
+                    Reject
+                  </Button>
+                  </Grid>
+                
+                </div>
+                :
+                null
+                }
+                
+                
+                
+                
+
+              </Grid>
+              <hr />
+              </div>
+            )
+            }
+            else {
+              return (
+                <Typography variant="subtitle1" align="center" style={{color: "white", padding: 20}}>
+                  {amendment.amendment}
+                </Typography>
+              )
+            }
+          })
+          :
+          null
+          }
+          
+          {(currRound < (propRound + 183000)) ?
+          <div>
+          <br />
+          <Typography color="secondary" variant="h6" align="center"> Amend this proposal </Typography>
+          <br />
+             
+            <TextField                
+                onChange={handleChange}
+                value={amend}
+                multiline
+                type="text"
+                label=""
+                name="amend"
+                autoComplete="false"
+                InputProps={{ style: { color: "black" } }}
+               
+                style={{
+                color: "black",
+                background: "white",
+                borderRadius: 15,
+                display: "flex",
+                margin: "auto",
+                width: "80%"
+               
+                }}
+              />
+            <br />
+            <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => amendSend()}>
+              <Typography  variant="h6"> Amend 10 </Typography>
+              <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
+            </Button>
             </div>
+          :
+          null
+          }
+          
+        </div>
         )
+     }
+     else {
+      return (
+        <div>
+          
+        </div>
+      )
+     }
+
+
+        
     
     
 }
+

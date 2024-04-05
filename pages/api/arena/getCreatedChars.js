@@ -16,9 +16,7 @@ async function getCreatedChars(req, res) {
 
     let ownedAssets = []
 
-    const token = {
-        'X-API-Key': process.env.indexerKey
-    }
+
   
     const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -52,7 +50,7 @@ async function getCreatedChars(req, res) {
 
         let contract = []
 
-        let contractAssets = await indexerClient.lookupAccountAssets("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE").do();
+        let contractAssets = await indexerClient.lookupAccountAssets("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM").do();
 
     
         contractAssets.assets.forEach((asset) => {
@@ -67,7 +65,7 @@ async function getCreatedChars(req, res) {
 
         while (numAccAssets == 1000) {
 
-          contractAssets = await indexerClient.lookupAccountAssets("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE").nextToken(nextAccToken).do();
+          contractAssets = await indexerClient.lookupAccountAssets("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM").nextToken(nextAccToken).do();
 
           contractAssets.assets.forEach((asset) => {
               if (asset.amount == 1) {
@@ -83,7 +81,7 @@ async function getCreatedChars(req, res) {
         let minted = []
 
 
-      let accountCreatedAssets = await indexerClient.lookupAccountCreatedAssets("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE").do();
+      let accountCreatedAssets = await indexerClient.lookupAccountCreatedAssets("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM").do();
 
       accountCreatedAssets.assets.forEach((asset) => {
         if (asset.params.reserve == req.body.activeAccount && !ownedAssets.includes(asset.index) && contract.includes(asset.index)) {
@@ -98,7 +96,7 @@ async function getCreatedChars(req, res) {
 
         while (numAssets == 1000) {
 
-          accountCreatedAssets = await indexerClient.lookupAccountCreatedAssets("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE").do();
+          accountCreatedAssets = await indexerClient.lookupAccountCreatedAssets("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM").do();
 
           accountCreatedAssets.assets.forEach((asset) => {
             if (asset.params.reserve == req.body.activeAccount && !ownedAssets.includes(asset.index)) {

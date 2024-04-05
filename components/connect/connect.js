@@ -61,9 +61,6 @@ export default function Connect(props) {
         }
       }))
 
-      console.log(wallet)
-
-
       props.setWallet(wallet)
 
       } 

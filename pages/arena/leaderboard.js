@@ -58,7 +58,7 @@ export default class Leaderboard extends React.Component {
       this.props.setMessage("")
     }
     catch(error) {
-      await props.sendDiscordMessage(error, "Fetch Leaderboard")
+      await this.props.sendDiscordMessage(error, "Fetch Leaderboard")
      }
 
 
@@ -102,9 +102,6 @@ export default class Leaderboard extends React.Component {
       
 
       
-      const token = {
-        'X-API-Key': process.env.indexerKey
-    }
 
     const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
             
@@ -204,9 +201,6 @@ export default class Leaderboard extends React.Component {
 
       let txgroup = algosdk.assignGroupID(txns)
 
-      const userMnemonic = process.env.DCwallet
-      const userAccout =  algosdk.mnemonicToSecretKey(userMnemonic)
-      // Sign the transaction
 
       
 
@@ -303,10 +297,7 @@ export default class Leaderboard extends React.Component {
         })
         })
 
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
-  
+
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
         
         let params = await client.getTransactionParams().do()
@@ -326,9 +317,7 @@ export default class Leaderboard extends React.Component {
 
       let txn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, this.props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
 
-      const userMnemonic = process.env.DCwallet
-      const userAccout =  algosdk.mnemonicToSecretKey(userMnemonic)
-      // Sign the transaction
+    
 
       
 

@@ -70,10 +70,7 @@ export default class Airdrop extends React.Component {
 
       this.setState({accounts: []})
 
-      const token = {
-        'X-API-Key': process.env.indexerKey
-      }
-  
+ 
       const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
       const assetInfo = await indexerClient.lookupAssetByID(this.state.basedAsset).do();
@@ -135,10 +132,6 @@ export default class Airdrop extends React.Component {
 
     this.setState({quote: []})
 
-
-    const token = {
-      'X-API-Key': process.env.indexerKey
-    }
 
     const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -269,8 +262,6 @@ export default class Airdrop extends React.Component {
 
 
     render() {
-
-      console.log(this.state.quote)
 
       let accountHeaders = [
         { label: "address", key: "address" },
@@ -643,7 +634,7 @@ export default class Airdrop extends React.Component {
 
               <Grid container spacing={3} align="center" style={{padding: 20, borderRadius: 15}}>
                 <Grid item xs={12} sm={12} md={12} >
-                  <Load contract={this.props.contracts.airdrop} sendDiscordMessage={this.props.sendDiscordMessage} sendAmount={this.state.sendAmount} sendAsset={this.state.sendAsset} basedAsset={this.state.basedAsset} freq={this.state.freq} quote={this.state.quote} quoteTotal={quoteTotal} notify={this.state.notify} note={this.state.note}  assetSendInfo={this.state.assetSendInfo} setMessage={this.props.setMessage}/>
+                  <Load contract={this.props.contracts.airdrop} sendDiscordMessage={this.props.sendDiscordMessage} sendAmount={this.state.sendAmount} sendAsset={this.state.sendAsset} basedAsset={this.state.basedAsset} freq={this.state.freq} quote={this.state.quote} quoteTotal={quoteTotal} notify={this.state.notify} note={this.state.note} assetSendInfo={this.state.assetSendInfo} setMessage={this.props.setMessage} resetQuote={() => this.setState({quote: []})} />
                  
                   </Grid>
                   <Grid item xs={12} sm={12} md={12} >

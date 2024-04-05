@@ -33,9 +33,6 @@ export default function Accept(props) {
 
       const fetchData = async () => {
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
 
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -140,10 +137,6 @@ export default function Accept(props) {
     const AcceptDC = async () => {
 
       let opted = false
-
-      const token = {
-        'X-API-Key': process.env.indexerKey
-      }
 
       const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -283,9 +276,6 @@ export default function Accept(props) {
 
       let opted = false
 
-      const token = {
-        'X-API-Key': process.env.indexerKey
-      }
 
       const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -426,9 +416,6 @@ export default function Accept(props) {
 
       let opted = false
 
-      const token = {
-        'X-API-Key': process.env.indexerKey
-      }
 
       const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -588,9 +575,6 @@ export default function Accept(props) {
 
       try {
 
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
 
       const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 

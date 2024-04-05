@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from "react"
 
-import algosdk from "algosdk"
+import algosdk, { assignGroupID } from "algosdk"
 
 import { useWallet } from '@txnlab/use-wallet'
 
-import { Card, Typography, Button, Grid, TextField, Link, CircularProgress } from "@mui/material"
+import { Card, Typography, Button, Grid, TextField, Link } from "@mui/material"
 
 export default function Load(props) {
 
@@ -19,25 +19,25 @@ export default function Load(props) {
 
     const fetchData = async () => {
 
-        if (activeAccount) {
-            let response = await fetch('/api/rewards/getCredits', {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    activeAddress: activeAccount.address,
-                    contract: props.contract
-                  }),
+        // if (activeAccount) {
+        //     let response = await fetch('/api/rewards/getCredits', {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify({
+        //             activeAddress: activeAccount.address,
+        //             contract: props.contract
+        //           }),
                 
                     
-                });
+        //         });
             
-            let session = await response.json()
+        //     let session = await response.json()
         
         
-            setCredits(session)
-        }
+        //     setCredits(session)
+        // }
 
 
     }
@@ -54,217 +54,175 @@ export default function Load(props) {
 
 
   
-      const load = async () => {
+    //   const load = async () => {
 
-        try {
-          
-        const token = {
-            'X-API-Key': process.env.indexerKey
-          }
+    //     try {
+
+    //       const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
       
-          const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-      
-          let params = await client.getTransactionParams().do()
-      
-          const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
-      
-      
-          let accountAppLocalStates = await indexerClient.lookupAccountAppLocalStates(activeAccount.address).do();
-            
-          let contractAccount = await algosdk.getApplicationAddress(props.contract)
-      
-          const accountAssets = await indexerClient.lookupAccountAssets(contractAccount).do();
-      
-          let contractOpt = false
-      
-          accountAssets.assets.forEach(async (asset) => {
-            if (asset["asset-id"] == loadAsset) {
-              contractOpt = true
-            }
-            
-          })
-      
-          const houseAssets = await indexerClient.lookupAccountAssets("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE").do();
-      
-          let houseOpt = false
-      
-          houseAssets.assets.forEach(async (asset) => {
-            if (asset["asset-id"] == loadAsset) {
-              houseOpt = true
-            }
-            
-          })
-      
-      
-          let opted = false
-      
-          let txns = []
-      
-      
-          accountAppLocalStates["apps-local-states"].forEach((app) => {
-            if (app.id == props.contract) {
-              opted = true
-            }
-          })
-      
-          let otxn = algosdk.makeApplicationOptInTxn(activeAccount.address, params, props.contract)
-      
-          if (!opted) {
-            txns.push(otxn)
-          }
-      
-          let appArgs = []
-            
-            appArgs.push(
-              new Uint8Array(Buffer.from("optin"))
-              
-              
-            )
-          
-            let accounts = []
-            let foreignApps = []
-      
-            let foreignAssets = [Number(loadAsset)]
-      
-          if (!contractOpt) {
-            let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
-              activeAccount.address, 
-              contractAccount, 
-              100000, 
-              undefined,
-              undefined,
-              params
-            );
+    //     let params = await client.getTransactionParams().do()
+    
+    //     const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+    
+    
+    //     let accountAppLocalStates = await indexerClient.lookupAccountAppLocalStates(activeAccount.address).do();
         
-            txns.push(ftxn)
-            
-            let aotxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
+    //     let contractAccount = await algosdk.getApplicationAddress(props.contract)
+    
+    //     const accountAssets = await indexerClient.lookupAccountAssets(contractAccount).do();
+    
+    //     let contractOpt = false
+    
+    //     accountAssets.assets.forEach(async (asset) => {
+    //     if (asset["asset-id"] == loadAsset) {
+    //         contractOpt = true
+    //     }
         
-            txns.push(aotxn)
-          }
-      
-      
-          const assetInfo = await indexerClient.lookupAssetByID(loadAsset).do();
-      
-          let decimals = assetInfo.asset.params.decimals
-          let div = 10**decimals
-      
-          
-      
-          let stxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            activeAccount.address, 
-            contractAccount, 
-            undefined, 
-            undefined,
-            Number(loadAmount) * div,  
-            undefined, 
-            Number(loadAsset), 
-            params
-          );
-      
-            txns.push(stxn)
-      
-          appArgs = []
-          
-          appArgs.push(
-            new Uint8Array(Buffer.from("load"))
-            
-            
-          )
+    //     })
+    
+    
+    //     let opted = false
+    
+    //     let txns = []
+    
+    
+    //     accountAppLocalStates["apps-local-states"].forEach((app) => {
+    //     if (app.id == props.contract) {
+    //         opted = true
+    //     }
+    //     })
+    
+    //     let otxn = algosdk.makeApplicationOptInTxn(activeAccount.address, params, props.contract)
+    
+    //     if (!opted) {
+    //     txns.push(otxn)
+    //     }
+    
+    //     let appArgs = []
         
-          accounts = []
-          foreignApps = []
+    //     appArgs.push(
+    //         new Uint8Array(Buffer.from("optin"))
             
-          foreignAssets = [Number(loadAsset)]
+            
+    //     )
         
-          
-          let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
-      
-          txns.push(atxn)
-      
-          let txgroup = algosdk.assignGroupID(txns)
-      
-          let encodedTxns= []
+    //     let accounts = []
+    //     let foreignApps = []
+    
+    //     let foreignAssets = [Number(loadAsset)]
+    
+    //     if (!contractOpt) {
+    //     let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
+    //         activeAccount.address, 
+    //         contractAccount, 
+    //         100000, 
+    //         undefined,
+    //         undefined,
+    //         params
+    //     );
+    
+    //     txns.push(ftxn)
+        
+    //     let aotxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
+    
+    //     txns.push(aotxn)
+    //     }
+    
+    
+    //     const assetInfo = await indexerClient.lookupAssetByID(loadAsset).do();
+    
+    //     let decimals = assetInfo.asset.params.decimals
+    //     let div = 10**decimals
+    
+        
+    
+    //     let stxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+    //     activeAccount.address, 
+    //     contractAccount, 
+    //     undefined, 
+    //     undefined,
+    //     Number(loadAmount) * div,  
+    //     undefined, 
+    //     Number(loadAsset), 
+    //     params
+    //     );
+    
+    //     txns.push(stxn)
+    
+    //     appArgs = []
+        
+    //     appArgs.push(
+    //     new Uint8Array(Buffer.from("load"))
+        
+        
+    //     )
+    
+    //     accounts = []
+    //     foreignApps = []
+        
+    //     foreignAssets = [Number(loadAsset)]
+    
+        
+    //     let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
+    
+    //     txns.push(atxn)
+    
+    //     let txgroup = algosdk.assignGroupID(txns)
+    
+    //     let encodedTxns= []
+
+    //     txns.forEach((txn) => {
+    //         let encoded = algosdk.encodeUnsignedTransaction(txn)
+    //         encodedTxns.push(encoded)
+    
+    //     })
+
+    //     props.setMessage("Sign Transaction...")
+
+    
+    //     const signedTransactions = await signTransactions(encodedTxns)
+
+    //     props.setMessage("Sending Transaction...")
+        
+    //     const { id } = await sendTransactions(signedTransactions)
+
+    //     let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+
+
+    //     props.setMessage("Transaction Confirmed, " + loadAmount + " of Asset " + loadAsset + " has been added for your account.")
   
-            txns.forEach((txn) => {
-              let encoded = algosdk.encodeUnsignedTransaction(txn)
-              encodedTxns.push(encoded)
-      
-            })
-
-            props.setMessage("Sign Transaction...")
-
-      
-            const signedTransactions = await signTransactions(encodedTxns)
-
-            props.setMessage("Sending Transaction...")
-            
-            const { id } = await sendTransactions(signedTransactions)
-
-            let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-
-    
-          if (!houseOpt) {
-            let htxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-              "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", 
-              "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", 
-              undefined, 
-              undefined,
-              0,  
-              undefined,
-              Number(loadAsset), 
-              params
-            );
-    
-            const DCMnemonic = process.env.DCwallet
-            const DCAccount =  algosdk.mnemonicToSecretKey(DCMnemonic)
         
-            const signedOptTxn = htxn.signTxn(DCAccount.sk);
-                
-            let { txId } = await client.sendRawTransaction(signedOptTxn).do()
-    
-            let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-      
-          }
-
-          props.setMessage("Transaction Confirmed, " + loadAmount + " of Asset " + loadAsset + " has been added for your account.")
-    
+  
+    //     setCredits([])
+  
+    //     let res = await fetch('/api/rewards/getCredits', {
+    //       method: "POST",
+    //       headers: {
+    //           "Content-Type": "application/json",
+    //       },
+    //       body: JSON.stringify({
+    //           activeAddress: activeAccount.address,
+    //           contract: props.contract
+    //         }),
           
-    
-          setCredits([])
-    
-          let response = await fetch('/api/rewards/getCredits', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                activeAddress: activeAccount.address,
-                contract: props.contract
-              }),
-            
-                
-            });
-        
-        let session = await response.json()
-        
-        setCredits(session)
-        }
-        catch(error) {
-          await props.sendDiscordMessage(error, "Load Credits", activeAccount.address)
-         }
+              
+    //       });
+      
+    //   let sess = await res.json()
+      
+    //   setCredits(sess)
+    //   }
+    //   catch(error) {
+    //     await props.sendDiscordMessage(error, "Load Credits", activeAccount.address)
+    //     }
       
       
-      }
+    // }
 
       const sendQuote = async () => {
 
         try {
 
-        const token = {
-          'X-API-Key': process.env.indexerKey
-        }
-    
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
     
         let params = await client.getTransactionParams().do()
@@ -284,26 +242,73 @@ export default function Load(props) {
         );
     
         ftxns.push(ftxn)
+
+        console.log(props.assetSendInfo)
+        console.log(Math.ceil(props.quoteTotal))
+        console.log(props.sendAsset)
+
+        let mult = 10 ** props.assetSendInfo.params.decimals
+
+        let aftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+          activeAccount.address, 
+          "66YD7UICVBBL6QG2THOIOPRONTNPYNJ7EUAFRBY4PCKTVV6MQIMMYTAHFE", 
+          undefined, 
+          undefined,
+          Number(Math.ceil(props.quoteTotal) * mult),  
+          undefined, 
+          Number(props.sendAsset), 
+          params
+        );
     
-        if (props.notify) {
-          let fatxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            activeAccount.address, 
-            "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", 
-            undefined, 
-            undefined,
-            Math.ceil(Number(props.quote[0].sendAmountAtomic)) * (10**props.assetSendInfo.params.decimals),  
-            undefined,
-            Number(props.sendAsset), 
-            params
-          );
+        ftxns.push(aftxn)
+
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+            
+        let contractAccount = await algosdk.getApplicationAddress(props.contract)
     
-          ftxns.push(fatxn)
+        const accountAssets = await indexerClient.lookupAccountAssets(contractAccount).do();
     
-          let txgroup = algosdk.assignGroupID(ftxns)
+        let contractOpt = false
     
-    
+        accountAssets.assets.forEach(async (asset) => {
+          console.log(asset)
+        if (asset["asset-id"] == props.sendAsset) {
+            contractOpt = true
         }
+        
+        })
+
+        let appArgs = []
+        
+        appArgs.push(
+            new Uint8Array(Buffer.from("optin"))
+            
+            
+        )
+        
+        let accounts = []
+        let foreignApps = []
     
+        let foreignAssets = [Number(loadAsset)]
+    
+        if (!contractOpt) {
+        let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
+            activeAccount.address, 
+            contractAccount, 
+            100000, 
+            undefined,
+            undefined,
+            params
+        );
+    
+        ftxns.push(ftxn)
+        
+        let aotxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
+    
+        ftxns.push(aotxn)
+        }
+
+        let txGroup = algosdk.assignGroupID(ftxns)
     
         let encodedTxns= []
   
@@ -323,189 +328,21 @@ export default function Load(props) {
 
         let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
 
+        console.log(confirmedTxn)
+
         props.setMessage("Fee Transaction confirmed, sending airdrop....")
-        
-        let quote = props.quote
-    
-    
-        let appArgs = []
-    
-        if (props.notify) {
-          appArgs.push(
-            new Uint8Array(Buffer.from("sendNoti")),
-            new Uint8Array(Buffer.from(props.note)),
-          )
-        }
-        else {
-          appArgs.push(
-            new Uint8Array(Buffer.from("send")),
-            new Uint8Array(Buffer.from(props.note)),
-          )
-        }
-        
-    
-        let accounts = [activeAccount.address]
-    
-        let foreignAssets = [Number(props.sendAsset), Number(props.basedAsset)]
-    
-        let foreignApps = []
-    
-        let stxn
-    
-        let txns = []
-        let signedTxns = []
-    
-        const DCMnemonic = process.env.DCwallet
-        const DCAccount =  algosdk.mnemonicToSecretKey(DCMnemonic)
-    
-        let tally = 0
-    
-        if (props.notify) {
-    
-        let stxn1
-    
-          while (quote.length > 0) {
-    
-            appArgs.push(algosdk.encodeUint64(quote[0].sendAmount))
-            accounts.push(quote[0].address)
-            
-            tally++
-        
-         
-            stxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
-            stxn1 = algosdk.makeAssetTransferTxnWithSuggestedParams(
-              "YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", 
-              quote[0].address, 
-              undefined, 
-              undefined,
-              quote[0].sendAmount,  
-              new Uint8Array(Buffer.from(props.note)),
-              Number(props.sendAsset), 
-              params
-            );
-            txns.push(stxn)
-            txns.push(stxn1)
-            
-            appArgs = []
-            appArgs.push(
-              new Uint8Array(Buffer.from("sendNoti")),
-              new Uint8Array(Buffer.from(props.note)),
-            )
-            accounts = [activeAccount.address]
-            if (txns.length > 15) {
-              let txgroup = algosdk.assignGroupID(txns)
-              let signedTxn
-              txns.forEach((txn) => {
-                signedTxn = txn.signTxn(DCAccount.sk);
-                signedTxns.push(signedTxn)
-              })
-              const { txId } = await client.sendRawTransaction(signedTxns).do()
-      
-              let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-      
-              props.setMessage("Accounts sent to: " + String(tally))
 
-              setNumSend(Number(tally))
-      
-              txns = []
-              signedTxns = []
-            }
-        
-            
-        
-            quote.shift()
-        
-        
-            }
 
-            
-
-            let txgroup = algosdk.assignGroupID(txns)
-            let signedTxn
-            txns.forEach((txn) => {
-              signedTxn = txn.signTxn(DCAccount.sk);
-              signedTxns.push(signedTxn)
-            })
-            const { txId } = await client.sendRawTransaction(signedTxns).do()
-    
-            let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-        
-            props.setMessage("Airdrop complete")
-    
-        }
-    
-        else {
-          while (quote.length > 0) {
-    
-            appArgs.push(algosdk.encodeUint64(quote[0].sendAmount))
-            accounts.push(quote[0].address)
-            
-            tally++
-        
-        
-            if (tally % 3 == 0) {
-              
-              stxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
-              txns.unshift(stxn)
-             
-              appArgs = []
-              appArgs.push(
-                new Uint8Array(Buffer.from("send")),
-                new Uint8Array(Buffer.from(props.note)),
-              )
-              accounts = [activeAccount.address]
-              if (txns.length > 15) {
-                let txgroup = algosdk.assignGroupID(txns)
-                let signedTxn
-                txns.forEach((txn) => {
-                  signedTxn = txn.signTxn(DCAccount.sk);
-                  signedTxns.push(signedTxn)
-                })
-                const { txId } = await client.sendRawTransaction(signedTxns).do()
-        
-                let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-        
-                props.setMessage("Accounts sent to: " + String(tally))
-                setNumSend(Number(tally))
-        
-                txns = []
-                signedTxns = []
-              }
-        
-            }
-        
-            quote.shift()
-        
-        
-            }
-        
-            stxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
-            txns.unshift(stxn)
-        
-            let txgroup = algosdk.assignGroupID(txns)
-            let signedTxn
-            txns.forEach((txn) => {
-              signedTxn = txn.signTxn(DCAccount.sk);
-              signedTxns.push(signedTxn)
-            })
-            const { txId } = await client.sendRawTransaction(signedTxns).do()
-        
-            let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-        
-            props.setMessage("Airdrop complete")
-            
-        }
-    
-        setNumSend(0)
-
-    
-        let response = await fetch('/api/rewards/getCredits', {
+        let response = await fetch('/api/rewards/sendAirdrop', {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
           },
           body: JSON.stringify({
-              activeAddress: activeAccount.address,
+              quote: props.quote,
+              note: props.note,
+              sendAsset: props.sendAsset,
+              basedAsset: props.basedAsset,
               contract: props.contract
             }),
           
@@ -513,8 +350,30 @@ export default function Load(props) {
           });
       
       let session = await response.json()
+
+      console.log(session)
+        
+        props.setMessage("Airdrop complete")
     
-      setCredits(session)
+        setNumSend(0)
+        props.resetQuote()
+
+      //   let res = await fetch('/api/rewards/getCredits', {
+      //     method: "POST",
+      //     headers: {
+      //         "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //         activeAddress: activeAccount.address,
+      //         contract: props.contract
+      //       }),
+          
+              
+      //     });
+      
+      // let sess = await res.json()
+    
+      // setCredits(sess)
       }
       catch(error) {
         props.setMessage(String(error))
@@ -548,28 +407,20 @@ export default function Load(props) {
             <div>
               {numSend == 0 ?
               <div>
-                <Typography align="center" color="secondary" variant="h6" > Credits cost: {Math.ceil(props.quoteTotal)} {props.assetSendInfo.params["unit-name"]} </Typography>
                 <br />
                 <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => sendQuote()}>
                   <Typography align="center" color="primary" variant="h6" > Send quote </Typography>
                   <Typography style={{margin: 10}} variant="h6"> {props.notify ? Number(props.quote.length * 0.05).toFixed(2) : Number(props.quote.length * 0.02).toFixed(2)}</Typography>
                   <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
-                  {props.notify ?
-                  <div style={{display: "flex", margin: "auto"}}>
-                  <Typography style={{margin: 10}} variant="h6"> {Math.ceil(Number(props.quote[0].sendAmountAtomic))}</Typography>
-                  <Typography style={{margin: 10}} variant="h6"> {props.assetSendInfo.params["unit-name"]}</Typography>
-      
-                  </div>
-                  :
-                  null
-                  }
+                  
+                  <Typography align="center" color="primary" variant="h6" style={{display: "grid"}}> +  {Math.ceil(props.quoteTotal)} {props.assetSendInfo.params["unit-name"]} </Typography>
                   
                 </Button>
                 </div>
                 :
                 null}
             
-            <Grid container spacing={3} align="center" style={{padding: 20, borderRadius: 15}}>
+            {/* <Grid container spacing={3} align="center" style={{padding: 20, borderRadius: 15}}>
             
           <Grid item xs={12} sm={12} md={12} >
 
@@ -638,7 +489,7 @@ export default function Load(props) {
                 null
               }
               </Grid>
-          </Grid>
+          </Grid> */}
             </div>
           )
         
@@ -654,28 +505,20 @@ export default function Load(props) {
           <Grid container spacing={3} align="center" style={{padding: 20, borderRadius: 15}}>
             {props.sendAmount && props.sendAsset && props.freq && props.quote.length && props.assetSendInfo && props.quoteTotal > 0 ? 
             <div>
-            <Typography align="center" color="secondary" variant="h6" > Credits cost: {Math.ceil(props.quoteTotal)} {props.assetSendInfo.params["unit-name"]} </Typography>
+            
             <br />
             <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => sendQuote()}>
               <Typography align="center" color="primary" variant="h6" > Send quote </Typography>
               <Typography style={{margin: 10}} variant="h6"> {props.notify ? Number(props.quote.length * 0.05).toFixed(2) : Number(props.quote.length * 0.02).toFixed(2)}</Typography>
               <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
-              {props.notify ?
-              <div style={{display: "flex", margin: "auto"}}>
-              <Typography style={{margin: 10}} variant="h6"> {Math.ceil(Number(props.quote[0].sendAmountAtomic))}</Typography>
-              <Typography style={{margin: 10}} variant="h6"> {props.assetSendInfo.params["unit-name"]}</Typography>
-  
-              </div>
-              :
-              null
-              }
+              <Typography align="center" color="secondary" variant="h6" > Credits cost: {Math.ceil(props.quoteTotal)} {props.assetSendInfo.params["unit-name"]} </Typography>
               
             </Button>
             </div>
           :
           null
           }
-          <Grid item xs={12} sm={12} md={12} >
+          {/* <Grid item xs={12} sm={12} md={12} >
 
           <Typography color="secondary" variant="h6" align="center"> Account Credits:  </Typography>
             <br />
@@ -742,7 +585,7 @@ export default function Load(props) {
                 :
                 null
               }
-              </Grid>
+              </Grid> */}
           </Grid>
           
          
@@ -750,11 +593,7 @@ export default function Load(props) {
       }
        
             
-                
-
-        
-       
-        
     
     
 }
+

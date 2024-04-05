@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 
 import { useRouter } from 'next/router'
 
+
 import PropTypes from "prop-types";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -26,6 +27,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 
 export default function MyApp(props) {
 
+ 
+
   const providers = useInitializeProviders({
     providers: [
       { id: PROVIDER_ID.PERA, clientStatic: PeraWalletConnect },
@@ -45,7 +48,7 @@ export default function MyApp(props) {
 
   //council: 1225804311
 
-  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1397879621}
+  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1434284594, swapper: 1632253886}
 
 
   const router = useRouter()
@@ -74,6 +77,7 @@ export default function MyApp(props) {
     
     
     <React.Fragment>
+
 
       {message ?
       <div style={{border: "1px solid white", position: "fixed", zIndex: 10, top: 15, left: 15, borderRadius: 5, backgroundColor: "#000000"}}>
@@ -117,7 +121,7 @@ export default function MyApp(props) {
           <Connect setWallet={setWallet} />
         </Grid>
       {router.pathname.substring(0,8) == "/council" ? 
-            <Grid xs={12}>
+            <Grid item xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/"
@@ -144,7 +148,7 @@ export default function MyApp(props) {
             null
         }
         {router.pathname.substring(0,7) == "/market" ? 
-            <Grid xs={12}>
+            <Grid item xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/">
@@ -155,25 +159,25 @@ export default function MyApp(props) {
                 </Button>
                 <br />
                 <Grid container align="center" spacing={3} >
-                  <Grid item xs={12} sm={3} md={3} lg={3} >
+                  <Grid item xs={12} sm={4} md={4} lg={4} >
                       <Button style={{backgroundColor: router.pathname == "/market/daos" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} href="/market/daos">
                         <Typography  variant="h6" style={{color: router.pathname == "/market/daos" ? "#000000" : "#FFFFFF"}}> DAOs </Typography>
                       </Button>
                       
                   </Grid>
-                  <Grid item xs={12} sm={3} md={3} lg={3} >
+                  {/* <Grid item xs={12} sm={3} md={3} lg={3} >
                       <Button style={{backgroundColor: router.pathname == "/market/warrior1" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} href="/market/warrior1">
                         <Typography  variant="h6" style={{color: router.pathname == "/market/warrior1" ? "#000000" : "#FFFFFF"}}> Warriors1 </Typography>
                       </Button>
                       
-                  </Grid>
-                  <Grid item xs={12} sm={3} md={3} lg={3} >
+                  </Grid> */}
+                  <Grid item xs={12} sm={4} md={4} lg={4} >
                       <Button style={{backgroundColor: router.pathname == "/market/warrior2" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} href="/market/warrior2">
                         <Typography  variant="h6" style={{color: router.pathname == "/market/warrior2" ? "#000000" : "#FFFFFF"}}> Warriors2 </Typography>
                       </Button>
                       
                   </Grid>
-                  <Grid item xs={12} sm={3} md={3} lg={3} >
+                  <Grid item xs={12} sm={4} md={4} lg={4} >
                       <Button style={{backgroundColor: router.pathname == "/market/chars" ? "#FFFFFF" : "#000000", border: "1px solid white", borderRadius: 15, padding: 10}} href="/market/chars">
                         <Typography  variant="h6" style={{color: router.pathname == "/market/chars" ? "#000000" : "#FFFFFF"}}> Characters </Typography>
                       </Button>
@@ -186,7 +190,7 @@ export default function MyApp(props) {
             null
         }
         {router.pathname == "mixer" ? 
-            <Grid xs={12}>
+            <Grid item xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 onClick={() => this.setState({place: ""})}>
@@ -201,7 +205,7 @@ export default function MyApp(props) {
             null
         }
         {router.pathname.substring(0,6) == "/arena" ? 
-            <Grid xs={12}>
+            <Grid item xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/">
@@ -212,27 +216,32 @@ export default function MyApp(props) {
                 </Button>
                 <br />
                 <Grid container >
-                    <Grid item xs={12} sm={3} style={{marginBottom: 50}}>
+                    {/* <Grid item xs={12} sm={3} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/arena/create" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/create">
                         <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/create" ? "#000000" : "#FFFFFF"}}> Create </Typography>
                     </Button>
-                    </Grid>
-                    <Grid item xs={12} sm={3} style={{marginBottom: 50}}>
+                    </Grid> */}
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/arena/select" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/select">
-                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/select" ? "#000000" : "#FFFFFF"}}> Select </Typography>
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/select" ? "#000000" : "#FFFFFF"}}> Select Fighter </Typography>
                     </Button>
                     </Grid>
-                    <Grid item xs={12} sm={3} style={{marginBottom: 50}}>
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
+                    <Button style={{backgroundColor: router.pathname == "/arena/swap" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/swap">
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/swap" ? "#000000" : "#FFFFFF"}}> Trait swapper </Typography>
+                    </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/arena/fight" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/fight">
-                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/fight" ? "#000000" : "#FFFFFF"}}> Fight </Typography>
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/fight" ? "#000000" : "#FFFFFF"}}> Battle in the Arena </Typography>
                     </Button>
                     </Grid>
-                    <Grid item xs={12} sm={3} style={{marginBottom: 50}}>
+                    <Grid item xs={12} sm={6} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/arena/history" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/history">
-                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/history" ? "#000000" : "#FFFFFF"}}> History </Typography>
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/history" ? "#000000" : "#FFFFFF"}}> Battle History </Typography>
                     </Button>
                     </Grid>
-                    <Grid item xs={12} sm={12} style={{marginBottom: 50}}>
+                    <Grid item xs={12} sm={6} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/arena/leaderboard" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/leaderboard">
                         <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/leaderboard" ? "#000000" : "#FFFFFF"}}> Leaderboard </Typography>
                     </Button>
@@ -243,7 +252,7 @@ export default function MyApp(props) {
             null
         }
           {router.pathname.substring(0,8) == "/rewards" ? 
-            <Grid xs={12}>
+            <Grid item xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/">
@@ -254,11 +263,7 @@ export default function MyApp(props) {
                 </Button>
                 <br />
                 <Grid container spacing={3}>
-                    {/* <Grid item xs={12} sm={6} style={{marginBottom: 50}}>
-                    <Button style={{backgroundColor: router.pathname == "/rewards/claim" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/rewards/claim">
-                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/rewards/claim" ? "#000000" : "#FFFFFF"}}> Claim </Typography>
-                    </Button>
-                    </Grid> */}
+                   
                     <Grid item xs={12} sm={12} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/rewards/airdrop" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/rewards/airdrop">
                         <Typography color="secondary" variant="h6" style={{color: router.pathname == "/rewards/airdrop" ? "#000000" : "#FFFFFF"}}> Airdrop </Typography>

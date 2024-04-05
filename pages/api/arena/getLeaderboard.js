@@ -14,11 +14,9 @@ async function getLeaderboard(req, res) {
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
     });
 
-    const token = {
-        'X-API-Key': process.env.indexerKey
-      }
+   
      
-    const indexerClient = new algosdk.Indexer(token, 'https://mainnet-algorand.api.purestake.io/idx2', '')
+    const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
     
     let global = await indexerClient.lookupApplications(req.body.contract).do();

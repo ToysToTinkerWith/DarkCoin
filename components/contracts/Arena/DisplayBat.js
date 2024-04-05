@@ -2,17 +2,25 @@ import React, { useEffect, useState } from "react"
 
 import algosdk from "algosdk"
 
-import { Typography, Button } from "@mui/material"
+import { Typography, Button, Grid } from "@mui/material"
 
 import { useWallet } from '@txnlab/use-wallet'
 
+import { CID } from 'multiformats/cid'
+
+
+import * as mfsha2 from 'multiformats/hashes/sha2'
+import * as digest from 'multiformats/hashes/digest'
+
 export default function DisplayBat(props) {
+
+    console.log(props)
 
     const { activeAccount, signTransactions, sendTransactions } = useWallet()
 
     const [ nft, setNft ] = useState(null)
     const [ nftUrl, setNftUrl ] = useState(null)
-    const [ charStats, setCharStats ] = useState(null)
+    const [ nftCharStats, setNftCharStats ] = useState(null)
 
     const [ story1, setStory1 ] = useState(null)
     const [ story2, setStory2 ] = useState(null)
@@ -39,12 +47,29 @@ export default function DisplayBat(props) {
             });
         
         let session = await response.json()
-    
+
+        if (session.nft.assets[0].params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
+            const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
+
+            const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+            const ocid = CID.create(0, 0x70, mhdigest)
+
+            let char = JSON.parse(session.charStats)
             
+            let properties = JSON.stringify(char.properties)
+            console.log(properties)
+
+            setNft(session.nft.assets[0].params)
+            setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
+            setNftCharStats(properties)
+        }
+        else {
 
         setNft(session.nft.assets[0].params)
-        setNftUrl("https://gateway.pinata.cloud/ipfs/" + session.nft.assets[0].params.url.slice(34))
-        setCharStats(session.charStats)
+        setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
+        setNftCharStats(session.charStats)
+        }
 
             }
             catch(error) {
@@ -71,11 +96,10 @@ export default function DisplayBat(props) {
         let charName
         let charStats
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-      
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+
+        props.setMessage("Sign transaction...")
+
 
         let response = await indexerClient.lookupAccountAppLocalStates(activeAccount.address).do();
         response["apps-local-states"].forEach((localstate) => {
@@ -83,6 +107,7 @@ export default function DisplayBat(props) {
                 localstate["key-value"].forEach((kv) => {
                     if (atob(kv.key) == "name") {
                         charName = atob(kv.value.bytes)
+                        console.log(charName)
                     }
                 })
                 localstate["key-value"].forEach(async (kv) => {
@@ -93,30 +118,28 @@ export default function DisplayBat(props) {
                 .txType("acfg")
                 .do();
 
-                charStats = atob(assetConfig.transactions[0].note)
+                let properties = JSON.parse(atob(assetConfig.transactions[assetConfig.transactions.length - 1].note))
+
+                console.log(properties.properties)
+
+                charStats = JSON.stringify(properties.properties)
                 
 
                 if (charName && charStats) {
 
-                    const token = {
-                        'X-API-Key': process.env.indexerKey
-                    }
-            
                     const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
                     let params = await client.getTransactionParams().do();
 
 
-                    let ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+                    let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
                         activeAccount.address,
-                        "5W64M4ZT4ERRI4AW77HMSO63YHYZVJTRGM6WC7RQIM3YJOLOPYPTXHMU6I", 
+                        "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
+                        500000, 
                         undefined,
                         undefined,
-                        1000000000, 
-                        undefined,
-                        1088771340,
                         params
-                    );
+                      );
 
                    
 
@@ -131,11 +154,10 @@ export default function DisplayBat(props) {
               
                     })
           
-                    props.setMessage("Sign transation...")
               
                     const signedTransactions = await signTransactions(encodedTxns)
           
-                    props.setMessage("Sending transation...")
+                    props.setMessage("Sending transaction...")
           
                     const { id } = await sendTransactions(signedTransactions)
           
@@ -152,7 +174,7 @@ export default function DisplayBat(props) {
                         charName: charName,
                         charStats: charStats,
                         charNameOther: nft.name,
-                        charStatsOther: charStats,
+                        charStatsOther: nftCharStats,
                         wager: props.wager
 
                     }),
@@ -175,7 +197,7 @@ export default function DisplayBat(props) {
                             charName: charName,
                             charStats: charStats,
                             charNameOther: nft.name,
-                            charStatsOther: charStats,
+                            charStatsOther: nftCharStats,
                             wager: props.wager
 
                         }),
@@ -193,6 +215,8 @@ export default function DisplayBat(props) {
 
                 setStory1(String(kv.value.uint) + ">" + charName + ">" + props.nftId + ">" + nft.name + ">" + props.wager + ">" + story1)
 
+                props.setProgress(50)
+
 
 
                 let res2 = await fetch('/api/arena/generateStory', {
@@ -202,7 +226,7 @@ export default function DisplayBat(props) {
                     },
                     body: JSON.stringify({
                         charName: nft.name,
-                        charStats: charStats,
+                        charStats: nftCharStats,
                         charNameOther: charName,
                         charStatsOther: charStats,
                         wager: props.wager
@@ -226,7 +250,7 @@ export default function DisplayBat(props) {
                         },
                         body: JSON.stringify({
                             charName: nft.name,
-                            charStats: charStats,
+                            charStats: nftCharStats,
                             charNameOther: charName,
                             charStatsOther: charStats,
                             wager: props.wager
@@ -238,7 +262,7 @@ export default function DisplayBat(props) {
 
                     sess2 = await res2.json()
 
-                    story2 = sess1.response
+                    story2 = sess2.response
 
 
 
@@ -246,10 +270,9 @@ export default function DisplayBat(props) {
 
 
                 setStory2(props.nftId + ">" + nft.name + ">" + String(kv.value.uint) + ">" + charName + ">" + props.wager + ">" + story2)
-
-
            
                 props.setMessage("Stories generated, ready to fight")
+                props.setProgress(100)
                         
                         
                         
@@ -272,10 +295,6 @@ export default function DisplayBat(props) {
 
         try {
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-      
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
@@ -340,11 +359,12 @@ export default function DisplayBat(props) {
         
             })
 
-            props.setMessage("Sign transation...")
+            props.setProgress(0)
+            props.setMessage("Sign transaction...")
         
             const signedTransactions = await signTransactions(encodedTxns)
 
-            props.setMessage("Sending transation...")
+            props.setMessage("Sending transaction...")
 
             const { id } = await sendTransactions(signedTransactions)
 
@@ -355,8 +375,6 @@ export default function DisplayBat(props) {
             let string = new TextDecoder().decode(Battle.value)
 
             let array = string.split(">")
-
-            console.log(array)
 
             let winner = Number(array[0])
             let loser = Number(array[2])
@@ -393,7 +411,25 @@ export default function DisplayBat(props) {
         let sessionWinner = await responseWinner.json()
 
         let nameWinner = sessionWinner.nft.assets[0].params.name
-        let urlWinner = "https://gateway.pinata.cloud/ipfs/" + sessionWinner.nft.assets[0].params.url.slice(34)
+        let urlWinner
+
+        if (nameWinner.substring(0, 18) == "Dark Coin Champion") {
+            let addr = algosdk.decodeAddress(sessionWinner.nft.assets[0].params.reserve)
+
+            let mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+            let ocid = CID.create(0, 0x70, mhdigest)
+
+            urlWinner = "https://gateway.pinata.cloud/ipfs/" + ocid.toString()
+
+
+        }
+        else {
+            urlWinner = "https://gateway.pinata.cloud/ipfs/" + sessionWinner.nft.assets[0].params.url.slice(34)
+        }
+
+        
+
 
         let responseLoser = await fetch('/api/getNft', {
             method: "POST",
@@ -411,7 +447,21 @@ export default function DisplayBat(props) {
         let sessionLoser = await responseLoser.json()
 
         let nameLoser = sessionLoser.nft.assets[0].params.name
-        let urlLoser = "https://gateway.pinata.cloud/ipfs/" + sessionLoser.nft.assets[0].params.url.slice(34)
+        let urlLoser
+
+        if (nameLoser.substring(0, 18) == "Dark Coin Champion") {
+            let addr = algosdk.decodeAddress(sessionLoser.nft.assets[0].params.reserve)
+
+            let mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+            let ocid = CID.create(0, 0x70, mhdigest)
+
+            urlLoser = "https://gateway.pinata.cloud/ipfs/" + ocid.toString()
+        }
+        else {
+            urlLoser = "https://gateway.pinata.cloud/ipfs/" + sessionLoser.nft.assets[0].params.url.slice(34)
+        }
+        
 
         let randomNumber = Math.floor(Math.random() * 2);
 
@@ -426,7 +476,7 @@ export default function DisplayBat(props) {
             
             embeds.push({
                 "title" : nameWinner,
-                "url": "https://algoexplorer.io/asset/" + winner,
+                "url": "https://explorer.perawallet.app/asset/" + winner,
                 "image": {
                     "url": String(urlWinner)
                 },
@@ -440,7 +490,7 @@ export default function DisplayBat(props) {
 
             embeds.push({
                 "title" : nameLoser,
-                "url": "https://algoexplorer.io/asset/" + loser,
+                "url": "https://explorer.perawallet.app/asset/" + loser,
                 "image": {
                     "url": String(urlLoser)
                 },
@@ -455,7 +505,7 @@ export default function DisplayBat(props) {
 
             embeds.push({
                 "title" : nameLoser,
-                "url": "https://algoexplorer.io/asset/" + loser,
+                "url": "https://explorer.perawallet.app/asset/" + loser,
                 "image": {
                     "url": String(urlLoser)
                 },
@@ -470,7 +520,7 @@ export default function DisplayBat(props) {
         
             embeds.push({
                 "title" : nameWinner,
-                "url": "https://algoexplorer.io/asset/" + winner,
+                "url": "https://explorer.perawallet.app/asset/" + winner,
                 "image": {
                     "url": String(urlWinner)
                 },
@@ -513,6 +563,7 @@ export default function DisplayBat(props) {
     }
 
     if (nft) {
+
         return (
             <div style={{border: "1px solid white"}}>
                 <br />
@@ -523,15 +574,36 @@ export default function DisplayBat(props) {
                 <Typography color="secondary" align="center" variant="h6"> {Number(props.wager / 1000000).toLocaleString("en-US")} <img style={{width: 40, paddingRight: 20}} src="/invDC.svg"/> </Typography>
                 <br />
                 {story1 && story2 ? 
+                <div>
                 <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => joinBattle()}>
                     <Typography color="primary" variant="h6" align="center"> Fight {Number(props.wager / 1000000).toLocaleString("en-US")} </Typography>
                     <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
                 </Button>
+                <Grid container>
+                    <Grid item xs={12} sm={6} md={6} style={{padding: 20}}>
+                        <Typography color="secondary" align="center" variant="subtitle1"> On win: </Typography>
+                        <Typography color="secondary" align="center" variant="subtitle1"> {story1.substring(story1.lastIndexOf(">") + 1)} </Typography>
+                    </Grid>
+                
+                    <Grid item xs={12} sm={6} md={6} style={{padding: 20}}>
+                        <Typography color="secondary" align="center" variant="subtitle1"> On loss: </Typography>
+                        <Typography color="secondary" align="center" variant="subtitle1"> {story2.substring(story2.lastIndexOf(">") + 1)} </Typography>
+                    </Grid>
+                </Grid>
+                </div>
                 :
+                props.address != activeAccount.address ?
+                <div>
+                <Typography color="secondary" align="center" variant="subtitle1"> *First transaction is to generate battle stories </Typography>
+                <br />
                 <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => genStory()}>
-                    <Typography  variant="h6"> Generate 1,000 </Typography>
-                    <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
+                    <Typography variant="h6"> Generate 0.5 </Typography>
+                    <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
                 </Button>
+
+                </div>
+                :
+                null
                 }
             <br />
     

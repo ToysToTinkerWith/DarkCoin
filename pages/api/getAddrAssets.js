@@ -38,7 +38,7 @@ async function getAddrAssets(req, res) {
 
   while (responseAddr.assets.length == 1000) {
     responseAddr = await indexerClient.lookupAccountCreatedAssets(req.body.activeAccount).nextToken(nextTokenAddr).limit(1000).do();
-    nextToken = responseAddr["next-token"]
+    nextTokenAddr = responseAddr["next-token"]
     responseAddr.assets.forEach((asset) => {
         if (asset.amount > 0) {
             addrAssets.push(asset["asset-id"])

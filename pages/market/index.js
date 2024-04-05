@@ -70,15 +70,15 @@ export default class DarkCoin extends React.Component {
               }
                 
             }
-            else if (asset["asset-id"] >= 818167963 && asset["asset-id"] <= 818219236) {
-              if (numWarrior1 < 12) {
-                this.setState(prevState => ({
-                  Warriors1: [...prevState.Warriors1, {id: asset["asset-id"]}]
-                }))
-                numWarrior1 += 1
-              }
+            // else if (asset["asset-id"] >= 818167963 && asset["asset-id"] <= 818219236) {
+            //   if (numWarrior1 < 12) {
+            //     this.setState(prevState => ({
+            //       Warriors1: [...prevState.Warriors1, {id: asset["asset-id"]}]
+            //     }))
+            //     numWarrior1 += 1
+            //   }
                 
-            }
+            // }
             else if (asset["asset-id"] >= 846867259 && asset["asset-id"] <= 846902086) {
               if (numWarrior2 < 12) {
                 this.setState(prevState => ({
@@ -113,15 +113,15 @@ export default class DarkCoin extends React.Component {
                 }
                   
               }
-              else if (asset["asset-id"] >= 818167963 && asset["asset-id"] <= 818219236) {
-                if (numWarrior1 < 12) {
-                  this.setState(prevState => ({
-                    Warriors1: [...prevState.Warriors1, {id: asset["asset-id"]}]
-                  }))
-                  numWarrior1 += 1
-                }
+              // else if (asset["asset-id"] >= 818167963 && asset["asset-id"] <= 818219236) {
+              //   if (numWarrior1 < 12) {
+              //     this.setState(prevState => ({
+              //       Warriors1: [...prevState.Warriors1, {id: asset["asset-id"]}]
+              //     }))
+              //     numWarrior1 += 1
+              //   }
                   
-              }
+              // }
               else if (asset["asset-id"] >= 846867259 && asset["asset-id"] <= 846902086) {
                 if (numWarrior2 < 12) {
                   this.setState(prevState => ({
@@ -175,7 +175,7 @@ export default class DarkCoin extends React.Component {
                       null
                     }
                     
-                    {this.state.cat == "Warrior1" ? 
+                    {/* {this.state.cat == "Warrior1" ? 
                       <>
                       <br />
                         <Typography color="secondary" align="center" variant="h6"> 
@@ -188,7 +188,7 @@ export default class DarkCoin extends React.Component {
                       </>
                       :
                       null
-                    }
+                    } */}
 
                     {this.state.cat == "Warrior2" ? 
                       <>
@@ -249,7 +249,7 @@ export default class DarkCoin extends React.Component {
                     null
                     }
 
-                    {this.state.cat == "Warrior1" ?
+                    {/* {this.state.cat == "Warrior1" ?
 
                     this.state.zoomNft ? 
                     <Grid item xs={12} sm={12} md={12} lg={12}>
@@ -268,7 +268,7 @@ export default class DarkCoin extends React.Component {
                    
                     :
                     null
-                    }
+                    } */}
 
                     {this.state.cat == "Warrior2" ?
 

@@ -7,6 +7,21 @@ import algosdk from "algosdk"
 
 import { Typography, Button, TextField, Grid} from "@mui/material"
 
+import firebase_app from '../../Firebase/FirebaseInit.js';
+
+import { getAuth, signInAnonymously } from "firebase/auth";
+
+const auth = getAuth();
+signInAnonymously(auth)
+  .then(() => {
+    // Signed in..
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // ...
+  });
+
 
 export default function ASAblasters(props) {
 
@@ -15,10 +30,27 @@ export default function ASAblasters(props) {
   const [ready, setReady] = useState(false)
 
   const [highScore, setHighScore] = useState(0)
-
   const [totalScore, setTotalScore] = useState(0)
+  const [assetScores, setAssetScores] = useState({})
+  const [assetDec, setAssetDec] = useState({})
+  const [assetIds, setAssetIds] = useState({})
+
+
+
+  const [AO, setAO] = useState(0);
+  const [chip, setchip] = useState(0);
+
   const [DARKCOIN, setDARKCOIN] = useState(0);
+  const [Gold, setGold] = useState(0);
+  const [GoldDAO, setGoldDAO] = useState(0);
+  const [META, setMETA] = useState(0);
+  const [PRSMS, setPRSMS] = useState(0);
+  const [Tacos, setTacos] = useState(0);
+  const [THC, setTHC] = useState(0);
+
   const [TRTS, setTRTS] = useState(0);
+  const [Vote, setVote] = useState(0);
+  const [YARN, setYARN] = useState(0);
 
 
   const [assets, setAssets] = useState([])
@@ -51,34 +83,61 @@ export default function ASAblasters(props) {
 
       console.log(contractAccount)
 
+      const accountTxns = await indexerClient.lookupAccountTransactions(contractAccount).do();
+
+      console.log(accountTxns)
+
+      accountTxns.transactions.slice(0, 10).forEach((txn) => {
+        if (txn["asset-transfer-transaction"]) {
+          console.log(txn)
+
+        }
+      })
 
       const accountInfo = await indexerClient.lookupAccountAssets(contractAccount).do();
 
-      console.log(accountInfo)
 
+      let accepted = [409604194, 388592191, 1088771340, 1241944285, 1241945177, 712012773, 753890862, 329110405, 1119722936, 1000870705, 452399768, 544217506]
+      let acceptedImg = ["AO.svg", "chip.svg", "DARKCOIN.svg", "Gold.svg", "GoldDAO.svg", "META.svg", "PRSMS.svg", "Tacos.svg", "THC.svg", "TRTS.svg", "Vote.svg", "YARN.svg"]
 
-      let accepted = [1088771340, 1000870705]
-      let acceptedImg = ["DARKCOIN.svg", "TRTS.svg"]
+      let scores = {}
+      let decimals = {}
+      let ids = {}
 
       if (accountInfo.assets) {
         accountInfo.assets.forEach( async (asset) => {
+          let indexOf = accepted.indexOf(asset["asset-id"])
+          if (indexOf >= 0) {
           let assetInfo = await indexerClient.lookupAssetByID(asset["asset-id"]).do();
           let unitName = assetInfo.asset.params["unit-name"]
-          let decimals = assetInfo.asset.params.decimals
-          let div = 10**decimals
+          let decimal = assetInfo.asset.params.decimals
+          let id = assetInfo.asset.index
+          let div = 10**decimal
           let indexOf = accepted.indexOf(asset["asset-id"])
-          console.log(indexOf)
-          if (indexOf >= 0) {
-            setAssets(assets => [...assets, {assetId: accepted[indexOf], amount: asset.amount / div, unitName: unitName, acceptedImg: acceptedImg[indexOf]}])
+          if (asset.amount > 0) {
+            let score = asset.amount / div / 10000
+            scores[unitName] = score
+            decimals[unitName] = decimal
+            ids[unitName] = id
+            setAssetScores(scores)
+            setAssetDec(decimals)
+            setAssetIds(ids)
+            setAssets(assets => [...assets, {assetId: accepted[indexOf], amount: asset.amount / div, score: score, unitName: unitName, decimals: decimal, acceptedImg: acceptedImg[indexOf]}])
           }
           
             
 
-
+          }
           })
-    }
+      }
+
+      
+
+
 
     if (activeAccount) {
+
+      try{
 
       const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
@@ -87,6 +146,10 @@ export default function ASAblasters(props) {
       let responseProposal = await client.getApplicationBoxByName(props.contracts.ASAblasters, addressBox.publicKey).do();
 
       setHighScore(byteArrayToLong(responseProposal.value))
+      }
+      catch {
+        
+      }
 
     }
 
@@ -107,7 +170,7 @@ export default function ASAblasters(props) {
 
     let ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
       activeAccount.address, 
-      "CJE4GXRL5A2TNTPZC5M3UAUYI42E6WBS4L5PS3XNKWSRI5NPY3H65FDMEE", 
+      "WATGQ3SIXJHNW645M4TDQBQ7YQGEULB3Y4YHZS7MQE2PIOWA33O2NO57JA", 
       undefined,
       undefined,
       1000000000, 
@@ -127,8 +190,7 @@ export default function ASAblasters(props) {
     sortedAssets.forEach((sasset) => {
       let found = false
       accountAssets.assets.forEach((asset) => {
-        console.log(sasset)
-        console.log(asset)
+   
         if (asset["asset-id"] == sasset.assetId) {
           found = true
         }
@@ -177,150 +239,164 @@ export default function ASAblasters(props) {
 
   }
 
-  const updateScore = (multiplier, assetId, amount) => {
+  const updateScore = (multiplier, assetId) => {
 
-    console.log(assetId)
+    if (assetId == 409604194) {
+      setAO((prevState) => prevState + 1);
+    }
+    else if (assetId == 388592191) {
+      setchip((prevState) => prevState + 1);
+    }
+    else if (assetId == 1088771340) {
+      setDARKCOIN((prevState) => prevState + 1);
+    }
+    else if (assetId == 1241944285) {
+      setGold((prevState) => prevState + 1);
+    }
+    else if (assetId == 1241945177) {
+      setGoldDAO((prevState) => prevState + 1);
+    }
+    else if (assetId == 712012773) {
+      setMETA((prevState) => prevState + 1);
+    }
+    else if (assetId == 753890862) {
+      setPRSMS((prevState) => prevState + 1);
+    }
+    else if (assetId == 329110405) {
+      setTacos((prevState) => prevState + 1);
+    }
+    else if (assetId == 1119722936) {
+      setTHC((prevState) => prevState + 1);
+    }
+    else if (assetId == 1000870705) {
+      setTRTS((prevState) => prevState + 1);
+    }
+    else if (assetId == 452399768) {
+      setVote((prevState) => prevState + 1);
+    }
+    else if (assetId == 544217506) {
+      setYARN((prevState) => prevState + 1);
 
-      if (assetId == 1088771340) {
-        setDARKCOIN((prevState) => prevState + (amount * multiplier));
-      }
-      else if (assetId == 1000870705) {
-        setTRTS((prevState) => prevState + (amount * multiplier));
+    }
 
-      }
-
-      setTotalScore((prevState) => prevState + multiplier)
+    setTotalScore((prevState) => prevState + multiplier)
 
       
   };
 
-  const sendRewardTransaction = async (totalScore, DARKCOIN, TRTS) => {
+  const sendRewardTransaction = async (totalScore, AO, chip, DARKCOIN, Gold, GoldDAO, META, PRSMS, Tacos, THC, TRTS, Vote, YARN) => {
 
     setAssets([])
+    setAO(0)
+    setchip(0)
     setDARKCOIN(0)
+    setGold(0)
+    setGoldDAO(0)
+    setMETA(0)
+    setPRSMS(0)
+    setTacos(0)
+    setTHC(0)
     setTRTS(0)
+    setVote(0)
+    setYARN(0)
     setTotalScore(0)
 
-    let txns = []
+    
 
     try {
 
-      const houseMnemonic = process.env.DCwallet
-      const houseAccount =  algosdk.mnemonicToSecretKey(houseMnemonic)
+      props.setMessage("Claiming...")
 
-      console.log(totalScore)
-      console.log(DARKCOIN)
-      console.log(TRTS)
+      console.log(assetIds)
 
-    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-    
-      let params = await client.getTransactionParams().do();
-       
-      let appArgs = []
-      appArgs.push(
-        new Uint8Array(Buffer.from("score")),
-        algosdk.encodeUint64(Number(totalScore))
-
-      )
-
-      let accounts = [activeAccount.address]
-      let foreignApps = []
-        
-      let foreignAssets = []
-
-      let scoreBox = algosdk.decodeAddress(activeAccount.address)
-
-      console.log(scoreBox)
-
-      let boxes = [{appIndex: 0, name: scoreBox.publicKey}]
-
-      let stxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, props.contracts.ASAblasters, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-
-      txns.push(stxn)
-
-
-      if (DARKCOIN > 0) {
-        appArgs = [
-          new Uint8Array(Buffer.from("reward")),
-          algosdk.encodeUint64(Number(DARKCOIN))
-        ]
-        foreignAssets = [1088771340]
-        boxes = []
-        stxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, props.contracts.ASAblasters, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-        txns.push(stxn)
-
-      }
-
-      console.log("here")
-
-
-      if (TRTS > 0) {
-        appArgs = [
-          new Uint8Array(Buffer.from("reward")),
-          algosdk.encodeUint64(Number(Math.ceil(TRTS)))
-        ]
-        foreignAssets = [1000870705]
-        boxes = []
-        stxn = algosdk.makeApplicationNoOpTxn("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE", params, props.contracts.ASAblasters, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-        txns.push(stxn)
-      }
-
-      if (txns.length > 1) {
-        let txgroup = algosdk.assignGroupID(txns)
-      }
-
-      let signed = []
-
-      txns.forEach((txn) => {
-        let signedTxn = txn.signTxn(houseAccount.sk);
-        signed.push(signedTxn)
-      })
-
-      
-      props.setMessage("Sending transation...")
-
-      const { id } = await sendTransactions(signed)
-
-      let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-
-      props.setMessage("Rewards sent and score updated.")
-
-      setAssets([])
-
-      const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
-
-      let contractAccount = await algosdk.getApplicationAddress(props.contracts.ASAblasters)
-
-      console.log(contractAccount)
-
-
-      const accountInfo = await indexerClient.lookupAccountAssets(contractAccount).do();
-
-      console.log(accountInfo)
-
-
-      let accepted = [1088771340, 1000870705]
-      let acceptedImg = ["DARKCOIN.svg", "TRTS.svg"]
-
-      if (accountInfo.assets) {
-        accountInfo.assets.forEach( async (asset) => {
-          let assetInfo = await indexerClient.lookupAssetByID(asset["asset-id"]).do();
-          let unitName = assetInfo.asset.params["unit-name"]
-          let decimals = assetInfo.asset.params.decimals
-          let div = 10**decimals
-          let indexOf = accepted.indexOf(asset["asset-id"])
-          console.log(indexOf)
-          if (indexOf >= 0) {
-            setAssets(assets => [...assets, {assetId: accepted[indexOf], amount: asset.amount / div, unitName: unitName, acceptedImg: acceptedImg[indexOf]}])
-          }
+      auth.currentUser.getIdToken(/* forceRefresh */ true).then(async function(idToken) {
+        // Send token to your backend via HTTPS
+        let response = await fetch('/api/ASAblasters/reward', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + idToken
+          },
+          body: JSON.stringify({
+              totalScore: totalScore,
+              address: activeAccount.address,
+              contract: props.contracts.ASAblasters,
+              assetScores: assetScores,
+              assetDec: assetDec,
+              assetIds: assetIds,
+              assetValues: {
+                AO: AO, 
+                chip: chip, 
+                DARKCOIN: DARKCOIN, 
+                Gold: Gold, 
+                GoldDAO: GoldDAO, 
+                META: META, 
+                PRSMS: PRSMS, 
+                Tacos: Tacos, 
+                THC: THC, 
+                TRTS: TRTS, 
+                Vote: Vote, 
+                YARN: YARN
+              }
+          }),
           
             
-
-
-          })
-      }
-
-      if (activeAccount) {
+        });
+  
+        let session = await response.json()
+  
+        console.log(session.res)
+  
+        props.setMessage("Assets Claimed")
+  
+  
+        setAssets([])
+  
+        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+  
+        let contractAccount = await algosdk.getApplicationAddress(props.contracts.ASAblasters)
+  
+        const accountInfo = await indexerClient.lookupAccountAssets(contractAccount).do();
+  
+        let accepted = [409604194, 388592191, 1088771340, 1241944285, 712012773, 329110405, 1119722936, 1000870705, 452399768, 544217506]
+        let acceptedImg = ["AO.svg", "chip.svg", "DARKCOIN.svg", "Gold.svg", "GoldDAO.svg", "PRSMS.svg", "Tacos.svg", "THC.svg", "TRTS.svg", "Vote.svg", "YARN.svg"]
+  
+        let scores = {}
+        let decimals = {}
+        let ids = {}
+  
+        if (accountInfo.assets) {
+          accountInfo.assets.forEach( async (asset) => {
+            let indexOf = accepted.indexOf(asset["asset-id"])
+            if (indexOf >= 0) {
+            let assetInfo = await indexerClient.lookupAssetByID(asset["asset-id"]).do();
+            let unitName = assetInfo.asset.params["unit-name"]
+            let decimal = assetInfo.asset.params.decimals
+            let id = assetInfo.asset.index
+            let div = 10**decimal
+            let indexOf = accepted.indexOf(asset["asset-id"])
+            if (asset.amount > 0) {
+              let score = asset.amount / div / 10000
+              scores[unitName] = score
+              decimals[unitName] = decimal
+              ids[unitName] = id
+              setAssetScores(scores)
+              setAssetDec(decimals)
+              setAssetIds(ids)
+              setAssets(assets => [...assets, {assetId: accepted[indexOf], amount: asset.amount / div, score: score, unitName: unitName, decimals: decimal, acceptedImg: acceptedImg[indexOf]}])
+            }
+            
+              
+  
+            }
+            })
+        }
+  
+  
+  
+        if (activeAccount) {
+  
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
   
         let addressBox = algosdk.decodeAddress(activeAccount.address)
   
@@ -328,12 +404,50 @@ export default function ASAblasters(props) {
   
         setHighScore(byteArrayToLong(responseProposal.value))
   
-      }
+        }
+  
+        await sendRewardMessage(totalScore, AO, chip, DARKCOIN, Gold, PRSMS, Tacos, THC, TRTS, Vote, YARN)
+        // ...
+      }).catch(function(error) {
+        // Handle error
+      });
+
+      
   
     }
     catch(error) {
       await props.sendDiscordMessage(error, "Send Reward Txn", activeAccount.address)
       }
+
+  }
+
+  const sendRewardMessage = async (totalScore, AO, chip, DARKCOIN, Gold, PRSMS, Tacos, THC, TRTS, Vote, YARN) => {
+       
+    let embeds = []
+
+      embeds.push({
+          "title": activeAccount.address + " Scored: " + totalScore,
+          "color": 0
+      })
+      
+
+      embeds.push({
+          "title": "Rewards",
+          "description": "AO = " + (AO * assetScores.AO).toFixed(assetDec.AO) + "\n" + "chip = " + (chip * assetScores.chip).toFixed(assetDec.chip) + "\n" + "DARKCOIN = " + (DARKCOIN * assetScores.DARKCOIN).toFixed(assetDec.DARKCOIN) + "\n" + "Gold = " + (Gold * assetScores.Gold).toFixed(assetDec.Gold) + "\n" + "PRSMS = " + (PRSMS * assetScores.PRSMS).toFixed(assetDec.PRSMS) + "\n" + "Tacos = " + (Tacos * assetScores.Tacos).toFixed(assetDec.Tacos) + "\n"+ "THC = " + (THC * assetScores.THC).toFixed(assetDec.THC) + "\n" + "TRTS = " + (TRTS * assetScores.TRTS).toFixed(assetDec.TRTS) + "\n" + "Vote = " + (Vote * assetScores.Vote).toFixed(assetDec.Vote) + "\n" + "YARN = " + (YARN * assetScores.YARN).toFixed(assetDec.YARN) + "\n",
+          "color": 16777215
+      })
+
+
+      const response = await fetch(process.env.rewardWebhook, {
+          method: "POST",
+          body: JSON.stringify({
+              username: "ASAblasters Reward",
+              embeds: embeds
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
   }
 
@@ -351,30 +465,51 @@ export default function ASAblasters(props) {
       sortedAssets.push(asset)
     }
   })
-  console.log(sortedAssets)
+
+  console.log(assetScores)
+      console.log(assetDec)
+      console.log(assetIds)
+
+
   return (
   <div>
-        <div style={{
-            position: 'absolute',
-            display: "grid",
-            color: 'red',
-            padding: '8px',
-            fontSize: '14px',
-            userSelect: 'none'}}>
-               Score: 
-               <span id="scoreEl"> TOTAL {totalScore}  </span>
-               
-              <span id="scoreEl"> DARKCOIN {DARKCOIN}  </span>
-              <span id="scoreE2"> TRTS {TRTS}  </span>
-             
-        </div>
+    {Object.keys(assetScores).length > 0 ? 
+    <div style={{
+      position: 'absolute',
+      display: "grid",
+      color: 'red',
+      padding: '8px',
+      fontSize: '14px',
+      userSelect: 'none'}}>
+         Score: 
+         <span id="scoreEl"> TOTAL {totalScore}  </span>
+         {Object.keys(assetScores).map((asset, index) => {
+          return (
+            <span key={index} > {asset} {(eval(asset) * assetScores[asset]).toFixed(assetDec[asset])}  </span>
+          )
+         })}
+       
+      </div>
+      : 
+      null
+      }
+        
         {ready ? 
         <Canvas 
-        score={"TOTAL " +  totalScore + "\n" + "DARKCOIN " + DARKCOIN + "\n" + "TRTS " + TRTS}
         highScore={highScore}
         totalScore={totalScore}
+        AO={AO}
+        chip={chip}
         DARKCOIN={DARKCOIN}
+        Gold={Gold}
+        GoldDAO={GoldDAO}
+        META={META}
+        PRSMS={PRSMS}
+        Tacos={Tacos}
+        THC={THC}
         TRTS={TRTS}
+        Vote={Vote}
+        YARN={YARN}
         setReady={setReady}
         updateScore={updateScore}
         sortedAssets={sortedAssets}
@@ -396,7 +531,7 @@ export default function ASAblasters(props) {
                 backgroundSize: 'cover', 
                 backgroundPosition: 'center'
             }}>
-                <h1 style={{ 
+                 <h1 style={{ 
                   fontSize: '24px', 
                   width: 'fit-content', 
                   margin: 'auto', 
@@ -484,54 +619,6 @@ export default function ASAblasters(props) {
                 onClick={() => window.location.href = 'https://asa-blasters.vercel.app/'}>
                     FREE DEMO
                 </button>
-
-                <h1 style={{ 
-                  fontSize: '16px', 
-                  width: 'fit-content', 
-                  margin: 'auto', 
-                  color: 'red', 
-                  backgroundColor: 'black', 
-                  borderRadius: '15px', 
-                  marginBottom: '0', 
-                  marginTop: '8px' }}>
-                    Contract contains:
-                </h1>
-                <Grid container style={{padding: 10}}>
-                {sortedAssets.map((asset, index) => {
-                    console.log(asset)
-                    return(
-                        <Grid 
-                          key={index} 
-                          item xs={12} 
-                          sm={6} 
-                          style={{border: "1px solid black", 
-                          borderRadius: 15, 
-                          padding: 10}}>
-                            <h1 style={{ 
-                              fontSize: '16px', 
-                              color: 'red',
-                              backgroundColor: 'black',
-                              width: 'fit-content',
-                              margin: 'auto'}}> {asset.amount} 
-                            </h1>
-                            <img 
-                              src={"/enemies/" + asset.acceptedImg} 
-                              style={{width: 50}}/>
-                            <h1 
-                              style={{ 
-                                fontSize: '16px', 
-                                color: 'red',
-                                backgroundColor: 'black',
-                                width: 'fit-content',
-                                margin: 'auto'}}> 
-                                  {asset.unitName} 
-                            </h1>
-
-                        </Grid>
-                    )
-                })}
-                </Grid>
-                
                 <button id="startButton" style={{
                     marginTop: '12px',
                     backgroundColor: 'blue',
@@ -547,6 +634,55 @@ export default function ASAblasters(props) {
                     <img src={"/enemies/DARKCOIN.svg"} style={{width: 25, display: "flex", margin: "auto"}}/>
 
                 </button>
+
+                <h1 style={{ 
+                  fontSize: '16px', 
+                  width: 'fit-content', 
+                  margin: 'auto', 
+                  color: 'red', 
+                  backgroundColor: 'black', 
+                  borderRadius: '15px', 
+                  marginBottom: '0', 
+                  marginTop: '8px' }}>
+                    Contract contains:
+                </h1>
+              
+              <Grid container style={{padding: 10}}>
+                {sortedAssets.map((asset, index) => {
+                    return(
+                      <Grid 
+                      key={index} 
+                      item xs={12} 
+                      sm={6} 
+                      style={{border: "1px solid black", 
+                      borderRadius: 15, 
+                      padding: 10}}>
+                        <h1 style={{ 
+                          fontSize: '16px', 
+                          color: 'red',
+                          backgroundColor: 'black',
+                          width: 'fit-content',
+                          margin: 'auto'}}> {asset.amount} 
+                        </h1>
+                        <img 
+                          src={"/enemies/" + asset.acceptedImg} 
+                          style={{width: 50}}/>
+                        <h1 
+                          style={{ 
+                            fontSize: '16px', 
+                            color: 'red',
+                            backgroundColor: 'black',
+                            width: 'fit-content',
+                            margin: 'auto'}}> 
+                              {asset.unitName} 
+                        </h1>
+
+                        </Grid>
+                    )
+                })}
+                </Grid>
+
+               
         </div>
         }
         

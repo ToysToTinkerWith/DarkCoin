@@ -69,12 +69,6 @@ export default class Gift extends React.Component {
 
 
       async gift(asset, amount, receiver) {
-
-        console.log(this.props.activeAddress)
-        console.log(receiver)
-        console.log(asset)
-        console.log(amount)
-
        
 
         try{
@@ -134,10 +128,8 @@ export default class Gift extends React.Component {
           
           const pk = algosdk.decodeAddress(receiver);
           const addrArray = pk.publicKey
-          console.log(addrArray);
         
           let accountBox = new Uint8Array([...addrArray, ...encoded])
-          console.log(accountBox)
         
           const boxes = [{appIndex: 0, name: accountBox}]
         
@@ -148,7 +140,6 @@ export default class Gift extends React.Component {
         
             let txId = txn.txID().toString();
             // Sign the transaction
-            console.log("Signed transaction with txID: %s", txId);
         
             let txns = [otxn, stxn, txn]
         

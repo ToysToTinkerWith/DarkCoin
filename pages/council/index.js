@@ -21,12 +21,7 @@ export default class Council extends React.Component {
 
         let address = await algosdk.getApplicationAddress(this.state.contract)
 
-        console.log(address)
-
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-      
+  
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
                 
         let accountInfo = await indexerClient.lookupAccountAssets(address).do();

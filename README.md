@@ -4,11 +4,11 @@ Dark Coin is a community built upon the Algorand Blockchain.
 
 For questions about Dark Coin, please visit our Discord Channel to learn about the past, present, and future of the project.
 
-https://discord.com/invite/xdZ6V5ybmq
+https://discord.com/invite/GWB89qusjQ
 
 # Dark Paper
 
-https://github.com/claudebaxter/Dark-Coin-ASA-601894079/blob/main/darkpaper.md
+https://dark-coin.io/
 
 # Dark DApp
 
@@ -20,16 +20,18 @@ Folder containing all the web components used to process and render the applicat
 
 Developed under the Next.js framework, the logic of the appication can be understood through the sequential rendering of the components beggining with the pages/index file. A user can see what APIs/SDKs are being used, and how the data from the Algorand Blockchain is processed to create the Dark Coin Application. The goal for this project is to be as open as possible, in ensuring trust, and creating transparency within the community.
 
-# Council.py
+# Council
 
 The Council is a place where users can propose changes to the Dark Coin Project, and vote on proposals with their Dark Coin DAO NFTs.
-To use the Council, one must click the Council Icon located in the Dark Coin DApp.
+To use the Council, one must click the Council Icon located at:
+
+https://dark-coin.com/council
 
 The user is presented with 2 options:
 
 ## Propose
 
-A connected wallet may propose a change or addition to the Dark Coin Project. The user is allowed to type 2000 characters into the textfield provided, to persuade the DAO of their idea. This transaction will cost the wallet 50 Dark Coin per character to pay the DAO voters, plus 1 Algo to cover the minimum balance requirement for on-chain storage. Once the proposer is ready, they may sign their proposal to the Council Smart Contract to be written on chain.
+A connected wallet may propose a change or addition to the Dark Coin Project. The user is allowed to type 2000 characters into the textfield provided, to persuade the DAO of their idea. This transaction will cost the wallet 20 Algo as initial funding for the proposal. A new contract will be made, and the 20 Algo will be sent to the new proposal contract address.
 
 ## Proposals
 

@@ -22,45 +22,46 @@ Developed under the Next.js framework, the logic of the appication can be unders
 
 # Apps
 
-The Council System on Dark Coin: A Breakdown
+## The Council System on Dark Coin
 
-Overview:
+### Overview
 The Council is an app integrated with Dark Coin, designed to let users vote on proposals using their DAO NFTs. It involves creating proposals, amending them, and voting to decide their fate.
 
-Step-by-Step Process:
-
-Creating a Proposal:
+### Step-by-Step Process
+Creating a Proposal
 
 Anyone can create a proposal by sending 20 Algo to the Council smart contract.
 Once this is done, a separate contract is made for the specific proposal, which holds the 20 Algo.
-Amending Phase:
+
+#### Amending Phase
 
 Duration: About a week (183,000 blockchain rounds).
 During this phase, users can suggest modifications to enhance the original proposal.
 If no amendments are proposed, the process moves directly to the voting stage.
-Voting on Amendments:
+
+#### Voting on Amendments
 
 Duration: About a week (183,000 blockchain rounds).
 DAO NFT holders vote on any proposed amendments.
 Amendments need more accept votes than reject votes to be included.
-Voting on the Proposal:
+
+#### Voting on the Proposal
 
 If amendments were made, the proposal is updated with accepted amendments.
 DAO NFT holders vote to accept or reject the proposal in its final form.
-Drafting Accepted Proposals:
+Drafting Accepted Proposals
 
 Proposals that receive more accept votes than reject votes move to the drafting phase.
 The accepted amendments are compiled into the original proposal.
 Funds can be allocated to the proposal draft.
 The larger Dark Coin community can contribute to completing the proposal using the assets in the proposal contract.
-Key Points to Remember:
 
+### Key Points to Remember
 Initial Funding: 20 Algo is required to start a proposal.
 Phases: Each stage (amending and voting) lasts about a week (183,000 blockchain rounds).
 Voting: Both amendments and proposals need majority accept votes to proceed.
 Community Involvement: The broader Dark Coin community can help implement accepted proposals.
-This system ensures that all proposals are thoroughly reviewed, amended, and agreed upon by the DAO NFT holders before being executed, promoting community involvement and improving the quality of proposals.the contracter should recieve.  
-
+This system ensures that all proposals are thoroughly reviewed, amended, and agreed upon by the DAO NFT holders before being executed, promoting community involvement and improving the quality of proposals.
 
 
 

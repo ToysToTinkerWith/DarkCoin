@@ -37,7 +37,7 @@ Once this is done, a separate contract is made for the specific proposal, which 
 
 Duration: About a week (183,000 blockchain rounds).
 During this phase, users can suggest modifications to enhance the original proposal.
-If no amendments are proposed, the process moves directly to the voting stage.
+If no amendments are proposed, the process moves directly to the proposal voting stage.
 
 #### Voting on Amendments
 
@@ -47,9 +47,11 @@ Amendments need more accept votes than reject votes to be included.
 
 #### Voting on the Proposal
 
-If amendments were made, the proposal is updated with accepted amendments.
-DAO NFT holders vote to accept or reject the proposal in its final form.
-Drafting Accepted Proposals
+Duration: About a week (183,000 blockchain rounds).
+DAO NFT holders vote on the proposal keeping in mind all accepted amendments.
+Proposal needs more accept votes than reject votes to be drafted.
+
+#### Drafting Accepted Proposals
 
 Proposals that receive more accept votes than reject votes move to the drafting phase.
 The accepted amendments are compiled into the original proposal.

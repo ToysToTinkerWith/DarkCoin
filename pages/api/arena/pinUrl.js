@@ -36,6 +36,7 @@ async function pinUrl(req, res) {
             try {
                 
                 const reader = got.stream(url)
+
                     
                 const options = {
                     pinataMetadata: {
@@ -47,6 +48,7 @@ async function pinUrl(req, res) {
                 };
 
                 return new Promise((resolve) => {
+                    
                     pinata.pinFileToIPFS(reader, options).then(async (result) => {
                         //handle results here
     
@@ -87,8 +89,6 @@ async function pinUrl(req, res) {
                         total:total,
                         unitName:unitName,
                     });
-
-                    console.log(mtxn)
                 
                     
                         const userAccout =  algosdk.mnemonicToSecretKey(process.env.DC_WALLET)
@@ -97,7 +97,7 @@ async function pinUrl(req, res) {
                 
                     
                         // Submit the transaction
-                        const { txId } = await client.sendRawTransaction(signedTxn).do()
+                        //const { txId } = await client.sendRawTransaction(signedTxn).do()
                 
                         let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
                 

@@ -8,22 +8,6 @@ const { Readable } = require('stream');
 
 const Jimp = require('jimp') ;
 
-import { initializeApp, getApps } from "firebase/app";
-
-const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-}
-
-let firebase_app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-
-
-import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 async function getHash(req, res) {
    // Run the cors middleware
@@ -40,100 +24,32 @@ async function getHash(req, res) {
             
               pinata.testAuthentication().then(async () => {
 
-                const storage = getStorage();
-                let extraRef
-                let armourRef
-                let magicRef
-                let weaponRef
-                let headRef
-                let skinRef
-                let backgroundRef
-                if (req.body.Extra != "None") {
-                    extraRef = ref(storage, "warriors/Extra/" + req.body.Extra + ".png");
-                }
-                if (req.body.Armour != "None") {
-                    armourRef = ref(storage, "warriors/Armour/" + req.body.Armour + ".png");
-                }
-                if (req.body.Magic != "None") {
-                    magicRef = ref(storage, "warriors/Magic/" + req.body.Magic + ".png");
-                }
-                if (req.body.Weapon != "None") {
-                    weaponRef = ref(storage, "warriors/Weapon/" + req.body.Weapon + ".png");
-                }
-                headRef = ref(storage, "warriors/Head/" + req.body.Head + ".png");
-                skinRef = ref(storage, "warriors/Skin/" + req.body.Skin + ".png");
-                backgroundRef = ref(storage, "warriors/Background/" + req.body.Background + ".png");
-
-                let extraUrl
-                let armourUrl
-                let magicUrl
-                let weaponUrl
-                let headUrl
-                let skinUrl
-                let backgroundUrl
                 
-                if (req.body.Extra != "None") {
-                    await getDownloadURL(extraRef)
-                    .then((url) => {
-                        extraUrl = url
-                    })
-                }
-                if (req.body.Armour != "None") {
-                    await getDownloadURL(armourRef)
-                    .then((url) => {
-                        armourUrl = url
-                    })
-                }
-                if (req.body.Magic != "None") {
-                    await getDownloadURL(magicRef)
-                    .then((url) => {
-                        magicUrl = url
-                    })
-                }
-                if (req.body.Weapon != "None") {
-                    await getDownloadURL(weaponRef)
-                    .then((url) => {
-                        weaponUrl = url
-                    })
-                }
-                await getDownloadURL(headRef)
-                .then((url) => {
-                    headUrl = url
-                })
-                await getDownloadURL(skinRef)
-                .then((url) => {
-                    skinUrl = url
-                })
-                await getDownloadURL(backgroundRef)
-                .then((url) => {
-                    backgroundUrl = url
-                })
-
                 let extra
                 let armour
                 let magic
                 let weapon
                 if (req.body.Extra != "None") {
-                    extra = await Jimp.read(extraUrl)
+                    extra = await Jimp.read(req.body.Extra)
                     extra = extra.resize(1080,1080)
                 }
                 if (req.body.Armour != "None") {
-                    armour = await Jimp.read(armourUrl)
+                    armour = await Jimp.read(req.body.Armour)
                     armour = armour.resize(1080,1080)
                 }
                 if (req.body.Magic != "None") {
-                    magic = await Jimp.read(magicUrl)
+                    magic = await Jimp.read(req.body.Magic)
                     magic = magic.resize(1080,1080)
                 }
                 if (req.body.Weapon != "None") {
-                    weapon = await Jimp.read(weaponUrl)
+                    weapon = await Jimp.read(req.body.Weapon)
                     weapon = weapon.resize(1080,1080)
                 }
-                let head = await Jimp.read(headUrl)
+                let head = await Jimp.read(req.body.Head)
                 head = head.resize(1080,1080)
-                let skin = await Jimp.read(skinUrl)
+                let skin = await Jimp.read(req.body.Skin)
                 skin = skin.resize(1080,1080)
-                let background = await Jimp.read(backgroundUrl)
+                let background = await Jimp.read(req.body.Background)
                 background = background.resize(1080,1080)
                 
                 background.composite(skin, 0, 0, {

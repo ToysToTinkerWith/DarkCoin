@@ -15,7 +15,6 @@ async function getCreatedChars(req, res) {
     });
 
     let account = []
-    let charsDC = []
     let warriors = []
 
     const token = {
@@ -52,29 +51,7 @@ async function getCreatedChars(req, res) {
 
     }
 
-    let dcChars = await indexerClient.searchForAssets().unit("DCCHAR").limit(1000).do();
-
-    dcChars.assets.forEach((asset) => {
-        charsDC.push(asset.index)
-        
-    })
-
-    numAssets = accountAssets.assets.length
-    nextToken = accountAssets["next-token"]
-
-    while (numAssets == 1000) {
-
-        let dcChars = await indexerClient.searchForAssets().unit("DCCHAR").nextToken(nextToken).limit(1000).do();
-
-        dcChars.assets.forEach((asset) => {
-            charsDC.push(asset.index)
-            
-        })
-
-        numAssets = accountAssets.assets.length
-        nextToken = accountAssets["next-token"]
-
-    }
+    
 
     let assets = await indexerClient.lookupAccountAssets("L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY").do();
 
@@ -106,7 +83,7 @@ async function getCreatedChars(req, res) {
     let ownedNfts = []
 
         for (var i = 0; i < account.length; i++) {
-            if (charsDC.includes(account[i]) || warriors.includes(account[i])) {
+            if (warriors.includes(account[i])) {
                 ownedNfts.push(account[i])
             }
         }

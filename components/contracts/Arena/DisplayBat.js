@@ -25,6 +25,9 @@ export default function DisplayBat(props) {
     const [ story1, setStory1 ] = useState(null)
     const [ story2, setStory2 ] = useState(null)
 
+    const [ img, setImg ] = useState(null)
+
+
 
     React.useEffect(() => {
 
@@ -135,16 +138,46 @@ export default function DisplayBat(props) {
                     let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
                         activeAccount.address,
                         "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
-                        500000, 
+                        100000, 
                         undefined,
                         undefined,
                         params
                       );
 
-                   
+                    let wtxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+                    activeAccount.address, 
+                    "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
+                    undefined,
+                    undefined,
+                    Number(props.wager), 
+                    undefined,
+                    1088771340,
+                    params
+                    );
 
                     
-                    let txns = [ftxn]
+                    const appArgs = []
+                    appArgs.push(
+                        new Uint8Array(Buffer.from("fight")),
+                        new Uint8Array(Buffer.from(props.address)),
+                        
+                    )
+
+                    const accounts = [props.address]
+                    const foreignApps = []
+                        
+                    const foreignAssets = [1088771340]
+
+
+                    const boxes = []
+                    
+                    let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+
+                    
+                    let txns = [ftxn, wtxn, atxn]
+
+                    let txgroup = algosdk.assignGroupID(txns)
+
 
                     let encodedTxns= []
 
@@ -162,10 +195,13 @@ export default function DisplayBat(props) {
                     const { id } = await sendTransactions(signedTransactions)
           
                     let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+
+                    let txId = atxn.txID().toString();
+
           
                     props.setMessage("Generating Stories...")
 
-                let res1 = await fetch('/api/arena/generateStory', {
+                let res = await fetch('/api/arena/generateStory', {
                     method: "POST",
                     headers: {
                     "Content-Type": "application/json",
@@ -175,110 +211,22 @@ export default function DisplayBat(props) {
                         charStats: charStats,
                         charNameOther: nft.name,
                         charStatsOther: nftCharStats,
-                        wager: props.wager
+                        wager: props.wager,
+                        txn: txId
 
                     }),
                     
                     
                 });
         
-                let sess1 = await res1.json()
+                let sess = await res.json()
         
-                let story1 = sess1.response
+                let result = sess.response
 
-                while (story1.length > 800) {
+                await sendBattle(result.winner, result.loser, result.wager, result.story, id, result.setting)
 
-                    res1 = await fetch('/api/arena/generateStory', {
-                        method: "POST",
-                        headers: {
-                        "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            charName: charName,
-                            charStats: charStats,
-                            charNameOther: nft.name,
-                            charStatsOther: nftCharStats,
-                            wager: props.wager
-
-                        }),
+                props.setMessage("Battle Complete")
                         
-                        
-                    });
-
-                    sess1 = await res1.json()
-
-                    story1 = sess1.response
-
-
-                }
-
-
-                setStory1(String(kv.value.uint) + ">" + charName + ">" + props.nftId + ">" + nft.name + ">" + props.wager + ">" + story1)
-
-                props.setProgress(50)
-
-
-
-                let res2 = await fetch('/api/arena/generateStory', {
-                    method: "POST",
-                    headers: {
-                    "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        charName: nft.name,
-                        charStats: nftCharStats,
-                        charNameOther: charName,
-                        charStatsOther: charStats,
-                        wager: props.wager
-
-                    }),
-                    
-                    
-                });
-        
-                let sess2 = await res2.json()
-        
-                let story2 = sess2.response
-
-
-                while (story2.length > 800) {
-
-                    res2 = await fetch('/api/arena/generateStory', {
-                        method: "POST",
-                        headers: {
-                        "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            charName: nft.name,
-                            charStats: nftCharStats,
-                            charNameOther: charName,
-                            charStatsOther: charStats,
-                            wager: props.wager
-
-                        }),
-                        
-                        
-                    });
-
-                    sess2 = await res2.json()
-
-                    story2 = sess2.response
-
-
-
-                }
-
-
-                setStory2(props.nftId + ">" + nft.name + ">" + String(kv.value.uint) + ">" + charName + ">" + props.wager + ">" + story2)
-           
-                props.setMessage("Stories generated, ready to fight")
-                props.setProgress(100)
-                        
-                        
-                        
-            
-                    
-            
                 }
             }
             })
@@ -291,108 +239,10 @@ export default function DisplayBat(props) {
 
       }
 
-      const joinBattle = async () => {
+    const sendBattle = async (winner, loser, wager, story, txId, setting) => {
 
-        try {
+        props.setMessage("Sending to Discord...")
 
-        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
-
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-        let params = await client.getTransactionParams().do();
-
-        let wtxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            activeAccount.address, 
-            "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
-            undefined,
-            undefined,
-            Number(props.wager), 
-            undefined,
-            1088771340,
-            params
-          );
-
-          let global = await indexerClient.lookupApplications(props.contract).do();
-
-          let globalState = global.application.params["global-state"]
-
-          let battleNum
-
-          globalState.forEach((keyVal) => {
-            if (atob(keyVal.key) == "battleNum") {
-                battleNum = keyVal.value.uint
-            }
-          })
-
-         
-          const appArgs = []
-          appArgs.push(
-            new Uint8Array(Buffer.from("fight")),
-            new Uint8Array(Buffer.from(props.address)),
-            new Uint8Array(Buffer.from("Battle" + String(battleNum))),
-            new Uint8Array(Buffer.from(story1)),
-            new Uint8Array(Buffer.from(story2)),
-
-            
-          )
-
-          const accounts = [props.address]
-          const foreignApps = []
-            
-          const foreignAssets = [1088771340]
-
-          let battleBox = new Uint8Array(Buffer.from("Battle" + String(battleNum)))
-
-          const boxes = [{appIndex: 0, name: battleBox}, {appIndex: 0, name: battleBox}]
-          
-          let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contract, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-          
-          let txns = [wtxn, atxn]
-
-          let txgroup = algosdk.assignGroupID(txns)
-
-          let encodedTxns= []
-
-            txns.forEach((txn) => {
-                let encoded = algosdk.encodeUnsignedTransaction(txn)
-                encodedTxns.push(encoded)
-        
-            })
-
-            props.setProgress(0)
-            props.setMessage("Sign transaction...")
-        
-            const signedTransactions = await signTransactions(encodedTxns)
-
-            props.setMessage("Sending transaction...")
-
-            const { id } = await sendTransactions(signedTransactions)
-
-            let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-
-            let Battle = await client.getApplicationBoxByName(props.contract, "Battle" + String(battleNum)).do();
-
-            let string = new TextDecoder().decode(Battle.value)
-
-            let array = string.split(">")
-
-            let winner = Number(array[0])
-            let loser = Number(array[2])
-            let wager = Number(array[4] / 1000000)
-            let story = array[5]
-
-        await sendBattle(winner, loser, wager, story, id)
-
-            props.setMessage("Battle complete")
-
-        }
-        catch(error) {
-            await props.sendDiscordMessage(error, "Join Battle", activeAccount.address)
-           }
-
-      }
-
-    const sendBattle = async (winner, loser, wager, story, txId) => {
 
         try {
 
@@ -529,6 +379,68 @@ export default function DisplayBat(props) {
 
         }
 
+        let responseNft = await fetch('/api/getNft', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nftId: props.charSel
+              }),
+            
+                
+            });
+        
+        let sessionNft = await responseNft.json()
+
+        let name = sessionNft.nft.assets[0].params.name
+        let url
+
+        if (name.substring(0, 18) == "Dark Coin Champion") {
+            let addr = algosdk.decodeAddress(sessionNft.nft.assets[0].params.reserve)
+
+            let mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+            let ocid = CID.create(0, 0x70, mhdigest)
+
+            url = "https://gateway.pinata.cloud/ipfs/" + ocid.toString()
+
+
+        }
+        else {
+            url = "https://gateway.pinata.cloud/ipfs/" + sessionNft.nft.assets[0].params.url.slice(34)
+        }
+
+        let responseImg = await fetch('/api/arena/imageComb', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                champ1: nftUrl,
+                champ2: url,
+                setting: setting
+              }),
+            
+                
+            });
+        
+        let session = await responseImg.json()
+
+        console.log(session)
+
+        embeds.push({
+            "image": {
+                "url": String(session.image)
+            },
+            "color": 16711680
+        })
+
+        embeds.push({
+            "title": "Fight!",
+            "color": 16777215
+        })
+
         embeds.push({
             "description": String(story).replace(/["']/g, "'"),
             "color": 16777215
@@ -536,7 +448,7 @@ export default function DisplayBat(props) {
 
         embeds.push({
             "title": nameWinner + " has won " + wager.toLocaleString("en-US") + " DC !",
-            "url": "https://algoexplorer.io/tx/" + txId,
+            "url": "https://allo.info/tx/" + txId,
             "color": 0
         })
 
@@ -554,12 +466,73 @@ export default function DisplayBat(props) {
 
         }
         catch(error) {
+            props.setMessage(error)
+
             await props.sendDiscordMessage(error, "Send Battle", activeAccount.address)
            }
 
 
 
         
+    }
+
+    const makeImage = async () => {
+
+        console.log(props.charSel)
+
+        let responseNft = await fetch('/api/getNft', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                nftId: props.charSel
+              }),
+            
+                
+            });
+        
+        let sessionNft = await responseNft.json()
+
+        let name = sessionNft.nft.assets[0].params.name
+        let url
+
+        if (name.substring(0, 18) == "Dark Coin Champion") {
+            let addr = algosdk.decodeAddress(sessionNft.nft.assets[0].params.reserve)
+
+            let mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+            let ocid = CID.create(0, 0x70, mhdigest)
+
+            url = "https://gateway.pinata.cloud/ipfs/" + ocid.toString()
+
+
+        }
+        else {
+            url = "https://gateway.pinata.cloud/ipfs/" + sessionNft.nft.assets[0].params.url.slice(34)
+        }
+
+        let response = await fetch('/api/arena/imageComb', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                champ1: nftUrl,
+                champ2: url
+              }),
+            
+                
+            });
+        
+        let session = await response.json()
+
+        setImg(session.image)
+
+        console.log(session.image)
+
+
+
     }
 
     if (nft) {
@@ -573,32 +546,17 @@ export default function DisplayBat(props) {
                 <Typography color="secondary" align="center" variant="subtitle1"> Wager </Typography>
                 <Typography color="secondary" align="center" variant="h6"> {Number(props.wager / 1000000).toLocaleString("en-US")} <img style={{width: 40, paddingRight: 20}} src="/invDC.svg"/> </Typography>
                 <br />
-                {story1 && story2 ? 
+                {props.address != activeAccount.address ?
                 <div>
-                <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => joinBattle()}>
-                    <Typography color="primary" variant="h6" align="center"> Fight {Number(props.wager / 1000000).toLocaleString("en-US")} </Typography>
-                    <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
-                </Button>
-                <Grid container>
-                    <Grid item xs={12} sm={6} md={6} style={{padding: 20}}>
-                        <Typography color="secondary" align="center" variant="subtitle1"> On win: </Typography>
-                        <Typography color="secondary" align="center" variant="subtitle1"> {story1.substring(story1.lastIndexOf(">") + 1)} </Typography>
-                    </Grid>
                 
-                    <Grid item xs={12} sm={6} md={6} style={{padding: 20}}>
-                        <Typography color="secondary" align="center" variant="subtitle1"> On loss: </Typography>
-                        <Typography color="secondary" align="center" variant="subtitle1"> {story2.substring(story2.lastIndexOf(">") + 1)} </Typography>
-                    </Grid>
-                </Grid>
-                </div>
-                :
-                props.address != activeAccount.address ?
-                <div>
-                <Typography color="secondary" align="center" variant="subtitle1"> *First transaction is to generate battle stories </Typography>
-                <br />
                 <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => genStory()}>
-                    <Typography variant="h6"> Generate 0.5 </Typography>
+                    <Typography variant="h6"> Fight {Number(props.wager / 1000000).toLocaleString("en-US")} </Typography>
+
+                    <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
+
+                    <Typography variant="h6"> 0.1 </Typography>
                     <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
+                    
                 </Button>
 
                 </div>
@@ -606,7 +564,15 @@ export default function DisplayBat(props) {
                 null
                 }
             <br />
-    
+                {/* <Button style={{backgroundColor: "#FFFFFF"}} onClick={() => makeImage()}>
+                    image
+                </Button>
+
+                {img ? 
+                <img src={img} style={{width: "100%"}}/>
+                :
+                null
+                } */}
     
             </div>
     

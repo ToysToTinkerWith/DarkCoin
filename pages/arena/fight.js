@@ -136,7 +136,7 @@ export default function Fight(props) {
           let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
             activeAccount.address,
             "VWNGMYLU4LGHU2Z2BYHP54IUNU3GJROHG2LOOPFH5JAES3K7W4TBODC6TU", 
-            500000, 
+            100000, 
             undefined,
             undefined,
             params
@@ -309,7 +309,7 @@ export default function Fight(props) {
                     <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => startBattle()}>
                         <Typography color="primary" variant="h6" align="center"> Wager {Number(wager).toLocaleString("en-US")} </Typography>
                         <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
-                        <Typography  variant="h6"> + 0.5 </Typography>
+                        <Typography  variant="h6"> + 0.1 </Typography>
                         <img src="/AlgoBlack.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} />
                     </Button>
                     :
@@ -326,11 +326,10 @@ export default function Fight(props) {
                 <br />
                 {battles.length > 0 ? 
                 battles.map((battle, index) => {
-                  console.log(battle)
-                  console.log(activeAccount.address)
+                 
                     return (
                       <div key={index}>
-                        <DisplayBat address={battle.addr} wager={battle.wager} nftId={battle.nftId} contract={props.contracts.arena} setMessage={props.setMessage} setProgress={props.setProgress} sendDiscordMessage={props.sendDiscordMessage} />
+                        <DisplayBat charSel={charSel} address={battle.addr} wager={battle.wager} nftId={battle.nftId} contract={props.contracts.arena} setMessage={props.setMessage} setProgress={props.setProgress} sendDiscordMessage={props.sendDiscordMessage} />
                       </div>
                     )
                 })

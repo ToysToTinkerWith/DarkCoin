@@ -7,20 +7,9 @@ import algosdk from "algosdk"
 
 import { Typography, Button, TextField, Grid} from "@mui/material"
 
-import firebase_app from '../../Firebase/FirebaseInit.js';
+import { db } from "../../Firebase/FirebaseInit"
+import { doc, setDoc, onSnapshot, serverTimestamp, increment, updateDoc } from "firebase/firestore"
 
-import { getAuth, signInAnonymously } from "firebase/auth";
-
-const auth = getAuth();
-signInAnonymously(auth)
-  .then(() => {
-    // Signed in..
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // ...
-  });
 
 
 export default function ASAblasters(props) {
@@ -30,28 +19,12 @@ export default function ASAblasters(props) {
   const [ready, setReady] = useState(false)
 
   const [highScore, setHighScore] = useState(0)
-  const [totalScore, setTotalScore] = useState(0)
   const [assetScores, setAssetScores] = useState({})
   const [assetDec, setAssetDec] = useState({})
   const [assetIds, setAssetIds] = useState({})
 
-
-
-  const [AO, setAO] = useState(0);
-  const [chip, setchip] = useState(0);
-
-  const [DARKCOIN, setDARKCOIN] = useState(0);
-  const [Gold, setGold] = useState(0);
-  const [GoldDAO, setGoldDAO] = useState(0);
-  const [META, setMETA] = useState(0);
-  const [PRSMS, setPRSMS] = useState(0);
-  const [Tacos, setTacos] = useState(0);
-  const [THC, setTHC] = useState(0);
-
-  const [TRTS, setTRTS] = useState(0);
-  const [Vote, setVote] = useState(0);
-  const [YARN, setYARN] = useState(0);
-
+  const [score, setScore] = useState([])
+  const [scoreObject, setScoreObject] = useState([])
 
   const [assets, setAssets] = useState([])
 
@@ -71,6 +44,8 @@ export default function ASAblasters(props) {
 };
 
 
+
+
   React.useEffect(() => {
 
     const fetchData = async () => {
@@ -81,19 +56,6 @@ export default function ASAblasters(props) {
 
       let contractAccount = await algosdk.getApplicationAddress(props.contracts.ASAblasters)
 
-      console.log(contractAccount)
-
-      const accountTxns = await indexerClient.lookupAccountTransactions(contractAccount).do();
-
-      console.log(accountTxns)
-
-      accountTxns.transactions.slice(0, 10).forEach((txn) => {
-        if (txn["asset-transfer-transaction"]) {
-          console.log(txn)
-
-        }
-      })
-
       const accountInfo = await indexerClient.lookupAccountAssets(contractAccount).do();
 
 
@@ -103,6 +65,8 @@ export default function ASAblasters(props) {
       let scores = {}
       let decimals = {}
       let ids = {}
+
+      let scoreObject = {}
 
       if (accountInfo.assets) {
         accountInfo.assets.forEach( async (asset) => {
@@ -115,13 +79,22 @@ export default function ASAblasters(props) {
           let div = 10**decimal
           let indexOf = accepted.indexOf(asset["asset-id"])
           if (asset.amount > 0) {
+            console.log(unitName)
+            scoreObject[unitName] = 0
+            console.log(asset.amount)
             let score = asset.amount / div / 10000
+            console.log(score)
+            if (unitName == "DARKCOIN") {
+              score = score + 0.1
+            }
             scores[unitName] = score
             decimals[unitName] = decimal
             ids[unitName] = id
+            console.log(score)
             setAssetScores(scores)
             setAssetDec(decimals)
             setAssetIds(ids)
+            setScoreObject(scoreObject)
             setAssets(assets => [...assets, {assetId: accepted[indexOf], amount: asset.amount / div, score: score, unitName: unitName, decimals: decimal, acceptedImg: acceptedImg[indexOf]}])
           }
           
@@ -129,29 +102,48 @@ export default function ASAblasters(props) {
 
           }
           })
+
+          
+
       }
 
       
 
+      if (activeAccount) {
+      
+        const userRef = doc(db, "ASAblasters", activeAccount.address);
 
-
-    if (activeAccount) {
-
-      try{
-
-      const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-      let addressBox = algosdk.decodeAddress(activeAccount.address)
-
-      let responseProposal = await client.getApplicationBoxByName(props.contracts.ASAblasters, addressBox.publicKey).do();
-
-      setHighScore(byteArrayToLong(responseProposal.value))
+        setDoc(userRef, {totalScore: 0})
+    
+        const unsub = onSnapshot(userRef, (docSnap) => {
+            if (docSnap.exists()) {
+                setScore(docSnap.data())
+            } else {
+            // doc.data() will be undefined in this case
+            console.log("Cannot get score");
+            
+            }
+            });
+  
+            
+  
+        try{
+  
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+  
+        let addressBox = algosdk.decodeAddress(activeAccount.address)
+  
+        let responseProposal = await client.getApplicationBoxByName(props.contracts.ASAblasters, addressBox.publicKey).do();
+  
+        setHighScore(byteArrayToLong(responseProposal.value))
+        }
+        catch {
+          
+        }
+  
+        return unsub
+  
       }
-      catch {
-        
-      }
-
-    }
 
     
 
@@ -163,6 +155,10 @@ export default function ASAblasters(props) {
     }, [activeAccount])
 
   const startGame = async () => {
+
+    const userRef = doc(db, "ASAblasters", activeAccount.address)
+
+    await setDoc(userRef, {totalScore: 0})
 
     const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
@@ -239,69 +235,87 @@ export default function ASAblasters(props) {
 
   }
 
-  const updateScore = (multiplier, assetId) => {
+  const updateScore = async (multiplier, assetId) => {
+
+    const userRef = doc(db, "ASAblasters", activeAccount.address)
+
 
     if (assetId == 409604194) {
-      setAO((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        AO: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 388592191) {
-      setchip((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        chip: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 1088771340) {
-      setDARKCOIN((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        DARKCOIN: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 1241944285) {
-      setGold((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        Gold: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 1241945177) {
-      setGoldDAO((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        GoldDAO: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 712012773) {
-      setMETA((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        META: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 753890862) {
-      setPRSMS((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        PRSMS: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 329110405) {
-      setTacos((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        Tacos: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 1119722936) {
-      setTHC((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        THC: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 1000870705) {
-      setTRTS((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        TRTS: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 452399768) {
-      setVote((prevState) => prevState + 1);
+      await updateDoc(userRef, {
+        Vote: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
     else if (assetId == 544217506) {
-      setYARN((prevState) => prevState + 1);
-
+      await updateDoc(userRef, {
+        YARN: increment(1),
+        totalScore: increment(multiplier)
+      });
     }
-
-    setTotalScore((prevState) => prevState + multiplier)
-
       
   };
 
-  const sendRewardTransaction = async (totalScore, AO, chip, DARKCOIN, Gold, GoldDAO, META, PRSMS, Tacos, THC, TRTS, Vote, YARN) => {
-
-    setAssets([])
-    setAO(0)
-    setchip(0)
-    setDARKCOIN(0)
-    setGold(0)
-    setGoldDAO(0)
-    setMETA(0)
-    setPRSMS(0)
-    setTacos(0)
-    setTHC(0)
-    setTRTS(0)
-    setVote(0)
-    setYARN(0)
-    setTotalScore(0)
-
-    
+  const sendRewardTransaction = async () => {
 
     try {
 
@@ -309,35 +323,17 @@ export default function ASAblasters(props) {
 
       console.log(assetIds)
 
-      auth.currentUser.getIdToken(/* forceRefresh */ true).then(async function(idToken) {
+      
+
         // Send token to your backend via HTTPS
         let response = await fetch('/api/ASAblasters/reward', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + idToken
           },
           body: JSON.stringify({
-              totalScore: totalScore,
               address: activeAccount.address,
               contract: props.contracts.ASAblasters,
-              assetScores: assetScores,
-              assetDec: assetDec,
-              assetIds: assetIds,
-              assetValues: {
-                AO: AO, 
-                chip: chip, 
-                DARKCOIN: DARKCOIN, 
-                Gold: Gold, 
-                GoldDAO: GoldDAO, 
-                META: META, 
-                PRSMS: PRSMS, 
-                Tacos: Tacos, 
-                THC: THC, 
-                TRTS: TRTS, 
-                Vote: Vote, 
-                YARN: YARN
-              }
           }),
           
             
@@ -358,8 +354,8 @@ export default function ASAblasters(props) {
   
         const accountInfo = await indexerClient.lookupAccountAssets(contractAccount).do();
   
-        let accepted = [409604194, 388592191, 1088771340, 1241944285, 712012773, 329110405, 1119722936, 1000870705, 452399768, 544217506]
-        let acceptedImg = ["AO.svg", "chip.svg", "DARKCOIN.svg", "Gold.svg", "GoldDAO.svg", "PRSMS.svg", "Tacos.svg", "THC.svg", "TRTS.svg", "Vote.svg", "YARN.svg"]
+        let accepted = [409604194, 388592191, 1088771340, 1241944285, 1241945177, 712012773, 753890862, 329110405, 1119722936, 1000870705, 452399768, 544217506]
+        let acceptedImg = ["AO.svg", "chip.svg", "DARKCOIN.svg", "Gold.svg", "GoldDAO.svg", "META.svg", "PRSMS.svg", "Tacos.svg", "THC.svg", "TRTS.svg", "Vote.svg", "YARN.svg"]
   
         let scores = {}
         let decimals = {}
@@ -377,6 +373,9 @@ export default function ASAblasters(props) {
             let indexOf = accepted.indexOf(asset["asset-id"])
             if (asset.amount > 0) {
               let score = asset.amount / div / 10000
+              if (unitName == "DARKCOIN") {
+                score = score + 0.1
+              }
               scores[unitName] = score
               decimals[unitName] = decimal
               ids[unitName] = id
@@ -406,12 +405,9 @@ export default function ASAblasters(props) {
   
         }
   
-        await sendRewardMessage(totalScore, AO, chip, DARKCOIN, Gold, PRSMS, Tacos, THC, TRTS, Vote, YARN)
-        // ...
-      }).catch(function(error) {
-        // Handle error
-      });
-
+        
+    
+        await sendRewardMessage(session.res)
       
   
     }
@@ -421,22 +417,31 @@ export default function ASAblasters(props) {
 
   }
 
-  const sendRewardMessage = async (totalScore, AO, chip, DARKCOIN, Gold, PRSMS, Tacos, THC, TRTS, Vote, YARN) => {
+  const sendRewardMessage = async (txnId) => {
        
     let embeds = []
 
       embeds.push({
-          "title": activeAccount.address + " Scored: " + totalScore,
+          "title": activeAccount.address + " Scored: " + score["totalScore"],
           "color": 0
       })
-      
 
-      embeds.push({
-          "title": "Rewards",
-          "description": "AO = " + (AO * assetScores.AO).toFixed(assetDec.AO) + "\n" + "chip = " + (chip * assetScores.chip).toFixed(assetDec.chip) + "\n" + "DARKCOIN = " + (DARKCOIN * assetScores.DARKCOIN).toFixed(assetDec.DARKCOIN) + "\n" + "Gold = " + (Gold * assetScores.Gold).toFixed(assetDec.Gold) + "\n" + "PRSMS = " + (PRSMS * assetScores.PRSMS).toFixed(assetDec.PRSMS) + "\n" + "Tacos = " + (Tacos * assetScores.Tacos).toFixed(assetDec.Tacos) + "\n"+ "THC = " + (THC * assetScores.THC).toFixed(assetDec.THC) + "\n" + "TRTS = " + (TRTS * assetScores.TRTS).toFixed(assetDec.TRTS) + "\n" + "Vote = " + (Vote * assetScores.Vote).toFixed(assetDec.Vote) + "\n" + "YARN = " + (YARN * assetScores.YARN).toFixed(assetDec.YARN) + "\n",
-          "color": 16777215
+      {Object.keys(score).map((asset, index) => {
+        if (asset != "totalScore") {
+          embeds.push({
+            "title": asset,
+            "description": score[asset] + " hits",
+            "color": 16777215
+          })
+        }
+        
+       })}
+
+       embeds.push({
+        "title": "Reward Txn",
+        "url": "https://allo.info/tx/" + txnId,
+        "color": 16777215
       })
-
 
       const response = await fetch(process.env.rewardWebhook, {
           method: "POST",
@@ -466,14 +471,17 @@ export default function ASAblasters(props) {
     }
   })
 
-  console.log(assetScores)
-      console.log(assetDec)
-      console.log(assetIds)
+  console.log(score)
+
+  let sortedScore = Object.keys(score).sort()
+  
+  
+  console.log(sortedScore)
 
 
   return (
   <div>
-    {Object.keys(assetScores).length > 0 ? 
+    {sortedScore.length > 0 ? 
     <div style={{
       position: 'absolute',
       display: "grid",
@@ -481,12 +489,15 @@ export default function ASAblasters(props) {
       padding: '8px',
       fontSize: '14px',
       userSelect: 'none'}}>
-         Score: 
-         <span id="scoreEl"> TOTAL {totalScore}  </span>
-         {Object.keys(assetScores).map((asset, index) => {
-          return (
-            <span key={index} > {asset} {(eval(asset) * assetScores[asset]).toFixed(assetDec[asset])}  </span>
-          )
+         <span > Total Score {score["totalScore"]} </span>
+         {sortedScore.map((asset, index) => {
+          console.log(score[asset])
+          if (asset != "created" && asset != "totalScore") {
+            return (
+              <span key={index} > {asset} {score[asset]}  </span>
+            )
+          }
+          
          })}
        
       </div>
@@ -497,19 +508,9 @@ export default function ASAblasters(props) {
         {ready ? 
         <Canvas 
         highScore={highScore}
-        totalScore={totalScore}
-        AO={AO}
-        chip={chip}
-        DARKCOIN={DARKCOIN}
-        Gold={Gold}
-        GoldDAO={GoldDAO}
-        META={META}
-        PRSMS={PRSMS}
-        Tacos={Tacos}
-        THC={THC}
-        TRTS={TRTS}
-        Vote={Vote}
-        YARN={YARN}
+        score={score}
+        assetScores={assetScores}
+        assetDec={assetDec}
         setReady={setReady}
         updateScore={updateScore}
         sortedAssets={sortedAssets}
@@ -649,6 +650,7 @@ export default function ASAblasters(props) {
               
               <Grid container style={{padding: 10}}>
                 {sortedAssets.map((asset, index) => {
+                  if (assetScores[asset.unitName]) {
                     return(
                       <Grid 
                       key={index} 
@@ -676,9 +678,20 @@ export default function ASAblasters(props) {
                             margin: 'auto'}}> 
                               {asset.unitName} 
                         </h1>
+                        <h1 
+                          style={{ 
+                            fontSize: '16px', 
+                            color: 'red',
+                            backgroundColor: 'black',
+                            width: 'fit-content',
+                            margin: 'auto'}}> 
+                              ~ {(Math.floor(assetScores[asset.unitName] * (10 ** assetDec[asset.unitName])) / (10 ** assetDec[asset.unitName])).toFixed(assetDec[asset.unitName])} per hit
+                        </h1>
 
                         </Grid>
                     )
+                  }
+                    
                 })}
                 </Grid>
 

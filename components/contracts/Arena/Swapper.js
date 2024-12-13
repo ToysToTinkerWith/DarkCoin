@@ -6,6 +6,8 @@ import { Typography, Button, Grid } from "@mui/material"
 
 import { CID } from 'multiformats/cid'
 
+import { storage } from "../../../Firebase/FirebaseInit"
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 import * as mfsha2 from 'multiformats/hashes/sha2'
 import * as digest from 'multiformats/hashes/digest'
@@ -50,15 +52,21 @@ export default function Swapper(props) {
   const [ ArmourId, setArmourId ] = useState("None")
   const [ ExtraId, setExtraId ] = useState("None")
 
+  const [ ownedBackgrounds, setOwnedBackgrounds ] = useState([])
+  const [ ownedWeapons, setOwnedWeapons ] = useState([])
+  const [ ownedMagics, setOwnedMagics ] = useState([])
+  const [ ownedHeads, setOwnedHeads ] = useState([])
+  const [ ownedArmours, setOwnedArmours ] = useState([])
+  const [ ownedExtras, setOwnedExtras ] = useState([])
+
   const [ cat, setCat ] = useState(null)
 
   const [ newImage, setNewImage ] = useState(null)
 
+
     useEffect(() => {
 
       const fetchData = async () => {
-
-        console.log(props.ownTraits)
 
 
           let response = await fetch('/api/getNft', {
@@ -85,7 +93,13 @@ export default function Swapper(props) {
         setNft(session.nft.assets[0].params)
         setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
 
+        
+
         if (props.zoom) {
+
+          let char = JSON.parse(session.charStats)
+        console.log(char)
+          setChar(char)
 
           const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
@@ -108,17 +122,15 @@ export default function Swapper(props) {
 
           let HeadBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("H"))])).do();
           HeadId = byteArrayToLong(HeadBox.value)
-          console.log(HeadId)
 
           let ArmourBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("A"))])).do();
           ArmourId = byteArrayToLong(ArmourBox.value)
-          console.log(ArmourId)
 
           let ExtraBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("E"))])).do();
           ExtraId = byteArrayToLong(ExtraBox.value)
 
           let Background = "None"
-          let Skin = "None"
+          let Skin = char.properties.Skin
           let Weapon = "None"
           let Magic = "None"
           let Head = "None"
@@ -127,11 +139,9 @@ export default function Swapper(props) {
 
           props.traits.forEach((trait) => {
             if (trait.assetId == BackgroundId) {
-              Background = trait.name.slice(0, trait.name.length - 11)
+              Background = trait.name
             }
-            else if (trait.assetId == SkinId) {
-              Skin = trait.name
-            }
+            
             else if (trait.assetId == WeaponId) {
               Weapon = trait.name
             }
@@ -150,23 +160,90 @@ export default function Swapper(props) {
           })
 
 
-          let char = JSON.parse(session.charStats)
-          setChar(char)
+          let extraRef
+          let armourRef
+          let magicRef
+          let weaponRef
+          let headRef
+          let skinRef
+          let backgroundRef
 
-          setBackground(Background)
-          setSkin(char.properties.Skin)
-          setWeapon(Weapon)
-          setMagic(Magic)
-          setHead(Head)
-          setArmour(Armour)
-          setExtra(Extra)
+          if (Extra != "None") {
+            extraRef = ref(storage, "warriors/Extra/" + Extra + ".png");
+          }
+          if (Armour != "None") {
+              armourRef = ref(storage, "warriors/Armour/" + Armour + ".png");
+          }
+          if (Magic != "None") {
+              magicRef = ref(storage, "warriors/Magic/" + Magic + ".png");
+          }
+          if (Weapon != "None") {
+              weaponRef = ref(storage, "warriors/Weapon/" + Weapon + ".png");
+          }
+          headRef = ref(storage, "warriors/Head/" + Head + ".png");
+          skinRef = ref(storage, "warriors/Skin/" + Skin + ".png");
+          backgroundRef = ref(storage, "warriors/Background/" + Background.slice(0, Background.length - 11) + ".png");
 
-          setBackgroundChange(Background)
-          setWeaponChange(Weapon)
-          setMagicChange(Magic)
-          setHeadChange(Head)
-          setArmourChange(Armour)
-          setExtraChange(Extra)
+          let extraUrl = "None"
+          let armourUrl = "None"
+          let magicUrl = "None"
+          let weaponUrl = "None"
+          let headUrl = "None"
+          let skinUrl = "None"
+          let backgroundUrl = "None"
+          
+          if (Extra != "None") {
+              await getDownloadURL(extraRef)
+              .then((url) => {
+                  extraUrl = url
+              })
+          }
+          if (Armour != "None") {
+              await getDownloadURL(armourRef)
+              .then((url) => {
+                  armourUrl = url
+              })
+          }
+          if (Magic != "None") {
+              await getDownloadURL(magicRef)
+              .then((url) => {
+                  magicUrl = url
+              })
+          }
+          if (Weapon != "None") {
+              await getDownloadURL(weaponRef)
+              .then((url) => {
+                  weaponUrl = url
+              })
+          }
+          await getDownloadURL(headRef)
+          .then((url) => {
+              headUrl = url
+          })
+          await getDownloadURL(skinRef)
+          .then((url) => {
+              skinUrl = url
+          })
+          await getDownloadURL(backgroundRef)
+          .then((url) => {
+              backgroundUrl = url
+          })
+
+
+          setBackground(backgroundUrl)
+          setSkin(skinUrl)
+          setWeapon(weaponUrl)
+          setMagic(magicUrl)
+          setHead(headUrl)
+          setArmour(armourUrl)
+          setExtra(extraUrl)
+
+          setBackgroundChange("None")
+          setWeaponChange("None")
+          setMagicChange("None")
+          setHeadChange("None")
+          setArmourChange("None")
+          setExtraChange("None")
 
           setBackgroundId(BackgroundId)
           setWeaponId(WeaponId)
@@ -174,6 +251,70 @@ export default function Swapper(props) {
           setHeadId(HeadId)
           setArmourId(ArmourId)
           setExtraId(ExtraId)
+
+          let backgrounds = []
+          let weapons = []
+          let magics = []
+          let heads = []
+          let armours = []
+          let extras = []
+
+          props.ownTraits.forEach(async (trait) => {
+            if (trait.type == "Background") {
+              await getDownloadURL(ref(storage, "warriors/Background/" + trait.name.slice(0, trait.name.length - 11) + ".png")).then((url) => {
+                console.log(url)
+                console.log(backgroundUrl)
+                if (!ownedBackgrounds.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != backgroundUrl) {
+                  backgrounds.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+                }
+              })
+            }
+            if (trait.type == "Weapon") {
+              console.log(trait)
+              await getDownloadURL(ref(storage, "warriors/Weapon/" + trait.name + ".png")).then((url) => {
+                if (!ownedWeapons.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != weaponUrl) {
+                  weapons.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+                  console.log(ownedWeapons)
+
+                }
+              })
+            }
+            if (trait.type == "Magic") {
+              await getDownloadURL(ref(storage, "warriors/Magic/" + trait.name + ".png")).then((url) => {
+                if (!ownedMagics.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != magicUrl) {
+                  magics.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+                }
+              })
+            }
+            if (trait.type == "Head") {
+              await getDownloadURL(ref(storage, "warriors/Head/" + trait.name + ".png")).then((url) => {
+                if (!ownedHeads.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != headUrl) {
+                  heads.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+                }
+              })
+            }
+            if (trait.type == "Armour") {
+              await getDownloadURL(ref(storage, "warriors/Armour/" + trait.name + ".png")).then((url) => {
+                if (!ownedArmours.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != armourUrl) {
+                  armours.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+                }
+              })
+            }
+            if (trait.type == "Extra") {
+              await getDownloadURL(ref(storage, "warriors/Extra/" + trait.name + ".png")).then((url) => {
+                if (!ownedExtras.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != extraUrl) {
+                  extras.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+                }
+              })
+            }
+          })
+
+          setOwnedBackgrounds(backgrounds)
+          setOwnedWeapons(weapons)
+          setOwnedMagics(magics)
+          setOwnedHeads(heads)
+          setOwnedArmours(armours)
+          setOwnedExtras(extras)
         }
 
              
@@ -207,11 +348,90 @@ export default function Swapper(props) {
           return value;
       };
 
-        const changeImg = async (B,W,M,H,A,E) => {
+        const changeImg = async (action, type) => {
 
-          if (BackgroundChange != B || WeaponChange != W || MagicChange != M || HeadChange != H || ArmourChange != A ||  ExtraChange != E) {
+          
             props.setMessage("Updating image...")
 
+            
+
+            let B = BackgroundChange != "None" ? BackgroundChange.url : Background
+            let W = WeaponChange != "None" ? WeaponChange.url : Weapon
+            let M = MagicChange != "None" ? MagicChange.url : Magic
+            let H = HeadChange != "None" ? HeadChange.url : Head
+            let A = ArmourChange != "None" ? ArmourChange.url : Armour
+            let E = ExtraChange != "None" ? ExtraChange.url : Extra
+
+            if (WeaponChange == "Remove") {
+              W = "None"
+            }
+            if (MagicChange == "Remove") {
+              M = "None"
+            }
+            if (ArmourChange == "Remove") {
+              A = "None"
+            }
+            if (ExtraChange == "Remove") {
+              E = "None"
+            }
+
+            if (action == "Remove") {
+              if (type == "Weapon") {
+                W = "None"
+              }
+              if (type == "Magic") {
+                M = "None"
+              }
+              if (type == "Armour") {
+                A = "None"
+              }
+              if (type == "Extra") {
+                E = "None"
+              }
+            }
+
+            else if (action == "None") {
+              if (type == "Background") {
+                B = "None"
+              }
+              if (type == "Weapon") {
+                W = "None"
+              }
+              if (type == "Magic") {
+                M = "None"
+              }
+              if (type == "Head") {
+                H = "None"
+              }
+              if (type == "Armour") {
+                A = "None"
+              }
+              if (type == "Extra") {
+                E = "None"
+              }
+            }
+            else {
+              if (type == "Background") {
+                B = action.url
+              }
+              if (type == "Weapon") {
+                W = action.url
+              }
+              if (type == "Magic") {
+                M = action.url
+              }
+              if (type == "Head") {
+                H = action.url
+              }
+              if (type == "Armour") {
+                A = action.url
+              }
+              if (type == "Extra") {
+                E = action.url
+              }
+            }
+
+            console.log(B,W,M,H,A,E)
             let response = await fetch('/api/changeImg', {
                 method: "POST",
                 headers: {
@@ -232,20 +452,23 @@ export default function Swapper(props) {
       
               let session = await response.json()
 
-              console.log(session)
 
               props.setMessage("")
+
       
               setNewImage(session.image)
-          }
           
+        
         }
 
         const mint = async () => {
 
+          try {
+
         props.setMessage("Initializing transaction...")
 
-          let newMetadata = char
+          let newMetadata = Object.assign({}, char)
+
 
           const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
@@ -259,16 +482,6 @@ export default function Swapper(props) {
           let otxn
           let stxn
 
-          newMetadata.properties = 
-          {
-            Armour: "None",
-            Background: "None",
-            Extra: "None",
-            Head: "None",
-            Magic: "None",
-            Skin: char.properties.Skin,
-            Weapon: "None"
-          }
 
           let newBackgroundId = 0
           let newWeaponId = 0
@@ -288,36 +501,54 @@ export default function Swapper(props) {
 
           let intBox
           let Box
+          console.log(newMetadata)
+
+          if (BackgroundChange != "None" && BackgroundChange != "Remove") {
+              newMetadata.properties.Background = BackgroundChange.name
+              newBackgroundId = BackgroundChange.assetId
+          }
+          if (WeaponChange != "None" && WeaponChange != "Remove") {
+            newMetadata.properties.Weapon = WeaponChange.name
+            newWeaponId = WeaponChange.assetId
+          }
+          else if (WeaponChange == "Remove"){
+            newMetadata.properties.Weapon = "None"
+          }
+          if (MagicChange != "None" && MagicChange != "Remove") {
+            newMetadata.properties.Magic = MagicChange.name
+            newMagicId = MagicChange.assetId
+          }
+          else if (MagicChange == "Remove") {
+            newMetadata.properties.Magic = "None"
+          }
+          if (HeadChange != "None" && HeadChange != "Remove") {
+            newMetadata.properties.Head = HeadChange.name
+            newHeadId = HeadChange.assetId
+          }
+          if (ArmourChange != "None" && ArmourChange != "Remove") {
+            newMetadata.properties.Armour = ArmourChange.name
+            newArmourId = ArmourChange.assetId
+          }
+          else if (ArmourChange == "Remove"){
+            newMetadata.properties.Armour = "None"
+          }
+          if (ExtraChange != "None" && ExtraChange != "Remove") {
+            newMetadata.properties.Extra = ExtraChange.name
+            newExtraId = ExtraChange.assetId
+          }
+          else if (ExtraChange == "Remove"){
+            newMetadata.properties.Extra = "None"
+          }
 
 
-          props.traits.forEach((trait) => {
-            if (trait.name == BackgroundChange + " Background") {
-              newMetadata.properties.Background = BackgroundChange
-              newBackgroundId = trait.assetId
-            }
-            else if (trait.name == WeaponChange) {
-              newMetadata.properties.Weapon = WeaponChange
-              newWeaponId = trait.assetId 
-            }
-            else if (trait.name == MagicChange) {
-              newMetadata.properties.Magic = MagicChange
-              newMagicId = trait.assetId 
-            }
-            else if (trait.name == HeadChange) {
-              newMetadata.properties.Head = HeadChange
-              newHeadId = trait.assetId 
-            }
-            else if (trait.name == ArmourChange) {
-              newMetadata.properties.Armour = ArmourChange
-              newArmourId = trait.assetId 
-            }
-            else if (trait.name == ExtraChange) {
-              newMetadata.properties.Extra = ExtraChange
-              newExtraId = trait.assetId 
-            }
-          })
+          console.log(newBackgroundId)
+          console.log(newWeaponId)
+          console.log(newMagicId)
+          console.log(newHeadId)
+          console.log(newArmourId)
+          console.log(newExtraId)
 
-          if (newBackgroundId != BackgroundId) {
+          if (newBackgroundId != 0) {
 
             if (BackgroundId != 0) {
 
@@ -365,6 +596,8 @@ export default function Swapper(props) {
               Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("B"))])
 
               boxes = [{appIndex: 0, name: Box}]
+
+              console.log("Background unequip")
                 
               let btxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
               txns.push(btxn)
@@ -398,14 +631,15 @@ export default function Swapper(props) {
                 accounts = []
                 foreignApps = []
                     
-                foreignAssets = [newWeaponId, props.nftId]
+                foreignAssets = [newBackgroundId, props.nftId]
   
                 intBox = longToByteArray(props.nftId)
             
                 Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("B"))])
     
                 boxes = [{appIndex: 0, name: Box}]
-                  
+                console.log("Background equip")
+
                 let betxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
                 txns.push(betxn)
                 signingIndex.push(signingIndex.length)
@@ -415,7 +649,7 @@ export default function Swapper(props) {
             
           }
 
-          if (newWeaponId != WeaponId) {
+          if (newWeaponId != 0 || WeaponChange == "Remove") {
 
             if (WeaponId != 0) {
 
@@ -463,7 +697,8 @@ export default function Swapper(props) {
               Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("W"))])
 
               boxes = [{appIndex: 0, name: Box}]
-                
+              console.log("weapon unequip")
+
               let wtxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
               txns.push(wtxn)
               signingIndex.push(signingIndex.length)
@@ -503,7 +738,8 @@ export default function Swapper(props) {
                 Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("W"))])
     
                 boxes = [{appIndex: 0, name: Box}]
-                  
+                console.log("Weapon equip")
+
                 let wetxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
                 txns.push(wetxn)
                 signingIndex.push(signingIndex.length)
@@ -513,7 +749,7 @@ export default function Swapper(props) {
             
           }
 
-          if (newMagicId != MagicId) {
+          if (newMagicId != 0 || MagicChange == "Remove") {
 
             if (MagicId != 0) {
 
@@ -561,7 +797,8 @@ export default function Swapper(props) {
               Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("M"))])
 
               boxes = [{appIndex: 0, name: Box}]
-                
+              console.log("Magic unequip")
+
               let mtxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
               txns.push(mtxn)
               signingIndex.push(signingIndex.length)
@@ -601,7 +838,8 @@ export default function Swapper(props) {
                 Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("M"))])
     
                 boxes = [{appIndex: 0, name: Box}]
-                  
+                console.log("Magic equip")
+
                 let metxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
                 txns.push(metxn)
                 signingIndex.push(signingIndex.length)
@@ -611,7 +849,7 @@ export default function Swapper(props) {
             
           }
 
-          if (newHeadId != HeadId) {
+          if (newHeadId != 0) {
 
             if (HeadId != 0) {
 
@@ -659,7 +897,8 @@ export default function Swapper(props) {
               Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("H"))])
 
               boxes = [{appIndex: 0, name: Box}]
-                
+              console.log("Head unequip")
+
               let htxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
               txns.push(htxn)
               signingIndex.push(signingIndex.length)
@@ -699,7 +938,8 @@ export default function Swapper(props) {
                 Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("H"))])
     
                 boxes = [{appIndex: 0, name: Box}]
-                  
+                console.log("Head equip")
+
                 let hetxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
                 txns.push(hetxn)
                 signingIndex.push(signingIndex.length)
@@ -709,7 +949,7 @@ export default function Swapper(props) {
             
           }
 
-          if (newArmourId != ArmourId) {
+          if (newArmourId != 0  || ArmourChange == "Remove") {
 
             if (ArmourId != 0) {
 
@@ -757,7 +997,8 @@ export default function Swapper(props) {
               Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("A"))])
 
               boxes = [{appIndex: 0, name: Box}]
-                
+              console.log("Armour unequip")
+
               let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
               txns.push(atxn)
               signingIndex.push(signingIndex.length)
@@ -797,7 +1038,8 @@ export default function Swapper(props) {
                 Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("A"))])
     
                 boxes = [{appIndex: 0, name: Box}]
-                  
+                console.log("Armour equip")
+
                 let aetxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
                 txns.push(aetxn)
                 signingIndex.push(signingIndex.length)
@@ -807,7 +1049,7 @@ export default function Swapper(props) {
             
           }
 
-          if (newExtraId != ExtraId) {
+          if (newExtraId != 0  || ExtraChange == "Remove") {
 
             if (ExtraId != 0) {
 
@@ -855,7 +1097,8 @@ export default function Swapper(props) {
               Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("E"))])
 
               boxes = [{appIndex: 0, name: Box}]
-                
+              console.log("Extra unequip")
+
               let etxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
               txns.push(etxn)
               signingIndex.push(signingIndex.length)
@@ -895,7 +1138,8 @@ export default function Swapper(props) {
                 Box = new Uint8Array([...intBox, new Uint8Array(Buffer.from("E"))])
     
                 boxes = [{appIndex: 0, name: Box}]
-                  
+                console.log("Extra equip")
+
                 let eetxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.swapper, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
                 txns.push(eetxn)
                 signingIndex.push(signingIndex.length)
@@ -904,6 +1148,34 @@ export default function Swapper(props) {
 
             
           }
+          console.log(BackgroundChange)
+          console.log(WeaponChange)
+          console.log(MagicChange)
+          console.log(HeadChange)
+          console.log(ArmourChange)
+          console.log(ExtraChange)
+
+
+          let B = BackgroundChange != "None" ? BackgroundChange.url : Background
+          let W = WeaponChange != "None" ? WeaponChange.url : Weapon
+          let M = MagicChange != "None" ? MagicChange.url : Magic
+          let H = HeadChange != "None" ? HeadChange.url : Head
+          let A = ArmourChange != "None" ? ArmourChange.url : Armour
+          let E = ExtraChange != "None" ? ExtraChange.url : Extra
+
+          if (WeaponChange == "Remove") {
+            W = "None"
+          }
+          if (MagicChange == "Remove") {
+            M = "None"
+          }
+          if (ArmourChange == "Remove") {
+            A = "None"
+          }
+          if (ExtraChange == "Remove") {
+            E = "None"
+          }
+          
 
           let response1 = await fetch('/api/getHash', {
             method: "POST",
@@ -912,13 +1184,13 @@ export default function Swapper(props) {
             },
             body: JSON.stringify({
                 name: nft.name,
-                Background: BackgroundChange,
+                Background: B,
                 Skin: Skin,
-                Weapon: WeaponChange,
-                Magic: MagicChange,
-                Head: HeadChange,
-                Armour: ArmourChange,
-                Extra: ExtraChange
+                Weapon: W,
+                Magic: M,
+                Head: H,
+                Armour: A,
+                Extra: E
             }),
             
               
@@ -931,6 +1203,11 @@ export default function Swapper(props) {
                 new cid(session1.hash.toString()).multihash
             ).digest
           );
+
+          console.log(newMetadata.properties)
+
+
+          console.log(new Uint8Array(Buffer.from(JSON.stringify(newMetadata))))
 
           let utxn = algosdk.makeAssetConfigTxnWithSuggestedParams(
             "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY", 
@@ -950,6 +1227,8 @@ export default function Swapper(props) {
             let txgroup = algosdk.assignGroupID(txns)
           }
 
+          console.log(txns)
+
          
           let encodedTxns= []
 
@@ -960,6 +1239,7 @@ export default function Swapper(props) {
           })
 
           props.setMessage("Sign transaction...")
+
     
           const signedTransactions = await signTransactions(encodedTxns, signingIndex)
 
@@ -991,13 +1271,22 @@ export default function Swapper(props) {
           let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
 
           props.setMessage("NFT updated")
+
+          props.refetchData()
+
+        }
+
+        catch (error) {
+          props.setMessage(error)
+        }
             
 
           
         }
 
-
         if (props.zoom) {
+          console.log(props.ownTraits)
+
           return (
             <div>
               <Grid container align="center">
@@ -1022,17 +1311,16 @@ export default function Swapper(props) {
                   cat == "Background" ?
                   <>
                   <Grid item xs={12} sm={6} md={2}>
-                    <Button onClick={() => [setBackgroundChange(Background), setCat(null), changeImg(Background, WeaponChange, MagicChange, HeadChange, ArmourChange, ExtraChange)]}>
-                      <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Background/" + Background + ".png"} />
+                    <Button onClick={() => [setBackgroundChange("None"), setCat(null), changeImg("None", "Background")]}>
+                      <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Background} />
                     </Button>
-                    {props.ownTraits.length > 0 ? props.ownTraits.map((trait, index) => {
-                      if (trait.type == "Background" && trait.name != Background) {
-                        return (
-                          <Button key={index} onClick={() => [setBackgroundChange(trait.name), setCat(null), changeImg(trait.name, WeaponChange, MagicChange, HeadChange, ArmourChange, ExtraChange)]}>
-                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Background/" + trait.name + ".png"} />
-                          </Button>
-                        )
-                      }
+                    {ownedBackgrounds.length > 0 ? ownedBackgrounds.map((trait, index) => {
+                      return (
+                        <Button key={index} onClick={() => [setBackgroundChange(trait), setCat(null), changeImg(trait, "Background")]}>
+                        <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={trait.url} />
+                        </Button>
+                      )
+                      
                     })
                     :
                     null
@@ -1044,25 +1332,22 @@ export default function Swapper(props) {
                   cat == "Weapon" ?
                   <>
                   <Grid item xs={12} sm={6} md={2}>
-                    <Button onClick={() => [setWeaponChange("None"), setCat(null), changeImg(BackgroundChange, "None", MagicChange, HeadChange, ArmourChange, ExtraChange)]}>
+                    <Button onClick={() => [setWeaponChange("Remove"), setCat(null), changeImg("Remove", "Weapon")]}>
                       <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/weapon.svg"} />
                     </Button>
                     {Weapon != "None" ?
-                    <Button onClick={() => [setWeaponChange(Weapon), setCat(null), changeImg(BackgroundChange, Weapon, MagicChange, HeadChange, ArmourChange, ExtraChange)]}>
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Weapon/" + Weapon + ".png"} />
+                    <Button onClick={() => [setWeaponChange("None"), setCat(null), changeImg("None", "Weapon")]}>
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Weapon} />
                     </Button>
                     :
                     null
                     }
-                    {props.ownTraits.length > 0 ? props.ownTraits.map((trait, index) => {
-                      console.log(trait)
-                      if (trait.type == "Weapon" && trait.name != Weapon) {
+                    {ownedWeapons.length > 0 ? ownedWeapons.map((trait, index) => {
                         return (
-                          <Button key={index} onClick={() => [setWeaponChange(trait.name), setCat(null), changeImg(BackgroundChange, trait.name, MagicChange, HeadChange, ArmourChange, ExtraChange)]}>
-                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Weapon/" + trait.name + ".png"} />
+                          <Button key={index} onClick={() => [setWeaponChange(trait), setCat(null), changeImg(trait, "Weapon")]}>
+                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={trait.url} />
                           </Button>
                         )
-                      }
                     })
                     :
                     null
@@ -1075,25 +1360,23 @@ export default function Swapper(props) {
                   cat == "Magic" ?
                   <>
                   <Grid item xs={12} sm={6} md={2}>
-                    <Button onClick={() => [setMagicChange("None"), setCat(null), changeImg(BackgroundChange, WeaponChange, "None", HeadChange, ArmourChange, ExtraChange)]}>
+                    <Button onClick={() => [setMagicChange("Remove"), setCat(null), changeImg("Remove", "Magic")]}>
                       <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/magic.svg"} />
                     </Button>
                     
                     {Magic != "None" ?
-                    <Button onClick={() => [setMagicChange(Magic), setCat(null), changeImg(BackgroundChange, WeaponChange, Magic, HeadChange, ArmourChange, ExtraChange)]}>
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Magic/" + Magic + ".png"} />
+                    <Button onClick={() => [setMagicChange("None"), setCat(null), changeImg("None", "Magic")]}>
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Magic} />
                     </Button>
                     :
                     null
                     }
-                    {props.ownTraits.length > 0 ? props.ownTraits.map((trait, index) => {
-                      if (trait.type == "Magic" && trait.name != Magic) {
+                    {ownedMagics.length > 0 ? ownedMagics.map((trait, index) => {
                         return (
-                          <Button key={index} onClick={() => [setMagicChange(trait.name), setCat(null), changeImg(BackgroundChange, WeaponChange, trait.name, HeadChange, ArmourChange, ExtraChange)]}>
-                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Magic/" + trait.name + ".png"} />
+                          <Button key={index} onClick={() => [setMagicChange(trait), setCat(null), changeImg(trait, "Magic")]}>
+                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={trait.url} />
                           </Button>
                         )
-                      }
                     })
                     :
                     null
@@ -1107,20 +1390,19 @@ export default function Swapper(props) {
                   <Grid item xs={12} sm={6} md={2}>
                     
                     {Head != "None" ?
-                    <Button onClick={() => [setHeadChange(Head), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, Head, ArmourChange, ExtraChange)]}>
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Head/" + Head + ".png"} />
+                    <Button onClick={() => [setHeadChange("None"), setCat(null), changeImg("None", "Head")]}>
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Head} />
                     </Button>
                     :
                     null
                     }
-                    {props.ownTraits.length > 0 ? props.ownTraits.map((trait, index) => {
-                      if (trait.type == "Head" && trait.name != Head) {
+                    {ownedHeads.length > 0 ? ownedHeads.map((trait, index) => {
                         return (
-                          <Button key={index} onClick={() => [setHeadChange(trait.name), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, trait.name, ArmourChange, ExtraChange)]}>
-                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Head/" + trait.name + ".png"} />
+                          <Button key={index} onClick={() => [setHeadChange(trait), setCat(null), changeImg(trait, "Head")]}>
+                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={trait.url} />
                           </Button>
                         )
-                      }
+                      
                     })
                     :
                     null
@@ -1132,25 +1414,24 @@ export default function Swapper(props) {
                   cat == "Armour" ?
                   <>
                   <Grid item xs={12} sm={6} md={2}>
-                    <Button onClick={() => [setArmourChange("None"), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, HeadChange, "None", ExtraChange)]}>
+                    <Button onClick={() => [setArmourChange("Remove"), setCat(null), changeImg("Remove", "Armour")]}>
                       <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/armour.svg"} />
                     </Button>
                     
                     {Armour != "None" ?
-                    <Button onClick={() => [setArmourChange(Armour), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, HeadChange, Armour, ExtraChange)]}>
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Armour/" + Armour + ".png"} />
+                    <Button onClick={() => [setArmourChange("None"), setCat(null), changeImg("None", "Armour")]}>
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Armour} />
                     </Button>
                     :
                     null
                     }
-                    {props.ownTraits.length > 0 ? props.ownTraits.map((trait, index) => {
-                      if (trait.type == "Armour" && trait.name != Armour) {
+                    {ownedArmours.length > 0 ? ownedArmours.map((trait, index) => {
                         return (
-                          <Button key={index} onClick={() => [setArmourChange(trait.name), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, HeadChange, trait.name, ExtraChange)]}>
-                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Armour/" + trait.name + ".png"} />
+                          <Button key={index} onClick={() => [setArmourChange(trait), setCat(null), changeImg(trait, "Armour")]}>
+                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={trait.url} />
                           </Button>
                         )
-                      }
+                      
                     })
                     :
                     null
@@ -1162,25 +1443,23 @@ export default function Swapper(props) {
                   cat == "Extra" ?
                   <>
                   <Grid item xs={12} sm={6} md={2}>
-                    <Button onClick={() => [setExtraChange("None"), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, HeadChange, ArmourChange, "None")]}>
+                    <Button onClick={() => [setExtraChange("Remove"), setCat(null), changeImg("Remove", "Extra")]}>
                       <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/extra.svg"} />
                     </Button>
                   </Grid>
                   {Extra != "None" ?
-                    <Button onClick={() => [setExtraChange(Extra), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, HeadChange, ArmourChange, Extra)]}>
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Extra/" + Extra + ".png"} />
+                    <Button onClick={() => [setExtraChange("None"), setCat(null), changeImg("None", "Extra")]}>
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Extra} />
                   </Button>
                     :
                     null
                     }
-                    {props.ownTraits.length > 0 ? props.ownTraits.map((trait, index) => {
-                      if (trait.type == "Extra" && trait.name != Extra) {
+                    {ownedExtras.length > 0 ? ownedExtras.map((trait, index) => {
                         return (
-                          <Button key={index} onClick={() => [setExtraChange(trait.name), setCat(null), changeImg(BackgroundChange, WeaponChange, MagicChange, HeadChange, ArmourChange, trait.name)]}>
-                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Extra/" + trait.name + ".png"} />
+                          <Button key={index} onClick={() => [setExtraChange(trait), setCat(null), changeImg(trait, "Extra")]}>
+                          <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={trait.url} />
                           </Button>
                         )
-                      }
                     })
                     :
                     null
@@ -1193,31 +1472,46 @@ export default function Swapper(props) {
                   <>
                   <Grid item xs={12} sm={6} md={2}>
                   <Button onClick={() => setCat("Background")}>
-                  {BackgroundChange == "None" ?
+                  {Background == "None" ?
                     <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/background.svg"} />
                     :
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Background/" + BackgroundChange + ".png"} />
+                    BackgroundChange == "None" ?
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Background} />
+                    :
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={BackgroundChange.url} />
+
                   }
                   </Button>
                   <Button onClick={() => setCat("Head")}>
-                    {HeadChange == "None" ?
+                    {Head == "None" ?
                     <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/head.svg"} />
                     :
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Head/" + HeadChange + ".png"} />
+                    HeadChange == "None" ?
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Head} />
+                    :
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={HeadChange.url} />
                     }
                   </Button>
                   <Button onClick={() => setCat("Weapon")}>
-                    {WeaponChange == "None" ?
+                    {Weapon == "None" || WeaponChange == "Remove" ?
                     <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/weapon.svg"} />
                     :
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Weapon/" + WeaponChange + ".png"} />
+                    WeaponChange == "None" ?
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Weapon} />
+                    :
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={WeaponChange.url} />
+
                     }
                   </Button>
                   <Button onClick={() => setCat("Extra")}>
-                    {ExtraChange == "None" ?
+                    {Extra == "None" || ExtraChange == "Remove" ?
                     <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/extra.svg"} />
                     :
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Extra/" + ExtraChange + ".png"} />
+                    ExtraChange == "None" ?
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Extra} />
+                    :
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={ExtraChange.url} />
+
                     }
                   </Button>
                 </Grid>
@@ -1227,21 +1521,29 @@ export default function Swapper(props) {
                     {Skin == "None" ?
                     <img style={{width: 150, height: 150, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/skin.svg"} />
                     :
-                    <img style={{width: 150, height: 150, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Skin/" + Skin + ".png"} />
+                    <img style={{width: 150, height: 150, border: "2px solid white", borderRadius: 15, padding: 10}} src={Skin} />
                     }
                   </Button>
                   <Button onClick={() => setCat("Armour")}>
-                    {ArmourChange == "None" ?
+                    {Armour == "None" || ArmourChange == "Remove" ?
                       <img style={{width: 150, height: 150, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/armour.svg"} />
                       :
-                      <img style={{width: 150, height: 150, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Armour/" + ArmourChange + ".png"} />
+                      ArmourChange == "None" ?
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Armour} />
+                    :
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={ArmourChange.url} />
+
                     }
                   </Button>
                   <Button onClick={() => setCat("Magic")}>
-                    {MagicChange == "None" ?
+                    {Magic == "None" || MagicChange == "Remove" ?
                     <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/magic.svg"} />
                     :
-                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={"/warriors/Magic/" + MagicChange + ".png"} />
+                    MagicChange == "None" ?
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={Magic} />
+                    :
+                    <img style={{width: 100, height: 100, border: "2px solid white", borderRadius: 15, padding: 10}} src={MagicChange.url} />
+
                     }
                   </Button>
                 </Grid>

@@ -20,6 +20,8 @@ import { DeflyWalletConnect } from "@blockshake/defly-connect";
 
 import { useWallet } from '@txnlab/use-wallet'
 
+import ChatBot from "../components/chatBot"
+
 import Connect from "../components/connect/connect"
 
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -48,7 +50,7 @@ export default function MyApp(props) {
 
   //council: 1225804311
 
-  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1434284594, swapper: 1632253886}
+  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1434284594, swapper: 1632253886, dragonshorde: 1870514811, raffle: 2046845196}
 
 
   const router = useRouter()
@@ -236,12 +238,17 @@ export default function MyApp(props) {
                         <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/fight" ? "#000000" : "#FFFFFF"}}> Battle in the Arena </Typography>
                     </Button>
                     </Grid>
-                    <Grid item xs={12} sm={6} style={{marginBottom: 50}}>
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/arena/history" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/history">
                         <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/history" ? "#000000" : "#FFFFFF"}}> Battle History </Typography>
                     </Button>
                     </Grid>
-                    <Grid item xs={12} sm={6} style={{marginBottom: 50}}>
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
+                    <Button style={{backgroundColor: router.pathname == "/arena/dragonshorde" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/dragonshorde">
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/dragonshorde" ? "#000000" : "#FFFFFF"}}> Dragon's Horde </Typography>
+                    </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
                     <Button style={{backgroundColor: router.pathname == "/arena/leaderboard" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/arena/leaderboard">
                         <Typography color="secondary" variant="h6" style={{color: router.pathname == "/arena/leaderboard" ? "#000000" : "#FFFFFF"}}> Leaderboard </Typography>
                     </Button>
@@ -251,22 +258,34 @@ export default function MyApp(props) {
             :
             null
         }
-          {router.pathname.substring(0,8) == "/rewards" ? 
+          {router.pathname.substring(0,8) == "/tools" ? 
             <Grid item xs={12}>
                 <Button 
                 style={{display: "grid", margin: "auto"}}
                 href="/">
-                <img src="/rewards.svg" style={{display: "flex", margin: "auto", height: 75}} />
+                <img src="/tools.svg" style={{display: "flex", margin: "auto", height: 75}} />
                 <Typography align="center" variant="h5" color="secondary">
-                    Rewards
+                    Tools
                 </Typography>
                 </Button>
                 <br />
                 <Grid container spacing={3}>
                    
-                    <Grid item xs={12} sm={12} style={{marginBottom: 50}}>
-                    <Button style={{backgroundColor: router.pathname == "/rewards/airdrop" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/rewards/airdrop">
-                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/rewards/airdrop" ? "#000000" : "#FFFFFF"}}> Airdrop </Typography>
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
+                    <Button style={{backgroundColor: router.pathname == "/tools/airdrop" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/tools/airdrop">
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/tools/airdrop" ? "#000000" : "#FFFFFF"}}> Airdrop </Typography>
+                    </Button>
+                    </Grid>
+
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
+                    <Button style={{backgroundColor: router.pathname == "/tools/imageai" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/tools/imageai">
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/tools/imageai" ? "#000000" : "#FFFFFF"}}> Image AI </Typography>
+                    </Button>
+                    </Grid>
+
+                    <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
+                    <Button style={{backgroundColor: router.pathname == "/tools/raffle" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/tools/raffle">
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/tools/raffle" ? "#000000" : "#FFFFFF"}}> Raffle </Typography>
                     </Button>
                     </Grid>
                    
@@ -279,6 +298,7 @@ export default function MyApp(props) {
       
         </Grid>
         <Component {...pageProps} setMessage={setMessage} setProgress={setProgress} contracts={contracts} sendDiscordMessage={sendDiscordMessage} wallet={wallet} />
+        <ChatBot />
       </ThemeProvider>
       </WalletProvider>
     </React.Fragment>

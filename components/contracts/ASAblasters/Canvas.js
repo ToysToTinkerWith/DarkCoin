@@ -261,7 +261,7 @@ const clickHandler = (event, context, canvas, enemies, projectiles, particles, u
     
 };
 
-const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransaction, setReady, totalScore, AO, chip, DARKCOIN, Gold, GoldDAO, META, PRSMS, Tacos, THC, TRTS, Vote, YARN }) => {
+const Canvas = ({ updateScore, score, assetScores, assetDec, setScore, sortedAssets, sendRewardTransaction, setReady, totalScore }) => {
     const [restartModal, setRestartModal] = useState(false);
     const [startModal, setStartModal] = useState(true);
     const [newGame, setNewGame] = useState(0);
@@ -703,14 +703,20 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                 }}>
                     <label style={{ fontSize: '14px', 
                         color: 'grey' }}>Game Over</label>
-                    <h3 id="modalScore" style={{
-                        display: "flex",
-                        margin: "auto",
-                        fontSize: '24px',
-                        width: "200px",
-                        color: 'red', 
-                        marginBottom: '0', 
-                        marginTop: '8px' }}>{score}</h3>
+                    <div id="modalScore" >
+                    <h3 style={{display: "grid"}}>
+                        Total Score = {score["totalScore"]}
+                    </h3>
+                    {Object.keys(score).map((asset, index) => {
+                        if (asset != "totalScore") {
+                            return (
+                                <h3 key={index} style={{display: "grid"}}>
+                                    {asset} = {score[asset]}
+                                </h3>
+                            )
+                        }
+                            
+                        })}</div>
                  
                     <button id="button" style={{
                         marginTop: '12px',
@@ -723,7 +729,7 @@ const Canvas = ({ updateScore, score, setScore, sortedAssets, sendRewardTransact
                     }} 
                     onClick={() => {
                         
-                        sendRewardTransaction(totalScore, AO, chip, DARKCOIN, Gold, GoldDAO, META, PRSMS, Tacos, THC, TRTS, Vote, YARN),
+                        sendRewardTransaction(totalScore),
                         setReady(false),
                         setRestartModal(false),
                         setStartModal(true)

@@ -183,7 +183,6 @@ export default function BuyNft(props) {
             })
 
             props.setMessage("Sign Transaction...")
-
       
             const signedTransactions = await signTransactions(encodedTxns)
 

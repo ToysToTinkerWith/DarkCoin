@@ -23,6 +23,7 @@ export default function History(props) {
 
         for (let i = 0; i < numBattles; i++) {
            
+            try {
 
             const response = await fetch('/api/arena/getHistBattles', {
                 method: "POST",
@@ -39,6 +40,10 @@ export default function History(props) {
             const session = await response.json()
                     
             setBattles(battles => [...battles, {battleNum: session.battleNum, winner: session.winner, winnerName: session.winnerName, loser: session.loser, loserName: session.loserName, wager: session.wager, story: session.story, randomNum: session.randomNum}])
+        }
+        catch {
+            
+        }
 
             
         }

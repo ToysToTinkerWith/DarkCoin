@@ -1,181 +1,216 @@
-import React from "react"
+import React, { useState } from "react"
 
 //43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA
 
-import { PeraWalletConnect } from "@perawallet/connect";
+import { useWallet } from '@txnlab/use-wallet'
 
-const peraWallet = new PeraWalletConnect();
 
 import algosdk from "algosdk"
 
 import { Typography, Button, TextField, Grid } from "@mui/material"
 
-export default class Gift extends React.Component { 
+export default function Gift(props) { 
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            proposal: "",
-            confirm: ""
-            
-        };
-        this.handleChange = this.handleChange.bind(this)
-        this.gift = this.gift.bind(this)
-        this.updateDiscord = this.updateDiscord.bind(this)
-    }
+    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    
+    const [asset, setAsset] = useState("")
+    const [amount, setAmount] = useState("")
+    const [receiver, setReceiver] = useState("")
 
-    async componentDidMount() {
-        
-        peraWallet.reconnectSession()
-        .catch((error) => {
-          // You MUST handle the reject because once the user closes the modal, peraWallet.connect() promise will be rejected.
-          // For the async/await syntax you MUST use try/catch
-          if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
-              // log the necessary errors
-              console.log(error)
-          }
-          });
+    React.useEffect(() => {
+      const fetchData = async () => {
+      
 
-          const token = {
-            'X-API-Key': process.env.indexerKey
-        }
+      }
 
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-          let status = await client.status().do();
-
-          this.setState({
-            currRound: status["last-round"]
-          })
+      try {
+        fetchData();
+      }
+      catch(error) {
+      }
 
 
-    }
+    }, [activeAccount])
 
 
-      handleChange(event) {
+    const handleChange = (event) => {
+
+      console.log(event)
+
+      if (event) {
+
         const target = event.target;
         let value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
 
-        if (value < 0) {
-          value = 0
+        if (name == "asset") {
+          setAsset(Number(value))
         }
-    
-        this.setState({
-        [name]: value
-    
-        });
+        if (name == "amount") {
+          setAmount(Number(value))
+        }
+        if (name == "receiver") {
+          setReceiver(value)
+        }
+
       }
+      
+
+     
+      
+    }
 
 
-      async gift(asset, amount, receiver) {
+      const gift = async () => {
        
 
         try{
 
+          const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+
+          let params = await client.getTransactionParams().do()
+
+          const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+          console.log(asset)
+
+          let addrOptedAssets = []
+
+          let responseAddr
+          let nextTokenAddr
+
+          responseAddr = await indexerClient.lookupAccountAssets("5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q").do();
+          nextTokenAddr = responseAddr["next-token"]
+          
+          responseAddr.assets.forEach((asset) => {
+            if (asset.amount >= 0) {
+              addrOptedAssets.push(asset["asset-id"])
+            }
+          })
+
+          while (responseAddr.assets.length == 1000) {
+            responseAddr = await indexerClient.lookupAccountAssets("5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q").nextToken(nextTokenAddr).limit(1000).do();
+            nextTokenAddr = responseAddr["next-token"]
+            responseAddr.assets.forEach((asset) => {
+                if (asset.amount >= 0) {
+                  addrOptedAssets.push(asset["asset-id"])
+                }
+            })  
+          }
+
+          console.log(addrOptedAssets)
+
+          let opted = addrOptedAssets.includes(asset)
+
+          console.log(opted)
+
+          let txns = []
+
+          if (!opted) {
+
+            let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
+              activeAccount.address, 
+              "5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q", 
+              100000, 
+              undefined,
+              undefined,
+              params
+            );
+
+            txns.push(ftxn)
+
             let appArgs = []
             appArgs.push(
               new Uint8Array(Buffer.from("optin"))
-              
-              
             )
 
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-          let params = await client.getTransactionParams().do()
-        
-          let accounts = []
-          let foreignApps = []
+            let accounts = []
+            let foreignApps = []
+              
+            let foreignAssets = [asset]
+          
             
-          let foreignAssets = [asset]
+            let otxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, 2638261330, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
+
+            txns.push(otxn)
+
+          }
+
+            const assetInfo = await indexerClient.lookupAssetByID(asset).do();
+  
+            let decimals = assetInfo.asset.params.decimals
+            let div = 10**decimals
         
           
-          let otxn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, 1103370576, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
-        
-        
-        
-          
-        let stxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            this.props.activeAddress, 
-            "VQY34GYVYTD3Z5NNMSQGHCJTO6XA4URSFSCXOZOEFZSCNPSGLGA6Y72K6Y", 
+        let atxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+            activeAccount.address, 
+            "5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q", 
             undefined, 
             undefined,
-            amount,  
+            amount * div,  
             undefined, 
             asset, 
             params
           );
+
+          txns.push(atxn)
             
-             appArgs = []
-            appArgs.push(
-              new Uint8Array(Buffer.from("addboxNFT")),
-              algosdk.encodeUint64(amount)
-              
-              
-            )
-        
-           accounts = [receiver]
-           foreignApps = []
-            
-           foreignAssets = [asset]
-        
-           let encoded = algosdk.encodeUint64(asset);
-        
+          let appArgs = []
+          appArgs.push(
+            new Uint8Array(Buffer.from("addboxNFT"))
+          )
+      
+          let accounts = [receiver]
+          let foreignApps = []
           
-          const pk = algosdk.decodeAddress(receiver);
+          let foreignAssets = [asset]
+      
+          let encoded = algosdk.encodeUint64(asset)
+          
+          const pk = algosdk.decodeAddress(receiver)
           const addrArray = pk.publicKey
         
           let accountBox = new Uint8Array([...addrArray, ...encoded])
+
+          console.log(accountBox)
         
           const boxes = [{appIndex: 0, name: accountBox}]
         
-          
-          let txn = algosdk.makeApplicationNoOpTxn(this.props.activeAddress, params, 1103370576, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+          let txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, 2638261330, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+
+          txns.push(txn)
         
-        
-        
-            let txId = txn.txID().toString();
-            // Sign the transaction
-        
-            let txns = [otxn, stxn, txn]
-        
-            let txgroup = algosdk.assignGroupID(txns)
-        
-        
+          let txId = txn.txID().toString();
+          // Sign the transaction
+              
+          let txgroup = algosdk.assignGroupID(txns)
+      
+          let encodedTxns= []
             
+          txns.forEach((txn) => {
+            let encoded = algosdk.encodeUnsignedTransaction(txn)
+            encodedTxns.push(encoded)
+    
+          })
+    
+          const signedTransactions = await signTransactions(encodedTxns)
+
+          props.setMessage("Sending Transaction...")
+          
+          const { id } = await sendTransactions(signedTransactions)
+
+          let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+
+          console.log(confirmedTxn)
+
+          props.setMessage("Transaction confirmed, asset has been mailed.")
         
-        
-            let multipleTxnGroups = [
-                {txn: otxn, signers: [this.props.activeAddress]},
-                {txn: stxn, signers: [this.props.activeAddress]},
-                {txn: txn, signers: [this.props.activeAddress]}
-              ];
-  
-              const signedTxn = await peraWallet.signTransaction([multipleTxnGroups]) 
-
-              txId = await client.sendRawTransaction(signedTxn).do();
-
-              this.setState({
-                confirm: "Sending Transaction..."
-              })
-
-              let confirmedTxn = await algosdk.waitForConfirmation(client, txId.txId, 4);
-
-
-              this.setState({
-                confirm: "Transaction Confirmed, Gift Successfully Sent"
-              })
-
-              this.updateDiscord()
         
         
      
           }catch(err){
-            this.props.sendDiscordMessage("Rewards/Gift", props.activeAddress, error)
+            console.log(err)
+            props.setMessage(err)
+            props.sendDiscordMessage("Rewards/Gift", activeAccount.address, err)
           }
          
   
@@ -186,7 +221,7 @@ export default class Gift extends React.Component {
 
     }
 
-    async updateDiscord() {
+    const updateDiscord = async () => {
 
       
 
@@ -221,20 +256,18 @@ export default class Gift extends React.Component {
   }
       
 
-    render() {
-
         return (
             <div style={{border: "1px solid white", margin: 20, borderRadius: 15}}>
               <br />
-              <Typography color="secondary" variant="h6" align="center"> Send a gift </Typography>
+              <Typography color="secondary" variant="h6" align="center"> Mail an asset </Typography>
               <br />
 
               <Grid container>
                 <Grid item xs={12} sm={6} md={6}>
                 <Typography color="secondary" variant="h6" align="center"> ASA ID </Typography>
                 <TextField                
-                    onChange={this.handleChange}
-                    value={this.state.asset}
+                    onChange={handleChange}
+                    value={asset}
                     multiline
                     type="number"
                     label=""
@@ -258,8 +291,8 @@ export default class Gift extends React.Component {
                <Typography color="secondary" variant="h6" align="center"> Amount </Typography>
 
                <TextField                
-                    onChange={this.handleChange}
-                    value={this.state.amount}
+                    onChange={handleChange}
+                    value={amount}
                     multiline
                     type="number"
                     label=""
@@ -283,8 +316,8 @@ export default class Gift extends React.Component {
                 <Typography color="secondary" variant="h6" align="center"> Receiver </Typography>
 
                 <TextField                
-                    onChange={this.handleChange}
-                    value={this.state.receiver}
+                    onChange={handleChange}
+                    value={receiver}
                     multiline
                     type="text"
                     label=""
@@ -316,10 +349,10 @@ export default class Gift extends React.Component {
 
                 
 
-                {this.state.asset && this.state.amount && this.state.receiver ? 
+                {asset && amount && receiver ? 
                 
-                <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => this.gift(Number(this.state.asset), Number(this.state.amount), String(this.state.receiver))}>
-                <Typography  variant="h6"> Send Gift {Number(this.state.proposal.length * 50).toLocaleString("en-US")} </Typography>
+                <Button variant="contained" color="secondary" style={{display: "flex", margin: "auto"}} onClick={() => gift()}>
+                <Typography variant="h6"> Send Gift </Typography>
               
 
 
@@ -334,13 +367,9 @@ export default class Gift extends React.Component {
     
                 <br />
 
-                <Typography color="secondary" variant="h6" align="center"> {this.state.confirm} </Typography>
-
-                <br />
 
                 
             </div>
         )
-    }
     
 }

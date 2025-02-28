@@ -50,7 +50,7 @@ export default function MyApp(props) {
 
   //council: 1225804311
 
-  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1434284594, swapper: 1632253886, dragonshorde: 1870514811, raffle: 2046845196}
+  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1434284594, swapper: 1632253886, dragonshorde: 1870514811, raffle: 2046845196, mailbox: 2638261330}
 
 
   const router = useRouter()
@@ -278,8 +278,8 @@ export default function MyApp(props) {
                     </Grid>
 
                     <Grid item xs={12} sm={4} style={{marginBottom: 50}}>
-                    <Button style={{backgroundColor: router.pathname == "/tools/imageai" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/tools/imageai">
-                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/tools/imageai" ? "#000000" : "#FFFFFF"}}> Image AI </Typography>
+                    <Button style={{backgroundColor: router.pathname == "/tools/mailbox" ? "#FFFFFF" : "#000000", border: "1px solid white", display: "flex", margin: "auto", padding: 10, borderRadius: 15}} href="/tools/mailbox">
+                        <Typography color="secondary" variant="h6" style={{color: router.pathname == "/tools/imageai" ? "#000000" : "#FFFFFF"}}> Mailbox </Typography>
                     </Button>
                     </Grid>
 

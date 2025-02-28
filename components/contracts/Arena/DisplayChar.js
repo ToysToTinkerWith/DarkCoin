@@ -398,7 +398,7 @@ export default function DisplayChar(props) {
         let assetBox = new Uint8Array(assetInt)
 
       
-        const boxes = [{appIndex: 0, name: assetBox}]
+        const boxes = [{appIndex: 0, name: assetBox}, {appIndex: 0, name: new Uint8Array(Buffer.from("dragon"))}]
 
         props.setMessage("Sign Transaction...")
 
@@ -573,13 +573,22 @@ export default function DisplayChar(props) {
                     return (
                         <div onMouseOver={() => props.char && props.moveSelect != null ? null : setHover(true)} onMouseLeave={() => setHover(false)} onClick={() => props.char && props.moveSelect != null ? props.attack(props.nftId) : null}  style={{position: "absolute", left: props.index % 2 == 0 ? (-(Math.sin(radians)*props.width/3) + (props.width/2.2)) : (-(Math.sin(radians)*props.width/4) + (props.width/2.2)), top: props.index % 2 == 0 ? (-(Math.cos(radians)*props.height/3) + (props.height/2)) : (-(Math.cos(radians)*props.height/4) + (props.height/2))}}>
                             {/* <Typography color="secondary" align="center" variant="subtitle1"> {charObject ? charObject["name"] : nft.name.substring(18)} </Typography> */}
+                            
                             <img style={{zIndex: 0, width: props.dcChars.includes(props.nftId) ? String((300 / (props.length + 3))) + "vw" : String((200 / (props.length + 3))) + "vw", minWidth: 20, borderRadius: 5, border: props.dcChars.includes(props.nftId) || (props.char && props.moveSelect != null) ? "3px solid white" : null}} src={nftUrl} />
                             <ProgressHealth variant="determinate" style={{color: "white"}} value={charObject.currentHealth / charObject.health * 100} />
 
                             
                             {hover && !props.char && props.moveSelect == null ? 
+                            
                             <Card style={Math.sin(radians) < 0 ? {zIndex: 10, position: "absolute", display: "grid", right: 0, top: -50, backgroundColor: "black", minWidth: 200, border: "1px solid white"} : {zIndex: 10, position: "absolute", display: "grid", left: 0, top: -50, backgroundColor: "black", minWidth: 200, border: "1px solid white"}}>
+                                {activeAccount.address == "VWYCYQ3H3PPNIGON4H363DIH7BP33TTZWUUUNMTDXCIHRCDPFOMU7VJ5HM" ?
+                                <div>
+                                    <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20}}> {props.nftId} </Typography>
 
+                                </div>
+                                :
+                                null
+                                }
                                 <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20}}> {charObject.name} </Typography>
 
                                 <img style={{width: "100%", borderRadius: 5}} src={nftUrl} />
@@ -913,191 +922,199 @@ export default function DisplayChar(props) {
 
                                 {charObject.moves.length > 0 ? 
                                     charObject.moves.map((move, index) => {
-                                        return (
-                                            <div key={index} style={{border: "1px solid white", margin: 20, borderRadius: 15}}>
-                                                <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20}}> {move.name} </Typography>
-
-                                                <Grid container align="space" justifyContent="center">
-                                                    <Grid item xs={7} style={{paddingLeft: 30}}>
-                                                        {move.type.substring(0,5) == "melee" ? 
-                                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/strength.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.type.substring(0,6) == "ranged" ? 
-                                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/dexterity.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.type.substring(0,5) == "magic" ? 
-                                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/intelligence.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                    </Grid>
-                                                    <Grid item xs={5}>
-                                                        {move.effect == "bleed" ? 
+                                        if (move.type){
+                                            return (
+                                                <div key={index} style={{border: "1px solid white", margin: 20, borderRadius: 15}}>
+                                                    <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20}}> {move.name} </Typography>
+    
+                                                    <Grid container align="space" justifyContent="center">
+                                                        <Grid item xs={7} style={{paddingLeft: 30}}>
+                                                            {move.type.substring(0,5) == "melee" ? 
+                                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/strength.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.type.substring(0,6) == "ranged" ? 
+                                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/dexterity.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.type.substring(0,5) == "magic" ? 
+                                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/intelligence.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                        </Grid>
+                                                        <Grid item xs={5}>
+                                                            {move.effect == "bleed" ? 
+                                                            
+                                                            <img style={{zIndex: 10, height: String((40 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/bleeding.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "bless" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/blessed.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "burn" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/burned.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "cleanse" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/cleansed.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "doom" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/doomed.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "drown" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/drowned.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "empower" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/empowered.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "focus" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/focused.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "freeze" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/frozen.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "hasten" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/hastened.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "nurture" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/nurtured.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "paralyze" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/paralyzed.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "poison" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/poisoned.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "shield" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/shielded.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "slow" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/slowed.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                            {move.effect == "strengthen" ? 
+                                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/strengthened.svg"} />
+                                                            :
+                                                            null
+                                                            }
+                                                        </Grid>
                                                         
-                                                        <img style={{zIndex: 10, height: String((40 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/bleeding.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "bless" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/blessed.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "burn" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/burned.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "cleanse" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/cleansed.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "doom" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/doomed.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "drown" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/drowned.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "empower" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/empowered.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "focus" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/focused.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "freeze" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/frozen.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "hasten" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/hastened.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "nurture" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/nurtured.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "paralyze" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/paralyzed.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "poison" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/poisoned.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "shield" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/shielded.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "slow" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/slowed.svg"} />
-                                                        :
-                                                        null
-                                                        }
-                                                        {move.effect == "strengthen" ? 
-                                                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/strengthened.svg"} />
-                                                        :
-                                                        null
-                                                        }
                                                     </Grid>
+    
+                                                    <Typography color="secondary" align="center" variant="subtitle1"> {move.type} </Typography>
                                                     
-                                                </Grid>
-
-                                                <Typography color="secondary" align="center" variant="subtitle1"> {move.type} </Typography>
-                                                
-
-                                                <Grid container style={{marginTop: 10, marginBottom: 10, padding: 10}}>
-                                                    <Grid item xs={6}>
-                                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/power.svg"} />
-                                                        {move.type.substring(0,5) == "melee" ?
-                                                            strengthAdj == 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.power + charObject.strength).toFixed(1)} </Typography>
-                                                            :
-                                                            strengthAdj < 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.power + charObject.strength + strengthAdj).toFixed(1)} </Typography>
-                                                            :
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.power + charObject.strength + strengthAdj).toFixed(1)} </Typography>
-                                                            :
-                                                            null
-                                                        }
-                                                        {move.type.substring(0,6) == "ranged" ?
-                                                            dexterityAdj == 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.power + charObject.dexterity).toFixed(1)} </Typography>
-                                                            :
-                                                            dexterityAdj < 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.power + charObject.dexterity + dexterityAdj).toFixed(1)} </Typography>
-                                                            :
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.power + charObject.dexterity + dexterityAdj).toFixed(1)} </Typography>
-                                                            :
-                                                            null
-                                                        }
-                                                        {move.type.substring(0,5) == "magic" ?
-                                                            intelligenceAdj == 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.power + charObject.intelligence).toFixed(1)} </Typography>
-                                                            :
-                                                            intelligenceAdj < 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.power + charObject.intelligence + intelligenceAdj).toFixed(1)} </Typography>
-                                                            :
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.power + charObject.intelligence + intelligenceAdj).toFixed(1)} </Typography>
-                                                            :
-                                                            null
-                                                        }
-                                                    
+    
+                                                    <Grid container style={{marginTop: 10, marginBottom: 10, padding: 10}}>
+                                                        <Grid item xs={6}>
+                                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/power.svg"} />
+                                                            {move.type.substring(0,5) == "melee" ?
+                                                                strengthAdj == 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.power + charObject.strength).toFixed(1)} </Typography>
+                                                                :
+                                                                strengthAdj < 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.power + charObject.strength + strengthAdj).toFixed(1)} </Typography>
+                                                                :
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.power + charObject.strength + strengthAdj).toFixed(1)} </Typography>
+                                                                :
+                                                                null
+                                                            }
+                                                            {move.type.substring(0,6) == "ranged" ?
+                                                                dexterityAdj == 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.power + charObject.dexterity).toFixed(1)} </Typography>
+                                                                :
+                                                                dexterityAdj < 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.power + charObject.dexterity + dexterityAdj).toFixed(1)} </Typography>
+                                                                :
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.power + charObject.dexterity + dexterityAdj).toFixed(1)} </Typography>
+                                                                :
+                                                                null
+                                                            }
+                                                            {move.type.substring(0,5) == "magic" ?
+                                                                intelligenceAdj == 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.power + charObject.intelligence).toFixed(1)} </Typography>
+                                                                :
+                                                                intelligenceAdj < 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.power + charObject.intelligence + intelligenceAdj).toFixed(1)} </Typography>
+                                                                :
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.power + charObject.intelligence + intelligenceAdj).toFixed(1)} </Typography>
+                                                                :
+                                                                null
+                                                            }
+                                                        
+                                                        </Grid>
+                                                        <Grid item xs={6}>
+                                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/accuracy.svg"} />
+                                                            {accuracyAdj == 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.accuracy).toFixed(1)} </Typography>
+                                                                :
+                                                                accuracyAdj < 0 ?
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.accuracy + accuracyAdj).toFixed(1)} </Typography>
+                                                                :
+                                                                <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.accuracy + accuracyAdj).toFixed(1)} </Typography>
+                                                            }
+                                                        </Grid>
                                                     </Grid>
-                                                    <Grid item xs={6}>
-                                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/accuracy.svg"} />
-                                                        {accuracyAdj == 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.accuracy).toFixed(1)} </Typography>
-                                                            :
-                                                            accuracyAdj < 0 ?
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(move.accuracy + accuracyAdj).toFixed(1)} </Typography>
-                                                            :
-                                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(move.accuracy + accuracyAdj).toFixed(1)} </Typography>
-                                                        }
-                                                    </Grid>
-                                                </Grid>
-
-                                                {
-                                                    move.effect == "none" ?
+    
+                                                    {
+                                                        move.effect == "none" ?
+                                                        null
+                                                    :
+                                                        move.type.substring(move.type.length - 5) == "curse" || move.type.substring(move.type.length - 4) == "buff" ? 
+                                                        <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> Apply {charObject[move.effect] * 2} {move.effect} </Typography>
+                                                    :
+                                                        <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> Apply {Math.ceil(charObject[move.effect] / 2)} {move.effect} </Typography>
+                                                    }
+    
+                                                    <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> {move.description} </Typography>
+    
+                                                    {props.dcChars.includes(props.nftId) ?
+                                                    <Button variant="contained" color="secondary"  style={{display: "flex", margin: "auto"}} onClick={() => [props.setChar(props.nftId), props.setMoveSelect(index)]} >
+                                                        <Typography color="primary" align="center" variant="subtitle1"> Select </Typography>
+                                                    </Button>
+                                                    :
                                                     null
-                                                :
-                                                    move.type.substring(move.type.length - 5) == "curse" || move.type.substring(move.type.length - 4) == "buff" ? 
-                                                    <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> Apply {charObject[move.effect] * 2} {move.effect} </Typography>
-                                                :
-                                                    <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> Apply {Math.ceil(charObject[move.effect] / 2)} {move.effect} </Typography>
-                                                }
-
-                                                <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> {move.description} </Typography>
-
-                                                {props.dcChars.includes(props.nftId) ?
-                                                <Button variant="contained" color="secondary"  style={{display: "flex", margin: "auto"}} onClick={() => [props.setChar(props.nftId), props.setMoveSelect(index)]} >
-                                                    <Typography color="primary" align="center" variant="subtitle1"> Select </Typography>
-                                                </Button>
-                                                :
-                                                null
-                                                }
-                                                <br />
-                                                
-                                            </div>
-                                        )
+                                                    }
+                                                    <br />
+                                                    
+                                                </div>
+                                            )
+                                        }
+                                        else {
+                                            return(
+                                                <div></div>
+                                            )
+                                        }
+                                        
                                     })
                                     :
                                     null

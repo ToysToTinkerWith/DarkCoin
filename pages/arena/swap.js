@@ -127,7 +127,7 @@ export default function Swap(props) {
                                 else if (asset.index == 1631224831 || (asset.index >= 1631236045 && asset.index <= 1631275042) || asset.index == 1792637776 || asset.index == 1792640216 || asset.index == 1935442966 || asset.index == 2156520475 || asset.index == 2311097574 || asset.index == 2311097577 || asset.index == 2311097585) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Head"})
                                 }
-                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
+                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792660153 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Armour"})
                                 }
                                 else if (asset.index >= 1631307699  && asset.index <= 1631309418 || asset.index == 2156520477 || asset.index == 2311097583) {
@@ -226,7 +226,7 @@ export default function Swap(props) {
                                 else if (asset.index == 1631224831 || (asset.index >= 1631236045 && asset.index <= 1631275042) || asset.index == 1792637776 || asset.index == 1792640216 || asset.index == 1935442966 || asset.index == 2156520475 || asset.index == 2311097574 || asset.index == 2311097577 || asset.index == 2311097585) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Head"})
                                 }
-                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
+                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792660153 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Armour"})
                                 }
                                 else if (asset.index >= 1631307699  && asset.index <= 1631309418 || asset.index == 2156520477 || asset.index == 2311097583) {
@@ -353,7 +353,7 @@ export default function Swap(props) {
                                 else if (asset.index == 1631224831 || (asset.index >= 1631236045 && asset.index <= 1631275042) || asset.index == 1792637776 || asset.index == 1792640216 || asset.index == 1935442966 || asset.index == 2156520475 || asset.index == 2311097574 || asset.index == 2311097577 || asset.index == 2311097585) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Head"})
                                 }
-                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
+                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792660153 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Armour"})
                                 }
                                 else if (asset.index >= 1631307699  && asset.index <= 1631309418 || asset.index == 2156520477 || asset.index == 2311097583) {
@@ -451,7 +451,7 @@ export default function Swap(props) {
                                 else if (asset.index == 1631224831 || (asset.index >= 1631236045 && asset.index <= 1631275042) || asset.index == 1792637776 || asset.index == 1792640216 || asset.index == 1935442966 || asset.index == 2156520475 || asset.index == 2311097574 || asset.index == 2311097577 || asset.index == 2311097585) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Head"})
                                 }
-                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
+                                else if ((asset.index >= 1631281879 && asset.index <= 1631305105) || asset.index == 1642179694 || asset.index == 1792660153 || asset.index == 1792645489 || asset.index == 1806077922 || asset.index == 2311097589) {
                                     ownedTraits.push({assetId: asset.index, name: asset.params.name, type: "Armour"})
                                 }
                                 else if (asset.index >= 1631307699  && asset.index <= 1631309418 || asset.index == 2156520477 || asset.index == 2311097583) {

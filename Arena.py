@@ -31,9 +31,11 @@ def approval_program():
     
 
     fight = Seq(
-        Assert(Gtxn[0].xfer_asset() == Int(1088771340)),
-        Assert(Gtxn[0].asset_amount() == App.globalGet(Txn.application_args[1])),
-        Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
+        Assert(Gtxn[0].amount() == Int(100000)),
+        Assert(Gtxn[0].receiver() == Global.current_application_address()),
+        Assert(Gtxn[1].xfer_asset() == Int(1088771340)),
+        Assert(Gtxn[1].asset_amount() == App.globalGet(Txn.application_args[1])),
+        Assert(Gtxn[1].asset_receiver() == Global.current_application_address()),
         If(
             Mod(Block.timestamp(Minus(Txn.first_valid(), Int(1))), Int(2)),
             Seq(
@@ -45,7 +47,6 @@ def approval_program():
                     TxnField.asset_amount: Mul(App.globalGet(Txn.application_args[1]), Int(2)),
                 }),
                 InnerTxnBuilder.Submit(),
-                App.box_put(Txn.application_args[2], Txn.application_args[4]),
                 App.globalDel(Txn.application_args[1]),
                 App.globalPut(Bytes("battleNum"), Add(App.globalGet(Bytes("battleNum")), Int(1)))
             ),
@@ -58,37 +59,40 @@ def approval_program():
                     TxnField.asset_amount:  Mul(App.globalGet(Txn.application_args[1]), Int(2)),
                 }),
                 InnerTxnBuilder.Submit(),
-                App.box_put(Txn.application_args[2], Txn.application_args[3]),
                 App.globalDel(Txn.application_args[1]),
                 App.globalPut(Bytes("battleNum"), Add(App.globalGet(Bytes("battleNum")), Int(1)))
 
             )
         ),
         Int(1)
-       
+    )
 
-
+    writeBattle = Seq(
+        Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
+        App.box_put(Txn.application_args[1], Txn.application_args[2]),
+        Int(1)
     )
 
     start = Seq(
-        Assert(Gtxn[0].xfer_asset() == Int(1088771340)),
-        Assert(Gtxn[0].asset_amount() >= Int(10000000000)),
-        Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
-        Assert(Gtxn[1].amount() == Int(500000)),
-        Assert(Gtxn[1].receiver() == Global.current_application_address()),
-        App.globalPut(Txn.application_args[1], Gtxn[0].asset_amount()),
-        Int(1)
-
+        If(App.globalGet(Txn.application_args[1]),
+           Int(0),
+           Seq(
+               Assert(Gtxn[0].xfer_asset() == Int(1088771340)),
+                Assert(Gtxn[0].asset_amount() >= Int(10000000000)),
+                Assert(Gtxn[0].asset_receiver() == Global.current_application_address()),
+                Assert(Gtxn[1].amount() == Int(100000)),
+                Assert(Gtxn[1].receiver() == Global.current_application_address()),
+                App.globalPut(Txn.application_args[1], Gtxn[0].asset_amount()),
+                Int(1)
+            )
+        )
     )
 
    
-    # doesn't need anyone to opt in
     handle_optin = Return(
         Seq(
             senderAssetBalance := AssetHolding.balance(Txn.sender(), Txn.assets[0]),
             Assert(senderAssetBalance.value() == Int(1)),
-            unitName := AssetParam.unitName(Txn.assets[0]),
-            Assert(Substring(unitName.value(), Int(0), Int(6)) == Bytes("DCCHAR")),
             App.localPut(Txn.sender(), Bytes("assetId"), Txn.assets[0]),
             App.localPut(Txn.sender(), Bytes("name"), Txn.application_args[0]),
             Int(1)
@@ -99,21 +103,20 @@ def approval_program():
             senderAssetBalance := AssetHolding.balance(Txn.sender(), Txn.assets[0]),
             Assert(senderAssetBalance.value() == Int(1)),
             unitName := AssetParam.unitName(Txn.assets[0]),
-            Assert(Substring(unitName.value(), Int(0), Int(6)) == Bytes("DCCHAR")),
             App.localPut(Txn.sender(), Bytes("assetId"), Txn.assets[0]),
             App.localPut(Txn.sender(), Bytes("name"), Txn.application_args[1]),
             Int(1)
     )
 
     reward = Seq(
-        Assert(Txn.sender() == Addr("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE")),
+        Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
         Assert(App.globalGet(Bytes("battleNum")) >= App.globalGet(Bytes("rewardBattle"))),
         App.globalPut(Bytes("rewardBattle"), Add(App.globalGet(Bytes("rewardBattle")), Int(100))),
         Int(1)
     )
 
     update = Seq(
-        Assert(Txn.sender() == Addr("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE")),
+        Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
         Assert(App.globalGet(Bytes("battleNum")) >= App.globalGet(Bytes("updateBattle"))),
         App.globalPut(Bytes("updateBattle"), Add(App.globalGet(Bytes("updateBattle")), Int(10))),
         Int(1)
@@ -168,6 +171,7 @@ def approval_program():
         [Txn.application_args[0] == Bytes("select"), Return(select)],
         [Txn.application_args[0] == Bytes("start"), Return(start)],
         [Txn.application_args[0] == Bytes("fight"), Return(fight)],
+        [Txn.application_args[0] == Bytes("writeBattle"), Return(writeBattle)],
         [Txn.application_args[0] == Bytes("reward"), Return(reward)],
         [Txn.application_args[0] == Bytes("update"), Return(update)],
         [Txn.application_args[0] == Bytes("globaldel"), Return(globaldel)],

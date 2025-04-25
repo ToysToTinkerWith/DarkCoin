@@ -17,6 +17,7 @@ import { useWallet } from '@txnlab/use-wallet'
 import multihash from "multihashes"
 
 import cid from 'cids'
+import Character from "./Character"
 
 export default function Swapper(props) { 
 
@@ -29,6 +30,8 @@ export default function Swapper(props) {
   const [ confirm, setConfirm ] = useState("")
 
   const [ char, setChar ] = useState(null)
+  const [ charObject, setCharObject ] = useState(null)
+
 
   const [ Background, setBackground ] = useState("None")
   const [ Skin, setSkin ] = useState("None")
@@ -63,268 +66,276 @@ export default function Swapper(props) {
 
   const [ newImage, setNewImage ] = useState(null)
 
+  const fetchData = async () => {
+
+    setCharObject(null)
+
+
+    let response = await fetch('/api/getNft', {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+          nftId: props.nftId
+        }),
+      
+          
+      });
+  
+  let session = await response.json()
+
+
+    const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
+
+    const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+    const ocid = CID.create(0, 0x70, mhdigest)
+
+  setNft(session.nft.assets[0].params)
+  setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
+
+  if (session.charObject != "none") {
+    setCharObject(session.charObject)
+  }
+
+  
+
+  if (props.zoom) {
+
+    let char = JSON.parse(session.charStats)
+  console.log(char)
+    setChar(char)
+
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+
+    let BackgroundId = 0
+    let SkinId = 0
+    let WeaponId = 0
+    let MagicId = 0
+    let HeadId = 0
+    let ArmourId = 0
+    let ExtraId = 0
+
+    let BackgroundBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("B"))])).do();
+    BackgroundId = byteArrayToLong(BackgroundBox.value)
+
+    let WeaponBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("W"))])).do();
+    WeaponId = byteArrayToLong(WeaponBox.value)
+    
+    let MagicBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("M"))])).do();
+    MagicId = byteArrayToLong(MagicBox.value)
+
+    let HeadBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("H"))])).do();
+    HeadId = byteArrayToLong(HeadBox.value)
+
+    let ArmourBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("A"))])).do();
+    ArmourId = byteArrayToLong(ArmourBox.value)
+
+    let ExtraBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("E"))])).do();
+    ExtraId = byteArrayToLong(ExtraBox.value)
+
+    let Background = "None"
+    let Skin = char.properties.Skin
+    let Weapon = "None"
+    let Magic = "None"
+    let Head = "None"
+    let Armour = "None"
+    let Extra = "None"
+
+    props.traits.forEach((trait) => {
+      if (trait.assetId == BackgroundId) {
+        Background = trait.name
+      }
+      
+      else if (trait.assetId == WeaponId) {
+        Weapon = trait.name
+      }
+      else if (trait.assetId == MagicId) {
+        Magic = trait.name
+      }
+      else if (trait.assetId == HeadId) {
+        Head = trait.name
+      }
+      else if (trait.assetId == ArmourId) {
+        Armour = trait.name
+      }
+      else if (trait.assetId == ExtraId) {
+        Extra = trait.name
+      }
+    })
+
+
+    let extraRef
+    let armourRef
+    let magicRef
+    let weaponRef
+    let headRef
+    let skinRef
+    let backgroundRef
+
+    if (Extra != "None") {
+      extraRef = ref(storage, "warriors/Extra/" + Extra + ".png");
+    }
+    if (Armour != "None") {
+        armourRef = ref(storage, "warriors/Armour/" + Armour + ".png");
+    }
+    if (Magic != "None") {
+        magicRef = ref(storage, "warriors/Magic/" + Magic + ".png");
+    }
+    if (Weapon != "None") {
+        weaponRef = ref(storage, "warriors/Weapon/" + Weapon + ".png");
+    }
+    headRef = ref(storage, "warriors/Head/" + Head + ".png");
+    skinRef = ref(storage, "warriors/Skin/" + Skin + ".png");
+    backgroundRef = ref(storage, "warriors/Background/" + Background.slice(0, Background.length - 11) + ".png");
+
+    let extraUrl = "None"
+    let armourUrl = "None"
+    let magicUrl = "None"
+    let weaponUrl = "None"
+    let headUrl = "None"
+    let skinUrl = "None"
+    let backgroundUrl = "None"
+    
+    if (Extra != "None") {
+        await getDownloadURL(extraRef)
+        .then((url) => {
+            extraUrl = url
+        })
+    }
+    if (Armour != "None") {
+        await getDownloadURL(armourRef)
+        .then((url) => {
+            armourUrl = url
+        })
+    }
+    if (Magic != "None") {
+        await getDownloadURL(magicRef)
+        .then((url) => {
+            magicUrl = url
+        })
+    }
+    if (Weapon != "None") {
+        await getDownloadURL(weaponRef)
+        .then((url) => {
+            weaponUrl = url
+        })
+    }
+    await getDownloadURL(headRef)
+    .then((url) => {
+        headUrl = url
+    })
+    await getDownloadURL(skinRef)
+    .then((url) => {
+        skinUrl = url
+    })
+    await getDownloadURL(backgroundRef)
+    .then((url) => {
+        backgroundUrl = url
+    })
+
+
+    setBackground(backgroundUrl)
+    setSkin(skinUrl)
+    setWeapon(weaponUrl)
+    setMagic(magicUrl)
+    setHead(headUrl)
+    setArmour(armourUrl)
+    setExtra(extraUrl)
+
+    setBackgroundChange("None")
+    setWeaponChange("None")
+    setMagicChange("None")
+    setHeadChange("None")
+    setArmourChange("None")
+    setExtraChange("None")
+
+    setBackgroundId(BackgroundId)
+    setWeaponId(WeaponId)
+    setMagicId(MagicId)
+    setHeadId(HeadId)
+    setArmourId(ArmourId)
+    setExtraId(ExtraId)
+
+    let backgrounds = []
+    let weapons = []
+    let magics = []
+    let heads = []
+    let armours = []
+    let extras = []
+
+    props.ownTraits.forEach(async (trait) => {
+      if (trait.type == "Background") {
+        await getDownloadURL(ref(storage, "warriors/Background/" + trait.name.slice(0, trait.name.length - 11) + ".png")).then((url) => {
+          console.log(url)
+          console.log(backgroundUrl)
+          if (!ownedBackgrounds.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != backgroundUrl) {
+            backgrounds.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+          }
+        })
+      }
+      if (trait.type == "Weapon") {
+        console.log(trait)
+        await getDownloadURL(ref(storage, "warriors/Weapon/" + trait.name + ".png")).then((url) => {
+          if (!ownedWeapons.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != weaponUrl) {
+            weapons.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+            console.log(ownedWeapons)
+
+          }
+        })
+      }
+      if (trait.type == "Magic") {
+        await getDownloadURL(ref(storage, "warriors/Magic/" + trait.name + ".png")).then((url) => {
+          if (!ownedMagics.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != magicUrl) {
+            magics.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+          }
+        })
+      }
+      if (trait.type == "Head") {
+        await getDownloadURL(ref(storage, "warriors/Head/" + trait.name + ".png")).then((url) => {
+          if (!ownedHeads.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != headUrl) {
+            heads.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+          }
+        })
+      }
+      if (trait.type == "Armour") {
+        await getDownloadURL(ref(storage, "warriors/Armour/" + trait.name + ".png")).then((url) => {
+          if (!ownedArmours.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != armourUrl) {
+            armours.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+          }
+        })
+      }
+      if (trait.type == "Extra") {
+        await getDownloadURL(ref(storage, "warriors/Extra/" + trait.name + ".png")).then((url) => {
+          if (!ownedExtras.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != extraUrl) {
+            extras.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
+          }
+        })
+      }
+    })
+
+    setOwnedBackgrounds(backgrounds)
+    setOwnedWeapons(weapons)
+    setOwnedMagics(magics)
+    setOwnedHeads(heads)
+    setOwnedArmours(armours)
+    setOwnedExtras(extras)
+  }
+
+       
+  
+
+    }
+
 
     useEffect(() => {
 
-      const fetchData = async () => {
-
-
-          let response = await fetch('/api/getNft', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                nftId: props.nftId
-              }),
-            
-                
-            });
-        
-        let session = await response.json()
-
-
-          const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
-
-          const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
-
-          const ocid = CID.create(0, 0x70, mhdigest)
-
-        setNft(session.nft.assets[0].params)
-        setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
-
-        
-
-        if (props.zoom) {
-
-          let char = JSON.parse(session.charStats)
-        console.log(char)
-          setChar(char)
-
-          const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-          let BackgroundId = 0
-          let SkinId = 0
-          let WeaponId = 0
-          let MagicId = 0
-          let HeadId = 0
-          let ArmourId = 0
-          let ExtraId = 0
-
-          let BackgroundBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("B"))])).do();
-          BackgroundId = byteArrayToLong(BackgroundBox.value)
-
-          let WeaponBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("W"))])).do();
-          WeaponId = byteArrayToLong(WeaponBox.value)
-          
-          let MagicBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("M"))])).do();
-          MagicId = byteArrayToLong(MagicBox.value)
-
-          let HeadBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("H"))])).do();
-          HeadId = byteArrayToLong(HeadBox.value)
-
-          let ArmourBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("A"))])).do();
-          ArmourId = byteArrayToLong(ArmourBox.value)
-
-          let ExtraBox = await client.getApplicationBoxByName(props.contracts.swapper, new Uint8Array([...longToByteArray(props.nftId), new Uint8Array(Buffer.from("E"))])).do();
-          ExtraId = byteArrayToLong(ExtraBox.value)
-
-          let Background = "None"
-          let Skin = char.properties.Skin
-          let Weapon = "None"
-          let Magic = "None"
-          let Head = "None"
-          let Armour = "None"
-          let Extra = "None"
-
-          props.traits.forEach((trait) => {
-            if (trait.assetId == BackgroundId) {
-              Background = trait.name
-            }
-            
-            else if (trait.assetId == WeaponId) {
-              Weapon = trait.name
-            }
-            else if (trait.assetId == MagicId) {
-              Magic = trait.name
-            }
-            else if (trait.assetId == HeadId) {
-              Head = trait.name
-            }
-            else if (trait.assetId == ArmourId) {
-              Armour = trait.name
-            }
-            else if (trait.assetId == ExtraId) {
-              Extra = trait.name
-            }
-          })
-
-
-          let extraRef
-          let armourRef
-          let magicRef
-          let weaponRef
-          let headRef
-          let skinRef
-          let backgroundRef
-
-          if (Extra != "None") {
-            extraRef = ref(storage, "warriors/Extra/" + Extra + ".png");
-          }
-          if (Armour != "None") {
-              armourRef = ref(storage, "warriors/Armour/" + Armour + ".png");
-          }
-          if (Magic != "None") {
-              magicRef = ref(storage, "warriors/Magic/" + Magic + ".png");
-          }
-          if (Weapon != "None") {
-              weaponRef = ref(storage, "warriors/Weapon/" + Weapon + ".png");
-          }
-          headRef = ref(storage, "warriors/Head/" + Head + ".png");
-          skinRef = ref(storage, "warriors/Skin/" + Skin + ".png");
-          backgroundRef = ref(storage, "warriors/Background/" + Background.slice(0, Background.length - 11) + ".png");
-
-          let extraUrl = "None"
-          let armourUrl = "None"
-          let magicUrl = "None"
-          let weaponUrl = "None"
-          let headUrl = "None"
-          let skinUrl = "None"
-          let backgroundUrl = "None"
-          
-          if (Extra != "None") {
-              await getDownloadURL(extraRef)
-              .then((url) => {
-                  extraUrl = url
-              })
-          }
-          if (Armour != "None") {
-              await getDownloadURL(armourRef)
-              .then((url) => {
-                  armourUrl = url
-              })
-          }
-          if (Magic != "None") {
-              await getDownloadURL(magicRef)
-              .then((url) => {
-                  magicUrl = url
-              })
-          }
-          if (Weapon != "None") {
-              await getDownloadURL(weaponRef)
-              .then((url) => {
-                  weaponUrl = url
-              })
-          }
-          await getDownloadURL(headRef)
-          .then((url) => {
-              headUrl = url
-          })
-          await getDownloadURL(skinRef)
-          .then((url) => {
-              skinUrl = url
-          })
-          await getDownloadURL(backgroundRef)
-          .then((url) => {
-              backgroundUrl = url
-          })
-
-
-          setBackground(backgroundUrl)
-          setSkin(skinUrl)
-          setWeapon(weaponUrl)
-          setMagic(magicUrl)
-          setHead(headUrl)
-          setArmour(armourUrl)
-          setExtra(extraUrl)
-
-          setBackgroundChange("None")
-          setWeaponChange("None")
-          setMagicChange("None")
-          setHeadChange("None")
-          setArmourChange("None")
-          setExtraChange("None")
-
-          setBackgroundId(BackgroundId)
-          setWeaponId(WeaponId)
-          setMagicId(MagicId)
-          setHeadId(HeadId)
-          setArmourId(ArmourId)
-          setExtraId(ExtraId)
-
-          let backgrounds = []
-          let weapons = []
-          let magics = []
-          let heads = []
-          let armours = []
-          let extras = []
-
-          props.ownTraits.forEach(async (trait) => {
-            if (trait.type == "Background") {
-              await getDownloadURL(ref(storage, "warriors/Background/" + trait.name.slice(0, trait.name.length - 11) + ".png")).then((url) => {
-                console.log(url)
-                console.log(backgroundUrl)
-                if (!ownedBackgrounds.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != backgroundUrl) {
-                  backgrounds.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
-                }
-              })
-            }
-            if (trait.type == "Weapon") {
-              console.log(trait)
-              await getDownloadURL(ref(storage, "warriors/Weapon/" + trait.name + ".png")).then((url) => {
-                if (!ownedWeapons.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != weaponUrl) {
-                  weapons.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
-                  console.log(ownedWeapons)
-
-                }
-              })
-            }
-            if (trait.type == "Magic") {
-              await getDownloadURL(ref(storage, "warriors/Magic/" + trait.name + ".png")).then((url) => {
-                if (!ownedMagics.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != magicUrl) {
-                  magics.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
-                }
-              })
-            }
-            if (trait.type == "Head") {
-              await getDownloadURL(ref(storage, "warriors/Head/" + trait.name + ".png")).then((url) => {
-                if (!ownedHeads.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != headUrl) {
-                  heads.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
-                }
-              })
-            }
-            if (trait.type == "Armour") {
-              await getDownloadURL(ref(storage, "warriors/Armour/" + trait.name + ".png")).then((url) => {
-                if (!ownedArmours.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != armourUrl) {
-                  armours.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
-                }
-              })
-            }
-            if (trait.type == "Extra") {
-              await getDownloadURL(ref(storage, "warriors/Extra/" + trait.name + ".png")).then((url) => {
-                if (!ownedExtras.includes({assetId: trait.assetId, name: trait.name, type: trait.type, url: url}) && url != extraUrl) {
-                  extras.push({assetId: trait.assetId, name: trait.name, type: trait.type, url: url})
-                }
-              })
-            }
-          })
-
-          setOwnedBackgrounds(backgrounds)
-          setOwnedWeapons(weapons)
-          setOwnedMagics(magics)
-          setOwnedHeads(heads)
-          setOwnedArmours(armours)
-          setOwnedExtras(extras)
-        }
-
-             
-        
-
-          }
-          fetchData();
-        
-          
-        }, [])
+      
+      fetchData();
+    
+      
+    }, [])
 
         const longToByteArray = (long) => {
           // we want to represent the input as a 8-bytes array
@@ -465,7 +476,8 @@ export default function Swapper(props) {
 
           try {
 
-        props.setMessage("Initializing transaction...")
+          props.setMessage("Initializing transaction...")
+          props.setProgress(0)
 
           let newMetadata = Object.assign({}, char)
 
@@ -547,6 +559,20 @@ export default function Swapper(props) {
           console.log(newHeadId)
           console.log(newArmourId)
           console.log(newExtraId)
+
+          let ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
+            activeAccount.address, 
+            "ZATKR4UKC6II7CGXVV4GOSEQLMVY72DBSEY5X4MMKQRT5SOPN3JZA6RWPA", 
+            undefined, 
+            undefined,
+            10000000000,  
+            undefined, 
+            1088771340, 
+            params
+          );
+
+          txns.push(ftxn)
+          signingIndex.push(signingIndex.length)
 
           if (newBackgroundId != 0) {
 
@@ -1175,7 +1201,6 @@ export default function Swapper(props) {
           if (ExtraChange == "Remove") {
             E = "None"
           }
-          
 
           let response1 = await fetch('/api/getHash', {
             method: "POST",
@@ -1190,13 +1215,64 @@ export default function Swapper(props) {
                 Magic: M,
                 Head: H,
                 Armour: A,
-                Extra: E
+                Extra: E,
+                charId: props.nftId
+
             }),
             
               
           });
   
           let session1 = await response1.json()
+
+          console.log(session1)
+
+          props.setMessage("Generating Character...")
+          props.setProgress(20)
+
+          let responseChar = await fetch('/api/arena/generateChar', {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                properties: newMetadata.properties,
+                charId: props.nftId,
+                url: session1.url
+            }),
+            
+              
+          });
+
+
+          let sessionChar = await responseChar.json()
+
+          console.log(sessionChar)
+
+          appArgs = []
+          appArgs.push(
+            new Uint8Array(Buffer.from("updateCharacter")),
+            new Uint8Array(Buffer.from(sessionChar))
+
+          )
+
+          accounts = []
+          foreignApps = []
+              
+          foreignAssets = [props.nftId]
+
+          intBox = longToByteArray(props.nftId)
+      
+          Box = new Uint8Array([...intBox])
+
+          boxes = [{appIndex: 0, name: Box}]
+
+          let ctxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.dragonshorde, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+          txns.push(ctxn)
+          signingIndex.push(signingIndex.length)
+
+
+          
   
           let reserve = algosdk.encodeAddress(
             multihash.decode(
@@ -1238,6 +1314,8 @@ export default function Swapper(props) {
     
           })
 
+          props.setProgress(100)
+
           props.setMessage("Sign transaction...")
 
     
@@ -1264,6 +1342,7 @@ export default function Swapper(props) {
 
           signedTransactions[signedTransactions.length - 1] = restoredSignedTxn
 
+          props.setProgress(0)
           props.setMessage("Sending transaction...")
 
           const { id } = await sendTransactions(signedTransactions)
@@ -1272,12 +1351,13 @@ export default function Swapper(props) {
 
           props.setMessage("NFT updated")
 
-          props.refetchData()
+          await props.refetchData()
+          await fetchData()
 
         }
 
         catch (error) {
-          props.setMessage(error)
+          props.setMessage(String(error))
         }
             
 
@@ -1285,10 +1365,12 @@ export default function Swapper(props) {
         }
 
         if (props.zoom) {
-          console.log(props.ownTraits)
+          console.log(charObject)
 
           return (
             <div>
+              <br />
+              <br />
               <Grid container align="center">
               
                 <Grid item xs={12} sm={12} md={6}>
@@ -1297,15 +1379,18 @@ export default function Swapper(props) {
                     <Button onClick={() => props.setSelWarrior(null)}>
                       <img style={{width: "100%", maxWidth: 500, border: "3px solid black", borderRadius: 15}} src={newImage} />
                     </Button>
-                    <Button style={{backgroundColor: "white"}} onClick={() => mint()}>
-                      <Typography variant="h6" > Update </Typography>
-                    </Button>
+                    
                   </div>
                 :
                   <Button onClick={() => props.setSelWarrior(null)}>
                       <img style={{width: "100%", maxWidth: 500, border: "3px solid black", borderRadius: 15}} src={nftUrl} />
                   </Button>
                 }
+                <Button style={{backgroundColor: "white", fontFamily: "Jacques", padding: 10}} onClick={() => mint()}>
+                      <Typography variant="h6" > Roll 10,000 </Typography>
+                      <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
+
+                    </Button>
                 </Grid>
                 {cat ? 
                   cat == "Background" ?
@@ -1547,9 +1632,17 @@ export default function Swapper(props) {
                     }
                   </Button>
                 </Grid>
+
+                {charObject ? 
+                  <Character nftId={props.nftId} contracts={props.contracts} setMessage={props.setMessage} />
+                  :
+                  null
+                }
                 </>
                 
                 }
+
+                
                 
 
               </Grid>
@@ -1558,7 +1651,14 @@ export default function Swapper(props) {
         }
         else {
           return (
-            <img style={{width: "100%", maxWidth: 500, border: "3px solid black", borderRadius: 15}} src={nftUrl} />
+            <div>
+              {charObject ? 
+                <Typography color="secondary" variant="caption" style={{position: "absolute", top: 20, left: "25%"}}> {charObject.name} </Typography>
+                :
+                null
+              }
+              <img style={{width: "100%", maxWidth: 500, border: "3px solid black", borderRadius: 15, border: charObject ? "3px solid white" : null}} src={nftUrl} />
+            </div>
           )
         }
 

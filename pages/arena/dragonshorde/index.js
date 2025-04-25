@@ -166,8 +166,8 @@ export default function DragonsHorde(props) {
 
 
                     contractBoxes.boxes.forEach((box) => {
-                        if (box.name.length == 8) {
-                            let assetId = byteArrayToLong(box.name)
+                        if (box.name.length == 15) {
+                            let assetId = byteArrayToLong(box.name.slice(0,8))
                         
                             brawlers.push(assetId)
                         }
@@ -430,18 +430,26 @@ export default function DragonsHorde(props) {
         <div>
             <div style={{height: "130vh", width: "100vw", position: "relative"}}>
 
-            <Typography color="secondary" align="center" variant="subtitle1"> Time til next round </Typography>
+                {drag ? 
+                <div>
+                    <Typography color="secondary" align="center" variant="subtitle1"> Time til next round </Typography>
 
-            <TimerBar variant="determinate" style={{display: "flex", margin: "auto", width: "50vw", color: "white"}} value={(((hours + (minutes / 60) + (seconds / 3600) + (offset / 60) + 1) % 24) / 24) * 100} />
+                    <TimerBar variant="determinate" style={{display: "flex", margin: "auto", width: "50vw", color: "white"}} value={(((hours + (minutes / 60) + (seconds / 3600) + (offset / 60) + 1) % 24) / 24) * 100} />
 
 
-            {typeof timeLeft === 'string' ?
-            <div>
-                <Typography color="secondary" align="center" variant="subtitle1"> {timeLeft} </Typography>
-            </div>
-            :
-            null
-            }
+                    {typeof timeLeft === 'string' ?
+                    <div>
+                        <Typography color="secondary" align="center" variant="subtitle1"> {timeLeft} </Typography>
+                    </div>
+                    :
+                    null
+                    }
+                </div>
+                :
+                null
+                }
+
+            
 
             
 
@@ -1185,7 +1193,7 @@ export default function DragonsHorde(props) {
             {dcChars.length > 0 ? 
             dcChars.map((nft, index) => {
                 return (
-                    <Grid key={index} item xs={6} sm={4} md={3} lg={2} >
+                    <Grid key={index} item xs={12} sm={6} md={4} lg={3} >
                         <DisplayChar drag={drag} nftId={nft} setNft={(nftId) => setCharSelect(nftId)} setMessage={props.setMessage} sendDiscordMessage={props.sendDiscordMessage} brawl={true} contracts={props.contracts} brawlChars={brawlChars} />
                         {/* <Button variant="contained" onClick={() => rollChar(nft)}> roll char </Button> */}
                         <br />

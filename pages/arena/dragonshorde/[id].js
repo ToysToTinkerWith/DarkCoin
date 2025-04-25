@@ -32,21 +32,21 @@ import * as digest from 'multiformats/hashes/digest'
     },
   }));
 
-  const ProgressHealth = styled(LinearProgress)(({ theme }) => ({
-    height: 5,
+  const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+    height: 10,
     borderRadius: 5,
     [`&.${linearProgressClasses.colorPrimary}`]: {
       backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
     },
     [`& .${linearProgressClasses.bar}`]: {
       borderRadius: 5,
-      backgroundColor: theme.palette.mode === 'light' ? '#B92C2C' : '#308fe8',
+      backgroundColor: theme.palette.mode === 'light' ? '#1a90ff' : '#308fe8',
     },
   }));
 
 
 
-export default function DisplayChar(props) {
+export default function Character(props) {
 
     const { activeAccount, signTransactions, sendTransactions } = useWallet()
 
@@ -57,6 +57,9 @@ export default function DisplayChar(props) {
     const [ charObject, setCharObject ] = useState(null)
     const [ action, setAction ] = useState(null)
 
+    const [ xp, setXp ] = useState(0)
+
+
     const [windowSize, setWindowSize] = useState([
         0,
         0,
@@ -64,6 +67,8 @@ export default function DisplayChar(props) {
 
     const [ tree, setTree ] = useState(null)
     const [ points, setPoints ] = useState(new Uint8Array(1600))
+    const [ oldPoints, setOldPoints ] = useState(new Uint8Array(1600))
+
     const [ trees, setTrees ] = useState([
         {
             skill1: {
@@ -436,98 +441,153 @@ export default function DisplayChar(props) {
     ])
 
     const router = useRouter()
+
+    const fetchData = async () => {
+
+        try {
+
+            console.log(Number(router.query.id))
+    
+    let response = await fetch('/api/getNft', {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            nftId: Number(router.query.id)
+          }),
+        
+            
+        });
+    
+    let session = await response.json()
+
+    console.log(session)
+
+    if (session.charObject != "none") {
+        setCharObject(session.charObject)
+    }
+    if (session.action) {
+        setAction(session.action)
+    }
+
+    if (session.nft.assets[0].params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
+        const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
+
+        const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+        const ocid = CID.create(0, 0x70, mhdigest)
+
+        let char = JSON.parse(session.charStats)
+        
+        let properties = JSON.stringify(char.properties)
+        setNft(session.nft.assets[0].params)
+        setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
+        setCharStats(properties)
+        
+    }
+    else {
+        setNft(session.nft.assets[0].params)
+        setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
+        setCharStats(session.charStats)
+    }
+
+    const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+
+    const txns = await indexerClient.searchForTransactions(1870514811).do();
+
+    console.log(txns)
+
+    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+
+    let assetBox = algosdk.encodeUint64(Number(router.query.id))
+
+    try {
+
+        console.log(assetBox)
+        console.log(props.contracts)
+
+        let accountBoxXp = await client.getApplicationBoxByName(props.contracts.dragonshorde, new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("xp"))])).do();
+        
+        console.log(accountBoxXp)
+        var length = accountBoxXp.value.length;
+
+        console.log(length)
+
+        let buffer = Buffer.from(accountBoxXp.value);
+        var result = buffer.readUIntBE(0, length);
+
+        console.log(result)
+
+        setXp(result)
+
+        let accountBoxPoints = await client.getApplicationBoxByName(props.contracts.dragonshorde, new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("points"))])).do();
+        
+        console.log(accountBoxPoints)
+        
+
+        setOldPoints(accountBoxPoints.value)
+        setPoints(accountBoxPoints.value)
+
+        
+    }
+    catch(err) {
+        console.log(err)
+    }
+
+    
+
+    const windowSizeHandler = () => {
+        setWindowSize([window.innerWidth, window.innerHeight]);
+      };
+      window.addEventListener("resize", windowSizeHandler);
+      setWindowSize([window.innerWidth, window.innerHeight])
+  
+      return () => {
+        window.removeEventListener("resize", windowSizeHandler);
+      };
+    
+
+        }
+        catch(error) {
+                //props.sendDiscordMessage(error, "Fetch Char", activeAccount.address)
+            
+           
+    }
+
+    }
     
     React.useEffect(() => {
-
-        const fetchData = async () => {
-
-            try {
-
-                console.log(Number(router.query.id))
-        
-        let response = await fetch('/api/getNft', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                nftId: Number(router.query.id)
-              }),
-            
-                
-            });
-        
-        let session = await response.json()
-
-        if (session.charObject != "none") {
-            setCharObject(session.charObject)
-        }
-        if (session.action) {
-            setAction(session.action)
-        }
-    
-        if (session.nft.assets[0].params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
-            const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
-
-            const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
-
-            const ocid = CID.create(0, 0x70, mhdigest)
-
-            let char = JSON.parse(session.charStats)
-            
-            let properties = JSON.stringify(char.properties)
-            setNft(session.nft.assets[0].params)
-            setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
-            setCharStats(properties)
-            
-        }
-        else {
-            setNft(session.nft.assets[0].params)
-            setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
-            setCharStats(session.charStats)
-        }
-
-        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
-
-        const txns = await indexerClient.searchForTransactions(1870514811).do();
-
-        console.log(txns)
-
-        const windowSizeHandler = () => {
-            setWindowSize([window.innerWidth, window.innerHeight]);
-          };
-          window.addEventListener("resize", windowSizeHandler);
-          setWindowSize([window.innerWidth, window.innerHeight])
-      
-          return () => {
-            window.removeEventListener("resize", windowSizeHandler);
-          };
-        
-    
-            }
-            catch(error) {
-                    //props.sendDiscordMessage(error, "Fetch Char", activeAccount.address)
-                
-               
-               }
-
-        }
 
         if (Number(router.query.id)) {
             fetchData();
         }
-
-        
-        
-    
-    
-    
-
         
 
     }, [router])
 
     const assignPoints = (byte, action, max, tier) => {
+
+        let level = 1
+        let nextLvl = 100
+        let prevLvl = 0
+
+    
+        while (xp >= nextLvl) {
+            prevLvl = nextLvl
+            nextLvl = nextLvl + (200 * level) + 100
+            level++
+        }
+
+        console.log(level)
+
+        let totalPoints = 0
+
+        for (let i = 0; i < points.length; i++) {
+            totalPoints += points[i]
+        }
+
+        console.log(totalPoints)
 
         let treeByte = Math.floor(byte / 100)
 
@@ -535,7 +595,10 @@ export default function DisplayChar(props) {
 
         let newPoints = points.slice()
 
-        if (tier == 1) {
+        if (totalPoints > (level - 1) && action == "plus") {
+
+        }
+        else if (tier == 1) {
             if (points[treeByte * 100] == 3) {
 
                 if (action == "plus") {
@@ -594,7 +657,6 @@ export default function DisplayChar(props) {
         .split(" ")
         // Transform each token
         .map(token => {
-            console.log(token.slice(token.length - 1))
 
         if (token.slice(token.length - 1) == "%") {
             return token
@@ -620,8 +682,84 @@ export default function DisplayChar(props) {
         .join(" ");
     }
 
+    const longToByteArray = (long) => {
+        // we want to represent the input as a 8-bytes array
+        var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
+    
+        for ( var index = byteArray.length - 1; index > 0; index -- ) {
+            var byte = long & 0xff;
+            byteArray [ index ] = byte;
+            long = (long - byte) / 256 ;
+        }
+    
+        return byteArray;
+    };
+
+    const applyPoints = async () => {
+
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+        
+        let params = await client.getTransactionParams().do();
+
+        const appArgs = []
+
+        appArgs.push(
+            new Uint8Array(Buffer.from("applyPoints")),
+            points
+        )
+
+            
+        const accounts = []
+        const foreignApps = []
+            
+        const foreignAssets = [Number(router.query.id)]
+
+        let assetInt = longToByteArray(Number(router.query.id))
+        
+        let assetBox = new Uint8Array([...assetInt, ...new Uint8Array(Buffer.from("points"))])    
+        
+        const boxes = [{appIndex: 0, name: assetBox}, {appIndex: 0, name: assetBox}]
+
+        props.setMessage("Sign Transaction...")
+
+        
+        let txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.dragonshorde, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+
+        let encoded = algosdk.encodeUnsignedTransaction(txn)
+    
+        const signedTransactions = await signTransactions([encoded])
+
+        props.setMessage("Sending Transaction...")
+
+        const { id } = await sendTransactions(signedTransactions)
+
+        let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+
+        props.setMessage("Transaction Confirmed, Skill Tree Updated")
+
+        fetchData()
+
+    }
+
+    const arraysEqual = (arr1, arr2) =>
+        arr1.length === arr2.length && arr1.every((val, i) => val === arr2[i]);
+
 
 if (charObject) {
+
+    let level = 1
+    let nextLvl = 100
+    let prevLvl = 0
+
+ 
+    while (xp >= nextLvl) {
+        prevLvl = nextLvl
+        nextLvl = nextLvl + (200 * level) + 100
+        level++
+    }
+
+    console.log(level)
+    
 
     let healthAdj = 0
     let speedAdj = 0
@@ -631,266 +769,134 @@ if (charObject) {
     let intelligenceAdj = 0
     let accuracyAdj = 0
 
-    if (charObject.effects["poison"]) {
-        healthAdj -= charObject.effects["poison"] * 1
-    }
-    if (charObject.effects["bleed"]) {
-        healthAdj -= charObject.effects["bleed"] * 0.7
-        strengthAdj -= charObject.effects["bleed"] * 0.1
-    }
-    if (charObject.effects["burn"]) {
-        healthAdj -= charObject.effects["burn"] * 0.5
-        intelligenceAdj -= charObject.effects["burn"] * 0.1
-        strengthAdj += charObject.effects["burn"] * 0.1
-        speedAdj += charObject.effects["burn"] * 0.2
-    }
-    if (charObject.effects["freeze"]) {
-        speedAdj -= charObject.effects["freeze"] * 0.2
-        dexterityAdj -= charObject.effects["freeze"] * 0.2
-    }
-    if (charObject.effects["slow"]) {
-        speedAdj -= charObject.effects["slow"] * 0.3
-        dexterityAdj -= charObject.effects["slow"] * 0.1
-    }
-    if (charObject.effects["paralyze"]) {
-        accuracyAdj -= charObject.effects["paralyze"] * 0.2
-    }
-    if (charObject.effects["drown"]) {
-        dexterityAdj -= charObject.effects["drown"] * 0.3
-        accuracyAdj -= charObject.effects["drown"] * 0.1
-    }
-    if (charObject.effects["doom"]) {
-        healthAdj -= charObject.effects["doom"] * 0.3
-        resistAdj -= charObject.effects["doom"] * 0.2
-        intelligenceAdj -= charObject.effects["doom"] * 0.2
+    if (charObject.effects) {
+        
+
+        if (charObject.effects["poison"]) {
+            healthAdj -= charObject.effects["poison"] * 1
+        }
+        if (charObject.effects["bleed"]) {
+            healthAdj -= charObject.effects["bleed"] * 0.7
+            strengthAdj -= charObject.effects["bleed"] * 0.1
+        }
+        if (charObject.effects["burn"]) {
+            healthAdj -= charObject.effects["burn"] * 0.5
+            intelligenceAdj -= charObject.effects["burn"] * 0.1
+            strengthAdj += charObject.effects["burn"] * 0.1
+            speedAdj += charObject.effects["burn"] * 0.2
+        }
+        if (charObject.effects["freeze"]) {
+            speedAdj -= charObject.effects["freeze"] * 0.2
+            dexterityAdj -= charObject.effects["freeze"] * 0.2
+        }
+        if (charObject.effects["slow"]) {
+            speedAdj -= charObject.effects["slow"] * 0.3
+            dexterityAdj -= charObject.effects["slow"] * 0.1
+        }
+        if (charObject.effects["paralyze"]) {
+            accuracyAdj -= charObject.effects["paralyze"] * 0.2
+        }
+        if (charObject.effects["drown"]) {
+            dexterityAdj -= charObject.effects["drown"] * 0.3
+            accuracyAdj -= charObject.effects["drown"] * 0.1
+        }
+        if (charObject.effects["doom"]) {
+            healthAdj -= charObject.effects["doom"] * 0.3
+            resistAdj -= charObject.effects["doom"] * 0.2
+            intelligenceAdj -= charObject.effects["doom"] * 0.2
+        }
+
+        
+        if (charObject.effects["strengthen"]) {
+            strengthAdj += charObject.effects["strengthen"] * 0.3
+        }
+        if (charObject.effects["empower"]) {
+            intelligenceAdj += charObject.effects["empower"] * 0.3
+        }
+        if (charObject.effects["hasten"]) {
+            dexterityAdj += charObject.effects["hasten"] * 0.3
+            speedAdj += charObject.effects["hasten"] * 0.1
+        }
+        if (charObject.effects["nurture"]) {
+            healthAdj += charObject.effects["nurture"] * 0.5
+        }
+        if (charObject.effects["bless"]) {
+            strengthAdj += charObject.effects["bless"] * 0.2
+            intelligenceAdj += charObject.effects["bless"] * 0.2
+            resistAdj += charObject.effects["bless"] * 0.1
+        }
+        if (charObject.effects["focus"]) {
+            accuracyAdj += charObject.effects["focus"] * 0.3
+        }
     }
 
+    let poisonAdj = oldPoints[0]
+    let bleedAdj = oldPoints[100]
+    let burnAdj = oldPoints[200]
+    let freezeAdj = oldPoints[300]
+    let slowAdj = oldPoints[400]
+    let drownAdj = oldPoints[500]
+    let paralyzeAdj = oldPoints[600]
+    let doomAdj = oldPoints[700]
+
+    let shieldAdj = oldPoints[800]
+    let strengthenAdj = oldPoints[900]
+    let focusAdj = oldPoints[1000]
+    let empowerAdj = oldPoints[1100]
+    let nurtureAdj = oldPoints[1200]
+    let blessAdj = oldPoints[1300]
+    let hastenAdj = oldPoints[1400]
+    let cleanseAdj = oldPoints[1500]
+
     
-    if (charObject.effects["strengthen"]) {
-        strengthAdj += charObject.effects["strengthen"] * 0.3
-    }
-    if (charObject.effects["empower"]) {
-        intelligenceAdj += charObject.effects["empower"] * 0.3
-    }
-    if (charObject.effects["hasten"]) {
-        dexterityAdj += charObject.effects["hasten"] * 0.3
-        speedAdj += charObject.effects["hasten"] * 0.1
-    }
-    if (charObject.effects["nurture"]) {
-        healthAdj += charObject.effects["nurture"] * 0.5
-    }
-    if (charObject.effects["bless"]) {
-        strengthAdj += charObject.effects["bless"] * 0.2
-        intelligenceAdj += charObject.effects["bless"] * 0.2
-        resistAdj += charObject.effects["bless"] * 0.1
-    }
-    if (charObject.effects["focus"]) {
-        accuracyAdj += charObject.effects["focus"] * 0.3
-    }
+
+    
 
     console.log(points)
+    console.log(oldPoints)
     
     return (
-        <div style={{position: "relative"}}>
+        <div >
             {/* <Typography color="secondary" align="center" variant="subtitle1"> {charObject ? charObject["name"] : nft.name.substring(18)} </Typography> */}
             
 
 
-            {trees.map((tree, index) => {
-                let radians = 2*Math.PI*(index/trees.length);
-                return (
-                    <div style={{position: "absolute", left: (-(Math.sin(radians)*windowSize[0]/3) + (windowSize[0]/2.3)), top: (-(Math.cos(radians)*200) + (100))}}>
-                        <Button style={{position: "absolute", width: "5%"}} onClick={() => setTree(tree)}>
-                            <img src={"/dragonshorde/trees/" + tree.skill1.title + ".svg"} style={{width: "100%"}}/>
-                        </Button>
-                    </div>
-                )
-            })}
 
-            
-            
-                           
-               <div style={{marginTop: 100, marginBottom: 200}}>
-                    <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20}}> {charObject.name} </Typography>
-                    <img style={{width: "20%", borderRadius: 5, display: "flex", margin: "auto", maxWidth: 200}} src={nftUrl} />
+                {/* <div style={{position: "relative"}}>
+
+                {trees.map((tree, index) => {
+                    let radians = 2*Math.PI*(index/trees.length);
+                    return (
+                        <div style={{position: "absolute", left: (-(Math.sin(radians)*windowSize[0]/3) + (windowSize[0]/2.3)), top: (-(Math.cos(radians)*200) + (500))}}>
+                            <Button style={{position: "absolute", width: "5%"}} onClick={() => setTree(tree)}>
+                                <img src={"/dragonshorde/trees/" + tree.skill1.title + ".svg"} style={{width: "100%"}}/>
+                            </Button>
+                        </div>
+                    )
+                })}
+
+                </div> */}
+
+                <div style={{marginTop: 100, marginBottom: 50}}>
+                    <Typography color="secondary" align="center" variant="h4" style={{fontFamily: "Jacques", margin: 20}}> {charObject.name} </Typography>
+                    <img style={{width: "50%", borderRadius: 5, display: "flex", margin: "auto", maxWidth: 500}} src={nftUrl} />
+                    
                 </div>
 
-                {tree ? 
-                <Grid container >
-                    <Grid item xs={12} sm={12} >
-                            <img src={"/dragonshorde/trees/" + tree.skill1.title + ".svg"} style={{width: "20%", display: "flex", margin: "auto"}}/>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{marginTop: 10}}> {tree.skill1.title} Practice </Typography>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", textTransform: 'none'}}> {tree.skill1.effect} </Typography>
-                            <Button style={{display: "flex", margin: "auto"}} onClick={() => assignPoints(tree.skill1.byte, "plus", tree.skill1.maxLevel, 0)}>
-                                <AddIcon style={{color: "#FFFFFF"}}/>
-                            </Button>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill1.byte]} / {tree.skill1.maxLevel} </Typography>
-                            <Button style={{display: "flex", margin: "auto"}} onClick={() => assignPoints(tree.skill1.byte, "minus", tree.skill1.maxLevel, 0)}>
-                                <RemoveIcon style={{color: "#FFFFFF"}}/>
-                            </Button>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {incrementNumbers(tree.skill1.effect, tree.skill1.byte)} </Typography>
+                <div style={{marginLeft: "25vw", marginRight: "25vw"}}>
+                    <BorderLinearProgress variant="determinate" style={{marginRight: 10, marginLeft: 10}} value={((xp - prevLvl) / (nextLvl - prevLvl)) * 100} />
+                    <Typography align="center" variant="caption" style={{fontFamily: "Jacques", display: "grid", color: "#FFFFFF"}}> {xp} / {nextLvl} </Typography>
 
-                    </Grid>
-                    <Grid item xs={6} sm={6} >
-                            <img src={"/dragonshorde/trees/tier1/" + tree.skill2.title + ".svg"} style={{height: 100, display: "flex", margin: "auto"}}/>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{marginTop: 10}}> {tree.skill2.title} </Typography>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", textTransform: 'none'}}> {tree.skill2.effect} </Typography>
-                            <Button style={{display: "flex", margin: "auto"}} onClick={() => assignPoints(tree.skill2.byte, "plus", tree.skill2.maxLevel, 1)}>
-                                <AddIcon style={{color: "#FFFFFF"}}/>
-                            </Button>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill2.byte]} / {tree.skill2.maxLevel} </Typography>
-                            <Button style={{display: "flex", margin: "auto"}} onClick={() => assignPoints(tree.skill2.byte, "minus", tree.skill2.maxLevel, 1)}>
-                                <RemoveIcon style={{color: "#FFFFFF"}}/>
-                            </Button>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {incrementNumbers(tree.skill2.effect, tree.skill2.byte)} </Typography>
+                    <Typography align="center" variant="h6" style={{fontFamily: "Jacques", display: "grid", margin: 10, color: "#FFFFFF"}}> Level {level} </Typography>
+                </div>
 
-                    </Grid>
-                    <Grid item xs={6} sm={6} >
-                            <img src={"/dragonshorde/trees/tier1/" + tree.skill3.title + ".svg"} style={{height: 100, display: "flex", margin: "auto"}}/>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{marginTop: 10}}> {tree.skill3.title}  </Typography>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", textTransform: 'none'}}> {tree.skill3.effect} </Typography>
-                            <Button style={{display: "flex", margin: "auto"}} onClick={() => assignPoints(tree.skill3.byte, "plus", tree.skill3.maxLevel, 1)}>
-                                <AddIcon style={{color: "#FFFFFF"}}/>
-                            </Button>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill3.byte]} / {tree.skill3.maxLevel} </Typography>
-                            <Button style={{display: "flex", margin: "auto"}} onClick={() => assignPoints(tree.skill3.byte, "minus", tree.skill3.maxLevel, 1)}>
-                                <RemoveIcon style={{color: "#FFFFFF"}}/>
-                            </Button>
-                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {incrementNumbers(tree.skill3.effect, tree.skill3.byte)} </Typography>
-
-                    </Grid>
-                    
-                </Grid>
-                :
-                null
-                }
-
-                <Grid container style={{padding: 20}}>
-                    {charObject.effects["bleed"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/bleeding.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.bleed} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["bless"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/blessed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.bless} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["burn"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/burned.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.burn} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["cleanse"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/cleansed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.cleanse} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["doom"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/doomed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.doom} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["drown"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/drowned.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.drown} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["empower"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/empowered.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.empower} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["focus"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/focused.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.focus} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["freeze"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/frozen.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.freeze} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["hasten"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/hastened.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.hasten} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["nurture"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/nurtured.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.nurture} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["paralyze"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/paralyzed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.paralyze} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["poison"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/poisoned.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.poison} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["shield"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/shielded.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.shield} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["slow"] ? 
-                        <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/slowed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.slow} </Typography>
-                    </Grid>                                :
-                    null
-                    }
-                    {charObject.effects["strengthen"] ? 
-                    <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/strengthened.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.effects.strengthen} </Typography>
-                    </Grid>
-                    :
-                    null
-                    }
-
-                    
-            
-                </Grid>
+                
 
                 {action ?
-                <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20, padding: 20, border: "1px solid white", borderRadius: 15}}>  {action.move.name} <ArrowForwardIcon /> {action.target} </Typography>
+                <Typography color="secondary" align="center" variant="subtitle1" style={{fontFamily: "Jacques", margin: 20, padding: 20, border: "1px solid white", borderRadius: 15}}>  {action.move.name} <ArrowForwardIcon /> {action.target} </Typography>
                 :
                 null
                 }
-
-
 
                 <Grid container style={{padding: 20}}> 
                     <Grid item xs={12}>
@@ -972,115 +978,115 @@ if (charObject) {
                 </Grid>
 
                 <Grid container style={{padding: 20}}>
-                    {charObject["bleed"] ? 
+                    {charObject["bleed"] + bleedAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/bleeding.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.bleed} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Bleed.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: bleedAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.bleed + bleedAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["bless"] ? 
+                    {charObject["bless"] + blessAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/blessed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.bless} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Bless.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: blessAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.bless + blessAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["burn"] ? 
+                    {charObject["burn"] + burnAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/burned.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.burn} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Burn.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: burnAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.burn + burnAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["cleanse"] ? 
+                    {charObject["cleanse"] + cleanseAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/cleansed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.cleanse} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Cleanse.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: cleanseAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.cleanse + cleanseAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["doom"] ? 
+                    {charObject["doom"] + doomAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/doomed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.doom} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Doom.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: doomAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.doom + doomAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["drown"] ? 
+                    {charObject["drown"] + drownAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/drowned.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.drown} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Drown.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: drownAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.drown + drownAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["empower"] ? 
+                    {charObject["empower"] + empowerAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/empowered.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.empower} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Empower.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: empowerAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.empower + empowerAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["focus"] ? 
+                    {charObject["focus"] + focusAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/focused.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.focus} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Focus.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: focusAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.focus + focusAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["freeze"] ? 
+                    {charObject["freeze"] + freezeAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/frozen.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.freeze} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Freeze.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: freezeAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.freeze + freezeAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["hasten"] ? 
+                    {charObject["hasten"] + hastenAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/hastened.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.hasten} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Hasten.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: hastenAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.hasten + hastenAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["nurture"] ? 
+                    {charObject["nurture"] + nurtureAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/nurtured.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.nurture} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Nurture.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: nurtureAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.nurture + nurtureAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["paralyze"] ? 
+                    {charObject["paralyze"] + paralyzeAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/paralyzed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.paralyze} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Paralyze.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: paralyzeAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.paralyze + paralyzeAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["poison"] ? 
+                    {charObject["poison"] + poisonAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/poisoned.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.poison} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Poison.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: poisonAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.poison + poisonAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["shield"] ? 
+                    {charObject["shield"] + shieldAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/shielded.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.shield} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Shield.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: shieldAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.shield + shieldAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["slow"] ? 
+                    {charObject["slow"] + slowAdj > 0 ? 
                         <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/slowed.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.slow} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Slow.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: slowAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.slow + slowAdj} </Typography>
                     </Grid>                                :
                     null
                     }
-                    {charObject["strengthen"] ? 
+                    {charObject["strengthen"] + strengthenAdj > 0 ? 
                     <Grid item xs={3} sm={3} md={3}>
-                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/effects/strengthened.svg"} />
-                        <Typography color="secondary" align="center" variant="subtitle1"> {charObject.strengthen} </Typography>
+                        <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/trees/Strengthen.svg"} />
+                        <Typography color="secondary" align="center" variant="subtitle1" style={{color: strengthenAdj > 0 ? "#4EC83E" : "#FFFFFF"}}> {charObject.strengthen + strengthenAdj} </Typography>
                     </Grid>
                     :
                     null
@@ -1090,116 +1096,88 @@ if (charObject) {
             
                 </Grid>
 
-                
+
+                <Grid container>
 
                 {charObject.moves.length > 0 ? 
                     charObject.moves.map((move, index) => {
+                        let bonus = 0
+                        console.log(move)
+                        if (move.effect == "bleed") {
+                            bonus = bleedAdj
+                        }
+                        else if (move.effect == "bless") {
+                            bonus = blessAdj
+                        }
+                        else if (move.effect == "burn") {
+                            bonus = burnAdj
+                        }
+                        else if (move.effect == "cleanse") {
+                            bonus = cleanseAdj
+                        }
+                        else if (move.effect == "doom") {
+                            bonus = doomAdj
+                        }
+                        else if (move.effect == "drown") {
+                            bonus = drownAdj
+                        }
+                        else if (move.effect == "empower") {
+                            bonus = empowerAdj
+                        }
+                        else if (move.effect == "focus") {
+                            bonus = focusAdj
+                        }
+                        else if (move.effect == "freeze") {
+                            bonus = freezeAdj
+                        }
+                        else if (move.effect == "hasten") {
+                            bonus = hastenAdj
+                        }
+                        else if (move.effect == "nurture") {
+                            bonus = nurtureAdj
+                        }
+                        else if (move.effect == "paralyze") {
+                            bonus = paralyzeAdj
+                        }
+                        else if (move.effect == "poison") {
+                            bonus = poisonAdj
+                        }
+                        else if (move.effect == "shield") {
+                            bonus = shieldAdj
+                        }
+                        else if (move.effect == "slow") {
+                            bonus = slowAdj
+                        }
+                        else if (move.effect == "strengthen") {
+                            bonus = strengthenAdj
+                        }
+                        console.log(bonus)
                         if (move.type){
                             return (
-                                <div key={index} style={{border: "1px solid white", margin: 20, borderRadius: 15}}>
-                                    <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20}}> {move.name} </Typography>
+                                <Grid item sm={6} md={6} lg={3} key={index} style={{border: "1px solid white", padding: 20, borderRadius: 15}}>
+                                    <Typography color="secondary" align="center" variant="subtitle1" style={{fontFamily: "Jacques", margin: 20}}> {move.name} </Typography>
+                                    <img src={move.url} style={{width: "50%", maxWidth: 400, display: "flex", margin: "auto"}} />
+                                    <br />
 
                                     <Grid container align="space" justifyContent="center">
-                                        <Grid item xs={7} style={{paddingLeft: 30}}>
+                                        <Grid item xs={12} style={{}}>
                                             {move.type.substring(0,5) == "melee" ? 
-                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/strength.svg"} />
+                                            <img style={{zIndex: 10, width: 100, minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/strength.svg"} />
                                             :
                                             null
                                             }
                                             {move.type.substring(0,6) == "ranged" ? 
-                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/dexterity.svg"} />
+                                            <img style={{zIndex: 10, width: 100, minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/dexterity.svg"} />
                                             :
                                             null
                                             }
                                             {move.type.substring(0,5) == "magic" ? 
-                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5}} src={"/dragonshorde/intelligence.svg"} />
+                                            <img style={{zIndex: 10, width: 100, minWidth: 50, maxWidth: 60, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/intelligence.svg"} />
                                             :
                                             null
                                             }
                                         </Grid>
-                                        <Grid item xs={5}>
-                                            {move.effect == "bleed" ? 
-                                            
-                                            <img style={{zIndex: 10, height: String((40 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/bleeding.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "bless" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/blessed.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "burn" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/burned.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "cleanse" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/cleansed.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "doom" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/doomed.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "drown" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/drowned.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "empower" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/empowered.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "focus" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/focused.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "freeze" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/frozen.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "hasten" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/hastened.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "nurture" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/nurtured.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "paralyze" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/paralyzed.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "poison" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/poisoned.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "shield" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/shielded.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "slow" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/slowed.svg"} />
-                                            :
-                                            null
-                                            }
-                                            {move.effect == "strengthen" ? 
-                                            <img style={{zIndex: 10, height: String((50 / (props.length + 3))) + "vw", minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5}} src={"/dragonshorde/effects/strengthened.svg"} />
-                                            :
-                                            null
-                                            }
-                                        </Grid>
+                                        
                                         
                                     </Grid>
 
@@ -1208,7 +1186,7 @@ if (charObject) {
 
                                     <Grid container style={{marginTop: 10, marginBottom: 10, padding: 10}}>
                                         <Grid item xs={6}>
-                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/power.svg"} />
+                                            <img style={{zIndex: 10, width: 100, minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/power.svg"} />
                                             {move.type.substring(0,5) == "melee" ?
                                                 strengthAdj == 0 ?
                                                 <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.power + charObject.strength).toFixed(1)} </Typography>
@@ -1245,7 +1223,7 @@ if (charObject) {
                                         
                                         </Grid>
                                         <Grid item xs={6}>
-                                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/accuracy.svg"} />
+                                            <img style={{zIndex: 10, width: 100, minWidth: 40, maxWidth: 60, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/accuracy.svg"} />
                                             {accuracyAdj == 0 ?
                                                 <Typography color="secondary" align="center" variant="subtitle1"> {Number(move.accuracy).toFixed(1)} </Typography>
                                                 :
@@ -1257,21 +1235,109 @@ if (charObject) {
                                         </Grid>
                                     </Grid>
 
+                                    
+
                                     {
                                         move.effect == "none" ?
                                         null
                                     :
                                         move.type.substring(move.type.length - 5) == "curse" || move.type.substring(move.type.length - 4) == "buff" ? 
-                                        <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> Apply {charObject[move.effect] * 2} {move.effect} </Typography>
+                                        <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10, color: bonus > 0 ? "#4EC83E" : null}}> Apply {(charObject[move.effect] + bonus) * 2} {move.effect} </Typography>
                                     :
-                                        <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> Apply {Math.ceil(charObject[move.effect] / 2)} {move.effect} </Typography>
+                                        <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10, color: bonus > 0 ? "#4EC83E" : null}}> Apply {Math.ceil((charObject[move.effect] + bonus) / 2)} {move.effect} </Typography>
                                     }
+
+                                        <Grid item xs={5} style={{display: "flex", margin: "auto"}}>
+                                            {move.effect == "bleed" ? 
+                                            
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Bleed.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "bless" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Bless.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "burn" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Burn.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "cleanse" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Cleanse.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "doom" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Doom.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "drown" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Drown.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "empower" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Empower.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "focus" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Focus.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "freeze" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Freeze.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "hasten" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Hasten.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "nurture" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Nurture.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "paralyze" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Paralyze.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "poison" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Poison.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "shield" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Shield.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "slow" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Slow.svg"} />
+                                            :
+                                            null
+                                            }
+                                            {move.effect == "strengthen" ? 
+                                            <img style={{zIndex: 10, height: 100, minHeight: 40, maxHeight: 50, borderRadius: 5, padding: 5, display: "flex", margin: "auto"}} src={"/dragonshorde/trees/Strengthen.svg"} />
+                                            :
+                                            null
+                                            }
+                                        </Grid>
 
                                     <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> {move.description} </Typography>
 
                                     <br />
+
                                     
-                                </div>
+                                    
+                                </Grid>
                             )
                         }
                         else {
@@ -1284,7 +1350,73 @@ if (charObject) {
                     :
                     null
                 }
+                </Grid>
+                 <br />
+                 <br />
+                 <Typography color="secondary" align="center" variant="h4" style={{fontFamily: "Jacques", margin: 20}}> Skill Tree </Typography>
 
+                 <br />
+                 <br />
+                <Grid container style={{}}>
+
+                    {trees.map((treeNode, index) => {
+                        return (
+                            <Grid item xs={3} sm={12/8} md={6/8} style={{}}>
+                                <Button style={{width: "5%"}} onClick={() => treeNode == tree ? setTree(null) : setTree(treeNode)}>
+                                    <img src={"/dragonshorde/trees/" + treeNode.skill1.title + ".svg"} style={{width: "100%"}}/>
+                                </Button>
+                            </Grid>
+                        )
+                    })}
+
+                    </Grid>
+
+                    <br />
+                    <br />
+
+
+                    {tree ? 
+                    <Grid container >
+                        <Grid item xs={12} sm={12} >
+                                <img src={"/dragonshorde/trees/" + tree.skill1.title + ".svg"} style={{width: "20%", display: "flex", margin: "auto"}}/>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{marginTop: 10, paddingLeft: 30, paddingRight: 30}}> {tree.skill1.title} Practice </Typography>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", textTransform: 'none', paddingLeft: 30, paddingRight: 30}}> {tree.skill1.effect} </Typography>
+                          
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill1.byte]} / {tree.skill1.maxLevel} </Typography>
+                           
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill1.effect, tree.skill1.byte)} </Typography>
+
+                        </Grid>
+                        <Grid item xs={6} sm={6} >
+                                <img src={"/dragonshorde/trees/tier1/" + tree.skill2.title + ".svg"} style={{height: 100, display: "flex", margin: "auto"}}/>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{marginTop: 10, paddingLeft: 30, paddingRight: 30}}> {tree.skill2.title} </Typography>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", textTransform: 'none', paddingLeft: 30, paddingRight: 30}}> {tree.skill2.effect} </Typography>
+                             
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill2.byte]} / {tree.skill2.maxLevel} </Typography>
+                              
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill2.effect, tree.skill2.byte)} </Typography>
+
+                        </Grid>
+                        <Grid item xs={6} sm={6} >
+                                <img src={"/dragonshorde/trees/tier1/" + tree.skill3.title + ".svg"} style={{height: 100, display: "flex", margin: "auto"}}/>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{marginTop: 10, paddingLeft: 30, paddingRight: 30}}> {tree.skill3.title}  </Typography>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", textTransform: 'none', paddingLeft: 30, paddingRight: 30}}> {tree.skill3.effect} </Typography>
+                             
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill3.byte]} / {tree.skill3.maxLevel} </Typography>
+                              
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill3.effect, tree.skill3.byte)} </Typography>
+
+                        </Grid>
+                        
+                    </Grid>
+                    :
+                    null
+                    }
+
+                    <br />
+                    <br />
+                    <br />
+              
             
         </div>
 

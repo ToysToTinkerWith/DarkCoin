@@ -66,8 +66,6 @@ export default function Proposals(props) {
         let string = new TextDecoder().decode(responseProposal.value)
 
         window.location.href = "/council/proposals/" + string
-          
-        
         
       }
 

@@ -4,33 +4,50 @@ import Head from "next/head"
 
 import { Grid, Typography, Button } from "@mui/material"
 
-export default class Index extends React.Component { 
+import { motion } from "framer-motion"
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            activeAddress: null,
-            walletType: "",
-            place: "",
-            error: "",
-        };
+import { useRef } from "react";
+
+export default function Index(props) { 
+
+
+        const arenaRef = useRef(null);
+        const councilRef = useRef(null);
+        const mailboxRef = useRef(null);
         
-    }
-
-    async componentDidMount() {
-
-    
-
-    }
-
-    
-   
-
-    render() {
+        
+        
+        
+          const handleMouseEnterArena = () => {
+            arenaRef.current.play();
+          };
+        
+          const handleMouseLeaveArena = () => {
+            arenaRef.current.pause();
+            arenaRef.current.currentTime = 0;
+          };
+        
+          const handleMouseEnterCouncil = () => {
+            councilRef.current.play();
+          };
+        
+          const handleMouseLeaveCouncil = () => {
+            councilRef.current.pause();
+            councilRef.current.currentTime = 0;
+          };
+        
+          const handleMouseEnterMailbox = () => {
+            mailboxRef.current.play();
+          };
+        
+          const handleMouseLeaveMailbox = () => {
+            mailboxRef.current.pause();
+            mailboxRef.current.currentTime = 0;
+          };
 
 
         return (
-            <div >
+            <div>
                 <Head>
                 <title>Dark Coin</title>
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,113 +57,102 @@ export default class Index extends React.Component {
                 
                 </Head>
 
+                <div> 
 
-                    <Grid container>
-                    <Grid item xs={12} sm={4}>
-                        <Button 
-                        style={{display: "grid", margin: "auto", marginBottom: 50}}
-                        href="/council">
-                        <img src="council.png" style={{display: "flex", margin: "auto", height: 75}} />
-                        <Typography align="center" variant="h5" color="secondary">
-                            Council
-                        </Typography>
-                        </Button>
-                    </Grid>
-                    <Grid item xs={12} sm={4}>
-                        <Button 
-                        style={{display: "grid", margin: "auto", marginBottom: 50}}
-                        href="/market">
-                        <img src="market.svg" style={{display: "flex", margin: "auto", height: 75}} />
-                        <Typography align="center" variant="h5" color="secondary">
-                            Market
-                        </Typography>
-                        </Button>
-                    </Grid>
-                    {/* <Grid item xs={12} sm={4}>
-                        <Button 
-                        style={{display: "grid", margin: "auto", marginBottom: 50}}
-                        onClick={() => this.setState({place: "mixer"})}>
-                        <img src="mixer.svg" style={{display: "flex", margin: "auto", height: 75}} />
-                        <Typography align="center" variant="h5" color="secondary">
-                            Mixer
-                        </Typography>
-                        </Button>
-                    </Grid> */}
-                    
-                    <Grid item xs={12} sm={4}>
-                    <Button 
-                    style={{display: "grid", margin: "auto", marginBottom: 50}}
-                    href="/arena">
-                    <img src="arena.svg" style={{display: "flex", margin: "auto", height: 75}} />
-                    <Typography align="center" variant="h5" color="secondary">
-                        Arena
-                    </Typography>
-                    </Button>
-                </Grid>
-                <Grid item xs={12} sm={12}>
-                    <Button 
-                    style={{display: "grid", margin: "auto", marginBottom: 50}}
-                    href="/tools">
-                    <img src="tools.svg" style={{display: "flex", margin: "auto", height: 75}} />
-                    <Typography align="center" variant="h5" color="secondary">
-                        Tools
-                    </Typography>
-                    </Button>
-                </Grid>
-                {/* <Grid item xs={12} sm={6}>
-                    <Button 
-                    style={{display: "grid", margin: "auto", marginBottom: 50}}
-                    href="/ASAblasters">
-                    <img src="ASAblasters.svg" style={{display: "flex", margin: "auto", height: 75}} />
-                    <Typography align="center" variant="h5" color="secondary">
-                        ASAblasters
-                    </Typography>
-                    </Button>
-                </Grid> */}
-                    
-                    
-                    </Grid>
-                    
-                
-                <br />
-                <br />
+                    <Grid container style={{marginTop: 150}}>
 
-                <Grid container align="center" spacing={3}>
-                <Grid item xs={12} sm={12} md={12}>
-                        <Button style={{border: "1px solid white", padding: 20, borderRadius: 15}}  onClick={() => window.open("https://discord.com/invite/GWB89qusjQ")}>
-                            <Typography color="secondary" align="center" variant="h5">
-                                Dark Discord
-                            </Typography>
-                            <img style={{paddingLeft: 10, width: 70}} src="/discord.jpg"/>
+                    
+                    <Grid item xs={12} sm={6} md={6}>
+                        <Button component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
+                        onClick={() => window.location.href = "/arena"}
+                        >
+
+                        
+                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: 20, bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Arena </Typography>
+                            
+                        
+                            <video  
+                                ref={arenaRef}
+                                muted
+                                loop
+                                playsInline
+                                preload="metadata"
+                                onMouseEnter={handleMouseEnterArena}
+                                onMouseLeave={handleMouseLeaveArena} 
+                                style={{width: "100%", border: "3px solid white"}}>
+                                <source src={"home/arena.mp4"} type='video/mp4'  />
+                            </video>      
+                            
+
                         </Button>
-                        <br />
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={6}> 
-                        <Button style={{border: "1px solid white", padding: 20, borderRadius: 15}} onClick={() => window.open("https://dark-coin.io/")}>
-                            <Typography color="secondary" align="center" variant="h5">
-                                Dark Paper
-                            </Typography>
-                            <img style={{paddingLeft: 10}} src="./DarkPaper.svg"/>
-                        </Button>
-                        <br />
-                        </Grid>
-                        <Grid item xs={12} sm={12} md={6}>
-                        <Button style={{border: "1px solid white", padding: 20, borderRadius: 15}}  onClick={() => window.open("https://github.com/ToysToTinkerWith/DarkCoin")}>
-                            <Typography color="secondary" align="center" variant="h5">
-                                Dark Repo
-                            </Typography>
-                            <img style={{paddingLeft: 10}} src="./DarkRepo.svg"/>
-                        </Button>
-                        <br />
-                        </Grid>
-                       
 
                     </Grid>
+
+                    <Grid item xs={12} sm={6} md={6} >
+
+
+                        <Button component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
+                        onClick={() => window.location.href = "/council"}
+                        >
+
+                        
+                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: 20, bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Council </Typography>
+                            
+                            <video  
+                                ref={councilRef}
+                                muted
+                                loop
+                                playsInline
+                                preload="metadata"
+                                onMouseEnter={handleMouseEnterCouncil}
+                                onMouseLeave={handleMouseLeaveCouncil} 
+                                style={{width: "100%", border: "3px solid white", display: "flex", margin: "auto"}}>
+                                <source src={"home/council.mp4"} type='video/mp4'  />
+                            </video>      
+                        
+
+                        </Button>
+
+                    </Grid>
+
+                    <Grid item xs={6} sm={4} md={4} >
+
+
+                        <Button component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
+                        onClick={() => window.location.href = "/tools/mailbox"}
+                        >
+
+                        
+                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: 20, bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Mailbox </Typography>
+                            
+                            <video  
+                                ref={mailboxRef}
+                                muted
+                                loop
+                                playsInline
+                                preload="metadata"
+                                onMouseEnter={handleMouseEnterMailbox}
+                                onMouseLeave={handleMouseLeaveMailbox} 
+                                style={{width: "100%", border: "3px solid white", display: "flex", margin: "auto"}}>
+                                <source src={"home/mailbox.mp4"} type='video/mp4'  />
+                            </video>      
+                        
+
+                        </Button>
+
+                    </Grid>
+
+                    </Grid>
+
+
+
+                </div>
+                    
 
                 
 
             </div>
         )
-    }
+    
     
 }

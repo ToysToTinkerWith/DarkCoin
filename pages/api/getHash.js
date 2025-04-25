@@ -8,6 +8,24 @@ const { Readable } = require('stream');
 
 const Jimp = require('jimp') ;
 
+import { initializeApp, getApps } from "firebase/app"
+import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage"
+
+
+const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+}
+
+let firebase_app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+
+const storage = getStorage(firebase_app)
+
 
 async function getHash(req, res) {
    // Run the cors middleware
@@ -21,6 +39,16 @@ async function getHash(req, res) {
    });
 
     return new Promise(async (resolve) => {
+
+            async function readableToBlob(readable, mimeType = 'application/octet-stream') {
+                const chunks = [];
+                
+                for await (const chunk of readable) {
+                chunks.push(chunk);
+                }
+            
+                return new Blob(chunks, { type: mimeType });
+            }
             
               pinata.testAuthentication().then(async () => {
 
@@ -99,6 +127,14 @@ async function getHash(req, res) {
 
                     const reader = Readable.from(buffer);
 
+                    console.log(buffer)
+                    console.log(reader)
+
+                    const blob = new Blob([buffer], { type: 'image/png' });
+
+                    console.log(blob)
+
+
                     const options = {
                         pinataMetadata: {
                             name: req.body.name,
@@ -108,15 +144,36 @@ async function getHash(req, res) {
                         }
                     };
 
+                    pinata.pinFileToIPFS(reader, options).then((result) => {
+                        //handle results here
 
-                        pinata.pinFileToIPFS(reader, options).then((result) => {
-                            //handle results here
-                            let ipfs = result.IpfsHash
-                                
-                            res.json({ hash: ipfs })
+                        console.log(result)
+
+                        let ipfs = result.IpfsHash
+
+                        const storageRef = ref(storage, 'moves/' + req.body.charId);
+
+                        uploadBytes(storageRef, blob).then((snapshot) => getDownloadURL(snapshot.ref)).then(async (downloadUrl) => {
+                            console.log(downloadUrl)
+                            console.log(ipfs)
+
+                
+                            res.json({ hash: ipfs, url: downloadUrl })
                             resolve()
 
+                            
                         })
+                        
+
+                    })
+                   
+
+                    
+
+                    
+
+
+                        
 
                     })
 

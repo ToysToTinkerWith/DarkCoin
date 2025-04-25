@@ -31,17 +31,17 @@ async function getAddrAssets(req, res) {
   
   responseAddr.assets.forEach((asset) => {
     if (asset.amount > 0) {
-        addrAssets.push(asset["asset-id"])
+        addrAssets.push(asset)
     }
   })
 
 
   while (responseAddr.assets.length == 1000) {
-    responseAddr = await indexerClient.lookupAccountCreatedAssets(req.body.activeAccount).nextToken(nextTokenAddr).limit(1000).do();
+    responseAddr = await indexerClient.lookupAccountAssets(req.body.activeAccount).nextToken(nextTokenAddr).limit(1000).do();
     nextTokenAddr = responseAddr["next-token"]
     responseAddr.assets.forEach((asset) => {
         if (asset.amount > 0) {
-            addrAssets.push(asset["asset-id"])
+            addrAssets.push(asset)
         }
       })  
     }

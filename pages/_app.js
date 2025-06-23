@@ -53,7 +53,7 @@ export default function MyApp(props) {
 
   //council: 1225804311
 
-  let contracts = {council: 1239236238, arena: 1053328572, market: 1100807585, airdrop: 1174019649, ASAblasters: 1434284594, swapper: 1632253886, dragonshorde: 1870514811, raffle: 2046845196, mailbox: 2638261330}
+  let contracts = {council: 1239236238, arena: 1053328572, market: 3069960875, airdrop: 1174019649, ASAblasters: 1434284594, swapper: 1632253886, dragonshorde: 1870514811, raffle: 2046845196, mailbox: 2638261330}
 
 
   const router = useRouter()
@@ -77,15 +77,15 @@ export default function MyApp(props) {
 
   }
 
-  useEffect(() => {
-    if (progress === 0 || progress === 100) return; // don't start counting until initialized
+  // useEffect(() => {
+  //   if (progress === 0 || progress === 100) return; // don't start counting until initialized
 
-    const interval = setInterval(() => {
-      setProgress(prev => prev + 1);
-    }, 1000);
+  //   const interval = setInterval(() => {
+  //     setProgress(prev => prev + 1);
+  //   }, 1000);
 
-    return () => clearInterval(interval);
-  }, [progress]);
+  //   return () => clearInterval(interval);
+  // }, [progress]);
 
   useEffect(() => {
     setDisplay(true)

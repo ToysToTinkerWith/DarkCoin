@@ -2,7 +2,7 @@ import NextCors from 'nextjs-cors';
 
 const Jimp = require('jimp') ;
 
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 
 import {Blob} from 'node:buffer';
 
@@ -12,7 +12,32 @@ const openai = new OpenAI({
     apiKey: process.env.DALLE_KEY
 });
 
-const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+import { initializeApp, getApps } from "firebase/app"
+import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage"
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+
+import { Readable } from 'stream';
+
+
+
+const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+}
+
+let firebase_app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+
+const storage = getStorage(firebase_app)
+const db = getFirestore(firebase_app)
+const auth = getAuth(firebase_app);
+
+const b64toBlob = (b64Data, contentType='image/png', sliceSize=512) => {
     const byteCharacters = atob(b64Data);
     const byteArrays = [];
   
@@ -30,9 +55,12 @@ const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
       
     const blob = new Blob(byteArrays, {type: contentType});
     return blob;
-  }
+}
 
-
+const blobToStream = async (blob) => {
+  const arrayBuffer = await blob.arrayBuffer();
+  return Readable.from(Buffer.from(arrayBuffer));
+};
 
 async function imageComb(req, res) {
    // Run the cors middleware
@@ -48,46 +76,52 @@ async function imageComb(req, res) {
     return new Promise(async (resolve) => {
         try {
 
-            let orgImg = new Jimp(500, 500, 0xFFFFFFFF)
+            const email    = 'abergquist96@gmail.com';
+            const password = process.env.EMAILPASS
+        
+            const { user } = await signInWithEmailAndPassword(auth, email, password);
+            const idToken  = await user.getIdToken();      // JWT you can send to your API
 
-            let maskImg = new Jimp(500, 500, 0xFFFFFF00)
+            let orgImg = new Jimp(1024, 1024, 0xFFFFFFFF)
 
-            let patch = new Jimp(100, 100, 0xFFFFFF00)
+            let maskImg = new Jimp(1024, 1024, 0xFFFFFF00)
+
+            let patch = new Jimp(256, 256, 0xFFFFFF00)
 
           
             let champ1 = await Jimp.read(req.body.champ1)
-            champ1 = champ1.resize(100,100)
+            champ1 = champ1.resize(256,256)
 
             let champ2 = await Jimp.read(req.body.champ2)
-            champ2 = champ2.resize(100,100)
+            champ2 = champ2.resize(256,256)
             champ2 = champ2.mirror(true,false)
 
-            orgImg.composite(champ1, 100, 250, {
+            orgImg.composite(champ1, 128, 512, {
                 mode: Jimp.BLEND_SOURCE_OVER,
                 opacityDest: 1,
                 opacitySource: 1
              })
 
-            orgImg.composite(champ2, 300, 250, {
+            orgImg.composite(champ2, 640, 512, {
                 mode: Jimp.BLEND_SOURCE_OVER,
                 opacityDest: 1,
                 opacitySource: 1
              })
 
-            maskImg.composite(champ1, 100, 250, {
+            maskImg.composite(champ1, 128, 512, {
                 mode: Jimp.BLEND_SOURCE_OVER,
                 opacityDest: 1,
                 opacitySource: 1
              })
 
-             maskImg.composite(champ2, 300, 250, {
+             maskImg.composite(champ2, 640, 512, {
                 mode: Jimp.BLEND_SOURCE_OVER,
                 opacityDest: 1,
                 opacitySource: 1
              })
 
-             maskImg.mask(patch, 100, 250)
-             maskImg.mask(patch, 300, 250)
+             maskImg.mask(patch, 128, 512)
+             maskImg.mask(patch, 640, 512)
 
 
              maskImg.getBase64Async(Jimp.MIME_PNG).then((maskImage) => {
@@ -102,18 +136,52 @@ async function imageComb(req, res) {
                     orgBlob.name = "org.png"
                     orgBlob.lastModified = 20
 
-                    const response = await openai.images.edit({
-                        image: orgBlob,
-                        mask: maskBlob,
-                        prompt: "A battle. " + req.body.setting,
-                        n: 1,
-                        size: "1024x1024"
-                    });
-                        
-                    console.log(response)
+                    await blobToStream(orgBlob).then(async (orgStream) => {
+                        await blobToStream(maskBlob).then(async (maskStream) => {
 
-                    res.json({ image: response.data[0].url});
-                    resolve()
+                        const response = await openai.images.edit({
+                            model: "gpt-image-1",
+                            image: await toFile(orgStream, null, {
+                                type: "image/png",
+                            }),
+                            mask: await toFile(maskStream, null, {
+                                type: "image/png",
+                            }),
+                            prompt: "Create a battle scene out of story: "  + req.body.story + ". Don't include any text in the image.",
+                            quality: "medium",
+                            size: "1024x1024"
+                        });
+                            
+                        console.log(response.data[0])
+                        
+                        const finalBlob = b64toBlob(response.data[0].b64_json);
+    
+                        const storageRef = ref(storage, 'fights/' + req.body.txId);
+
+                        const metadata = {
+                            contentType: 'image/png',
+                        };
+    
+                        // 'file' comes from the Blob or File API
+                        uploadBytes(storageRef, finalBlob, metadata).then((snapshot) => getDownloadURL(snapshot.ref)).then(async (downloadUrl) => {
+    
+                            console.log(downloadUrl)
+    
+                            await setDoc(doc(db, "fights",  req.body.txId), {
+                                winner: req.body.winner,
+                                loser: req.body.loser,
+                                wager: req.body.wager,
+                                url: downloadUrl
+                                });
+                                            
+                                res.json({ image: downloadUrl});
+                                resolve()
+    
+                        })
+                        
+
+                        })
+                    })
                     
                 })
             })

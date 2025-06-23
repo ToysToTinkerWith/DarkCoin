@@ -1,10 +1,17 @@
 import NextCors from 'nextjs-cors';
 
-import { initializeApp, getApps } from "firebase/app"
-import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage"
-import { getFirestore, doc, setDoc } from "firebase/firestore";
 
-import algosdk from 'algosdk';
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+    apiKey: process.env.DALLE_KEY
+});
+
+import { initializeApp, getApps } from "firebase/app"
+import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+
 
 
 const firebaseConfig = {
@@ -19,15 +26,9 @@ const firebaseConfig = {
 
 let firebase_app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-const storage = getStorage(firebase_app)
 const db = getFirestore(firebase_app)
+const auth = getAuth(firebase_app);
 
-
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-    apiKey: process.env.DALLE_KEY
-});
 
 
 async function generateChar(req, res) {
@@ -42,25 +43,28 @@ async function generateChar(req, res) {
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
  });
 
- async function urlToBlob(imageUrl) {
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const arrayBuffer = await response.arrayBuffer();
-    return new Blob([arrayBuffer], { type: response.headers.get('content-type') });
-}
-
 
 return new Promise(async (resolve) => {
 
+    const email    = 'abergquist96@gmail.com';
+    const password = process.env.EMAILPASS
 
-   const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+    const { user } = await signInWithEmailAndPassword(auth, email, password);
+    const idToken  = await user.getIdToken();      // JWT you can send to your API
+
+    let properties
+
+    const docRef = doc(db, "chars", req.body.charId + String("meta"));
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+    properties = docSnap.data().properties
+    } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+    }
                
-    let params = await client.getTransactionParams().do()
             
-    let properties = req.body.properties
-
     console.log(properties)
 
     let propertyOptions = []
@@ -76,14 +80,6 @@ return new Promise(async (resolve) => {
     let moveTrait2 = propertyOptions[Math.floor(Math.random() * propertyOptions.length)]
     let moveTrait3 = propertyOptions[Math.floor(Math.random() * propertyOptions.length)]
     let moveTrait4 = propertyOptions[Math.floor(Math.random() * propertyOptions.length)]
-
-    console.log(moveTrait1)
-    console.log(moveTrait2)
-
-    console.log(moveTrait3)
-    console.log(moveTrait4)
-
-
 
 
     let moveExample1 = JSON.stringify({
@@ -269,233 +265,16 @@ return new Promise(async (resolve) => {
         
     })
 
-    console.log(charObj)
-
- 
-    const responseImage = await openai.images.generate({
-        model: "dall-e-3",
-        prompt: "Create an image that resembles this move = " + charObj["moves"][0].name + ". The character has weapon = " + properties.Weapon + ", head = " + properties.Head + ", and armour = " + properties.Armour + ". The image should have a " + properties.Background + ". IMPORTANT: Avoid any content that may be considered inappropriate or offensive, ensuring the image aligns with content policies. Without any text or borders, only a visual representation of the action.",
-        n: 1,
-        size: "1024x1024",
-      });
-
-    console.log(responseImage)
-
-    const genUrl = responseImage.data[0].url;
-
-    urlToBlob(genUrl)
-    .then(async blob => {
-        console.log('Blob created:', blob);
-        console.log('Blob size:', blob.size);
-        console.log('Blob type:', blob.type);
-
-        const storageRef = ref(storage, 'moves/' + req.body.charId + String(charObj["moves"][0].name));
-
-        // 'file' comes from the Blob or File API
-        uploadBytes(storageRef, blob).then((snapshot) => getDownloadURL(snapshot.ref)).then(async (downloadUrl) => {
-
-            await setDoc(doc(db, "moves",  req.body.charId + String(charObj["moves"][0].name)), {
-                type: String(charObj["moves"][0].type),
-                effect: String(charObj["moves"][0].effect),
-                power: Number(charObj["moves"][0].power),
-                accuracy: Number(charObj["moves"][0].accuracy),
-                description: String(charObj["moves"][0].description),
-                name: String(charObj["moves"][0].name),
-                url: downloadUrl
-              });
-
-        })
-            
-        console.log('Uploaded a blob or file!');
-
-        
-
-        const responseImage1 = await openai.images.generate({
-            model: "dall-e-3",
-            prompt: "Create an image that resembles this move = " + charObj["moves"][1].name + ". The character has weapon = " + properties.Weapon + ", head = " + properties.Head + ", and armour = " + properties.Armour + ". The image should have a " + properties.Background + ". IMPORTANT: Avoid any content that may be considered inappropriate or offensive, ensuring the image aligns with content policies. Without any text or borders, only a visual representation of the action.",
-            n: 1,
-            size: "1024x1024",
-          });
-    
-        console.log(responseImage1)
-    
-        const genUrl1 = responseImage1.data[0].url;
-    
-        urlToBlob(genUrl1)
-        .then(async blob => {
-            console.log('Blob created:', blob);
-            console.log('Blob size:', blob.size);
-            console.log('Blob type:', blob.type);
-    
-            const storageRef = ref(storage, 'moves/' + req.body.charId + String(charObj["moves"][1].name));
-    
-            // 'file' comes from the Blob or File API
-            uploadBytes(storageRef, blob).then((snapshot) => getDownloadURL(snapshot.ref)).then(async (downloadUrl) => {
-    
-                await setDoc(doc(db, "moves",  req.body.charId + String(charObj["moves"][1].name)), {
-                    type: String(charObj["moves"][1].type),
-                    effect: String(charObj["moves"][1].effect),
-                    power: Number(charObj["moves"][1].power),
-                    accuracy: Number(charObj["moves"][1].accuracy),
-                    description: String(charObj["moves"][1].description),
-                    name: String(charObj["moves"][1].name),
-                    url: downloadUrl
-                  });
-    
-            })
-                
-            console.log('Uploaded a blob or file!');
-        
-            const responseImage2 = await openai.images.generate({
-                model: "dall-e-3",
-                prompt: "Create an image that resembles this move = " + charObj["moves"][2].name + ". The character has weapon = " + properties.Weapon + ", head = " + properties.Head + ", and armour = " + properties.Armour + ". The image should have a " + properties.Background + ". IMPORTANT: Avoid any content that may be considered inappropriate or offensive, ensuring the image aligns with content policies. Without any text or borders, only a visual representation of the action.",
-                n: 1,
-                size: "1024x1024",
-              });
-        
-            console.log(responseImage2)
-        
-            const genUrl2 = responseImage2.data[0].url;
-        
-            urlToBlob(genUrl2)
-            .then(async blob => {
-                console.log('Blob created:', blob);
-                console.log('Blob size:', blob.size);
-                console.log('Blob type:', blob.type);
-        
-                const storageRef = ref(storage, 'moves/' + req.body.charId + String(charObj["moves"][2].name));
-        
-                // 'file' comes from the Blob or File API
-                uploadBytes(storageRef, blob).then((snapshot) => getDownloadURL(snapshot.ref)).then(async (downloadUrl) => {
-        
-                    await setDoc(doc(db, "moves",  req.body.charId + String(charObj["moves"][2].name)), {
-                        type: String(charObj["moves"][2].type),
-                        effect: String(charObj["moves"][2].effect),
-                        power: Number(charObj["moves"][2].power),
-                        accuracy: Number(charObj["moves"][2].accuracy),
-                        description: String(charObj["moves"][2].description),
-                        name: String(charObj["moves"][2].name),
-                        url: downloadUrl
-                      });
-        
-                })
-                    
-                console.log('Uploaded a blob or file!');
-        
-                const responseImage3 = await openai.images.generate({
-                    model: "dall-e-3",
-                    prompt: "Create an image that resembles this move = " + charObj["moves"][3].name + ". The character has weapon = " + properties.Weapon + ", head = " + properties.Head + ", and armour = " + properties.Armour + ". The image should have a " + properties.Background + ". IMPORTANT: Avoid any content that may be considered inappropriate or offensive, ensuring the image aligns with content policies. Without any text or borders, only a visual representation of the action.",
-                    n: 1,
-                    size: "1024x1024",
-                  });
-            
-                console.log(responseImage3)
-            
-                const genUrl3 = responseImage3.data[0].url;
-            
-                urlToBlob(genUrl3)
-                .then(blob => {
-                    console.log('Blob created:', blob);
-                    console.log('Blob size:', blob.size);
-                    console.log('Blob type:', blob.type);
-            
-                    const storageRef = ref(storage, 'moves/' + req.body.charId + String(charObj["moves"][3].name));
-            
-                    // 'file' comes from the Blob or File API
-                    uploadBytes(storageRef, blob).then((snapshot) => getDownloadURL(snapshot.ref)).then(async (downloadUrl) => {
-            
-                        await setDoc(doc(db, "moves",  req.body.charId + String(charObj["moves"][3].name)), {
-                            type: String(charObj["moves"][3].type),
-                            effect: String(charObj["moves"][3].effect),
-                            power: Number(charObj["moves"][3].power),
-                            accuracy: Number(charObj["moves"][3].accuracy),
-                            description: String(charObj["moves"][3].description),
-                            name: String(charObj["moves"][3].name),
-                            url: downloadUrl
-                          });
-
-                          charObj["moves"][0] = charObj["moves"][0].name
-                          charObj["moves"][1] = charObj["moves"][1].name
-                          charObj["moves"][2] = charObj["moves"][2].name
-                          charObj["moves"][3] = charObj["moves"][3].name
+    await setDoc(doc(db, "chars",  req.body.charId + String("object")), {
+        charObj
+    });
 
 
-                          console.log('Uploaded a blob or file!');
-                        
-            
-                            let jsonChar = JSON.stringify(charObj)
-                    
-                    
-                            res.json(jsonChar)
-                    
-                            resolve()
-            
-                    })
-                        
-                    
-            
-            
-            
-                })
-                .catch(console.error);
-        
-        
-        
-            })
-            .catch(console.error);
+
+    res.json({status: "generated"})
     
     
-    
-        })
-        .catch(console.error);
 
-
-
-    })
-    .catch(console.error);
-
-    
-
-    
-
-    
-
-    // console.log(charObj)
-
-
-
-    // let appArgs = []
-    // appArgs.push(
-    //     new Uint8Array(Buffer.from("updateCharacter")),
-    //     new Uint8Array(Buffer.from(jsonChar))
-        
-    // )
-
-    // let accounts = []
-    // let foreignApps = []
-        
-    // let foreignAssets = [champ]
-
-    // let assetInt = longToByteArray(champ)
-
-    // let box = new Uint8Array(assetInt)
-
-    // console.log(box)
-
-    // let boxes = [{appIndex: 0, name: box}, {appIndex: 0, name: box}, {appIndex: 0, name: box}, {appIndex: 0, name: box}]
-    
-    // let txn = algosdk.makeApplicationNoOpTxn("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM", params, 1870514811, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-    
-    // let signedTxn = txn.signTxn(houseAccount.sk);
-    
-    // // Submit the transaction
-    // let { txId } = await client.sendRawTransaction(signedTxn).do()                           
-    // // Wait for transaction to be confirmed
-    // let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
-
-    // console.log(confirmedTxn)
-
-    
 })
 
     

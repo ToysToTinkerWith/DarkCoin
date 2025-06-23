@@ -46,7 +46,7 @@ async function getNft(req, res) {
 
  return new Promise(async (resolve) => {
 
-
+console.log(req.body.nftId)
 
  const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
@@ -55,7 +55,6 @@ async function getNft(req, res) {
   let nft;
   let charStats
 
-  console.log(req.body.nftId)
 
   nft = await indexerClient.searchForAssets().index(req.body.nftId).do();
 
@@ -77,17 +76,14 @@ async function getNft(req, res) {
 
    charObject.moves.forEach(async (move, index) => {
 
-    console.log(move)
-
     const docRef = doc(db, "moves", req.body.nftId + move);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-    console.log("Document data:", docSnap.data());
     charObject.moves[index] = docSnap.data()
     } else {
     // docSnap.data() will be undefined in this case
-    console.log("No such document!");
+    //console.log("No such document!");
     }
 
    })
@@ -95,7 +91,7 @@ async function getNft(req, res) {
 
   }
   catch(error) {
-    
+    console.log(error)
   }
 
   let action = null

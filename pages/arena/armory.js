@@ -136,8 +136,6 @@ export default function Swap(props) {
                     setTraits(traits)
                     setOwnTraits(ownedTraits)
 
-                    console.log(ownedTraits)
-                    console.log(traits)
 
                 }
 
@@ -259,7 +257,6 @@ export default function Swap(props) {
 
         
         
-        console.log(warriors)
 
         if (selWarrior) {
             return (

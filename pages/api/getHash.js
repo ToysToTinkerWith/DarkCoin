@@ -10,6 +10,11 @@ const Jimp = require('jimp') ;
 
 import { initializeApp, getApps } from "firebase/app"
 import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage"
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+
+
 
 
 const firebaseConfig = {
@@ -25,6 +30,9 @@ const firebaseConfig = {
 let firebase_app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 const storage = getStorage(firebase_app)
+const db = getFirestore(firebase_app)
+const auth = getAuth(firebase_app);
+
 
 
 async function getHash(req, res) {
@@ -40,15 +48,12 @@ async function getHash(req, res) {
 
     return new Promise(async (resolve) => {
 
-            async function readableToBlob(readable, mimeType = 'application/octet-stream') {
-                const chunks = [];
-                
-                for await (const chunk of readable) {
-                chunks.push(chunk);
-                }
-            
-                return new Blob(chunks, { type: mimeType });
-            }
+            const email    = 'abergquist96@gmail.com';
+            const password = process.env.EMAILPASS
+        
+            const { user } = await signInWithEmailAndPassword(auth, email, password);
+            const idToken  = await user.getIdToken();      // JWT you can send to your API
+
             
               pinata.testAuthentication().then(async () => {
 
@@ -151,9 +156,14 @@ async function getHash(req, res) {
 
                         let ipfs = result.IpfsHash
 
-                        const storageRef = ref(storage, 'moves/' + req.body.charId);
+                        const storageRef = ref(storage, 'chars/' + req.body.charId);
 
                         uploadBytes(storageRef, blob).then((snapshot) => getDownloadURL(snapshot.ref)).then(async (downloadUrl) => {
+
+                             await setDoc(doc(db, "chars",  req.body.charId + String("meta")), {
+                                properties: req.body.properties
+                            });
+
                             console.log(downloadUrl)
                             console.log(ipfs)
 

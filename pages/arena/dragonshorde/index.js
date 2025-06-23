@@ -335,23 +335,6 @@ export default function DragonsHorde(props) {
 
       }
 
-      const rollChar = async (nftId) => {
-
-        const response = await fetch('/api/arena/rollChar', {
-            method: "POST",
-            body: JSON.stringify({
-              nftId: nftId
-            }),
-            headers: {
-              "Content-Type": "application/json",
-            }
-              
-          });
-        
-          const session = await response.json()
-  
-      }
-
     
         let healthAdj = 0
         let speedAdj = 0
@@ -467,7 +450,7 @@ export default function DragonsHorde(props) {
                 }
 
                 {char ? 
-                <Button variant="contained" color="secondary"  style={{display: "flex", margin: "auto"}} onClick={() => [setChar(null), setMoveSelect(null)]} >
+                <Button variant="contained" color="secondary"  style={{display: "flex", margin: "auto"}} onClick={() => [setChar(null), setMoveSelect(null), props.setMessage(null)]} >
                     <Typography color="primary" align="center" variant="subtitle1"> Cancel </Typography>
                 </Button>
                 :

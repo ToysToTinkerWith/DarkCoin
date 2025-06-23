@@ -445,8 +445,6 @@ export default function Character(props) {
     const fetchData = async () => {
 
         try {
-
-            console.log(props.nftId)
     
     let response = await fetch('/api/getNft', {
         method: "POST",
@@ -461,8 +459,6 @@ export default function Character(props) {
         });
     
     let session = await response.json()
-
-    console.log(session)
 
     if (session.charObject != "none") {
         setCharObject(session.charObject)
@@ -496,35 +492,30 @@ export default function Character(props) {
 
     const txns = await indexerClient.searchForTransactions(1870514811).do();
 
-    console.log(txns)
-
     const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
     let assetBox = algosdk.encodeUint64(props.nftId)
 
-    try {
 
-        console.log(assetBox)
-        console.log(props.contracts)
+    try {
 
         let accountBoxXp = await client.getApplicationBoxByName(props.contracts.dragonshorde, new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("xp"))])).do();
         
-        console.log(accountBoxXp)
         var length = accountBoxXp.value.length;
-
-        console.log(length)
 
         let buffer = Buffer.from(accountBoxXp.value);
         var result = buffer.readUIntBE(0, length);
 
-        console.log(result)
-
         setXp(result)
+        
+    }
+    catch(err) {
+        //console.log(err)
+    }
 
-        let accountBoxPoints = await client.getApplicationBoxByName(props.contracts.dragonshorde, new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("points"))])).do();
-        
-        console.log(accountBoxPoints)
-        
+    try {
+
+        let accountBoxPoints = await client.getApplicationBoxByName(props.contracts.dragonshorde, new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("points"))])).do();        
 
         setOldPoints(accountBoxPoints.value)
         setPoints(accountBoxPoints.value)
@@ -532,7 +523,7 @@ export default function Character(props) {
         
     }
     catch(err) {
-        console.log(err)
+        //console.log(err)
     }
 
     
@@ -579,19 +570,13 @@ export default function Character(props) {
             level++
         }
 
-        console.log(level)
-
         let totalPoints = 0
 
         for (let i = 0; i < points.length; i++) {
             totalPoints += points[i]
         }
 
-        console.log(totalPoints)
-
         let treeByte = Math.floor(byte / 100)
-
-        console.log(treeByte)
 
         let newPoints = points.slice()
 
@@ -756,10 +741,7 @@ if (charObject) {
         prevLvl = nextLvl
         nextLvl = nextLvl + (200 * level) + 100
         level++
-    }
-
-    console.log(level)
-    
+    }    
 
     let healthAdj = 0
     let speedAdj = 0
@@ -849,11 +831,6 @@ if (charObject) {
     let cleanseAdj = oldPoints[1500]
 
     
-
-    
-
-    console.log(points)
-    console.log(oldPoints)
     
     return (
         <div >
@@ -1102,7 +1079,6 @@ if (charObject) {
                 {charObject.moves.length > 0 ? 
                     charObject.moves.map((move, index) => {
                         let bonus = 0
-                        console.log(move)
                         if (move.effect == "bleed") {
                             bonus = bleedAdj
                         }
@@ -1151,7 +1127,6 @@ if (charObject) {
                         else if (move.effect == "strengthen") {
                             bonus = strengthenAdj
                         }
-                        console.log(bonus)
                         if (move.type){
                             return (
                                 <Grid item sm={6} md={6} lg={3} key={index} style={{border: "1px solid white", padding: 20, borderRadius: 15}}>
@@ -1361,7 +1336,7 @@ if (charObject) {
 
                     {trees.map((treeNode, index) => {
                         return (
-                            <Grid item xs={3} sm={12/8} md={6/8} style={{}}>
+                            <Grid key={index} item xs={3} sm={12/8} md={6/8} style={{}}>
                                 <Button style={{width: "5%"}} onClick={() => treeNode == tree ? setTree(null) : setTree(treeNode)}>
                                     <img src={"/dragonshorde/trees/" + treeNode.skill1.title + ".svg"} style={{width: "100%"}}/>
                                 </Button>

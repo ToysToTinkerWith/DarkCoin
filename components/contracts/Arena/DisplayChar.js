@@ -529,6 +529,107 @@ export default function DisplayChar(props) {
                 )
 
             }
+            else if (props.fight) {
+                    return (
+                        <div>
+                            {charObject ?
+                                <Typography color="secondary" align="center" variant="subtitle1"> {charObject.name} </Typography>
+                                :
+                                <Typography color="secondary" align="center" variant="subtitle1"> {nft.name} </Typography>
+                            }
+                            <img onClick={() => window.location.href = "/arena/dragonshorde/" + String(props.nftId)} style={{width: "100%", borderRadius: 5}} src={nftUrl} />
+                            {charObject ? 
+                                
+                                    
+                                
+                                
+                                
+                                    props.fights.some(obj => obj.asset === props.nftId) ? 
+                                    null
+                                    :
+                                    <Grid container>
+                                        <Grid item xs={6}>
+                                            <Button color="primary" style={{backgroundColor: "white", display: "flex", margin: "auto"}} onClick={() => props.setNft(props.nftId)} >                                
+                                                <Typography align="center" variant="caption" style={{color: "#000000"}}> Join Fight </Typography>
+                                            </Button>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                        <Button color="primary" style={{backgroundColor: "white", display: "grid", margin: "auto"}} onClick={() => props.startFight(props.nftId)} >                                
+                                            <Typography  variant="caption"> Start Fight </Typography>
+                                            <Typography color="primary" align="center" variant="caption" style={{display: "inline-flex"}}> {(10000).toLocaleString()} <img src="/invDC.svg" style={{display: "inline-flex", width: 30, paddingLeft: 10}} />
+ </Typography>
+                                        </Button>
+                                        </Grid>
+                                    </Grid>
+                                    
+                                
+                            :
+                            null
+                            }
+                            
+                            
+                        </div>
+            
+                    )
+
+            }
+            else if (props.fighter) {
+                    return (
+                        <div style={{padding: 20, border: props.char ? "1px solid white" : null, borderRadius: 15}} onClick={() => props.char ? props.genStory(props.nftId, props.char, props.wager) : null}>
+                            {charObject ?
+                                <Typography color="secondary" align="center" variant="subtitle1"> {charObject.name} </Typography>
+                                :
+                                <Typography color="secondary" align="center" variant="subtitle1"> {nft.name} </Typography>
+                            }
+                            <img style={{width: "50%", borderRadius: 5, display: "flex", margin: "auto"}} src={nftUrl} />
+                            <Typography color="secondary" align="center" variant="subtitle1" style={{display: "inline-flex", marginLeft: "30%"}}> {(props.wager / 1000000).toLocaleString()} </Typography>
+                            <img src="/invDC.svg" style={{display: "inline-flex", margin: "auto", width: 40, padding: 10}} />
+                        </div>
+            
+                    )
+
+            }
+            else if (props.battle) {
+                    return (
+                        <div>
+                            {charObject ?
+                                <Typography color="secondary" align="center" variant="subtitle1"> {charObject.name} </Typography>
+                                :
+                                <Typography color="secondary" align="center" variant="subtitle1"> {nft.name} </Typography>
+                            }
+                            <img style={{width: "100%", borderRadius: 5}} src={nftUrl} />
+                            {charObject ? 
+                                <Grid container>
+                                    <Grid item xs={6}>
+                                        <Button color="primary" style={{backgroundColor: "white", display: "flex", margin: "auto"}} onClick={() => window.location.href = "/arena/dragonshorde/" + String(props.nftId)} >                                
+                                            <Typography align="center" variant="caption" style={{color: "#000000"}}> character sheet </Typography>
+                                            <DescriptionIcon />
+                                        </Button>
+                                    </Grid>
+                                
+                                
+                                
+                                    {props.brawlChars.includes(props.nftId) ? 
+                                    null
+                                    :
+                                    <Grid item xs={6}>
+                                    <Button color="primary" style={{backgroundColor: "white", display: "flex", margin: "auto"}} onClick={() => joinBrawl()} >                                
+                                        <Typography  variant="caption"> Select </Typography>
+                                        {/* <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 40, padding: 10}} /> */}
+                                    </Button>
+                                    </Grid>
+                                    }
+                                </Grid>
+                            :
+                            null
+                            }
+                            
+                            
+                        </div>
+            
+                    )
+
+            }
             else if (props.brawl) {
                     return (
                         <div>
@@ -585,11 +686,7 @@ export default function DisplayChar(props) {
                     level++
                 }
 
-                console.log(radians)
-                console.log(props.height)
-                console.log(-(Math.cos(radians)))
-                console.log(-(Math.cos(radians)*props.height/2))
-                
+              
 
                 let healthAdj = 0
                 let speedAdj = 0
@@ -679,13 +776,13 @@ export default function DisplayChar(props) {
                 let cleanseAdj = points[1500]
                     
                     return (
-                        <div onMouseOver={() => props.char && props.moveSelect != null ? null : setHover(true)} onMouseLeave={() => setHover(false)} onClick={() => props.char && props.moveSelect != null ? props.attack(props.nftId) : null}  style={{position: "absolute", left: props.index % 2 == 0 ? (-(Math.sin(radians)*props.width/3) + (props.width/2.2)) : (-(Math.sin(radians)*props.width/4) + (props.width/2.2)), top: props.index % 2 == 0 ? (-(Math.cos(radians)*props.height/3) + (props.height/2)) : (-(Math.cos(radians)*props.height/4) + (props.height/2))}}>
+                        <div onMouseOver={() => props.char && props.moveSelect != null ? null : setHover(true)} onMouseLeave={() => setHover(false)} onClick={() => props.char && props.moveSelect != null ? props.attack(props.nftId) : null}  style={{position: "absolute", border: props.char && props.moveSelect != null ? "1px solid white" : null, borderRadius: 15, padding: 10, left: props.index % 2 == 0 ? (-(Math.sin(radians)*props.width/4) + (props.width/2.2)) : (-(Math.sin(radians)*props.width/3) + (props.width/2.2)), top: props.index % 2 == 0 ? (-(Math.cos(radians)*props.height/4) + 200 + (props.height/4)) : (-(Math.cos(radians)*props.height/2.5) + 200 +  (props.height/4))}}>
                             {/* <Typography color="secondary" align="center" variant="subtitle1"> {charObject ? charObject["name"] : nft.name.substring(18)} </Typography> */}
                             
                             
                             {hover && !props.char && props.moveSelect == null ? 
                             
-                            <Card style={Math.sin(radians) < 0 ? {zIndex: 10, position: "absolute", display: "grid",  left: (-(Math.sin(radians)*props.width/3) + (props.width/5)), top: (-(Math.cos(radians)*props.height/50) + (props.height/20)), backgroundColor: "black", minWidth: 200, border: "1px solid white"} : {zIndex: 10, position: "absolute", display: "grid",  left: (-(Math.sin(radians)*props.width/3) + (props.width/5)), top: (-(Math.cos(radians)*props.height/50) + (props.height/20)),  backgroundColor: "black", minWidth: 200, border: "1px solid white"}}>
+                            <div style={{position: "absolute", zIndex: 100, backgroundColor: "black", minWidth: 200, border: "1px solid white"}}>
                                 <br />
                                 <Button color="primary" style={{backgroundColor: "white", display: "flex", margin: "auto"}} onClick={() => window.location.href = "/arena/dragonshorde/" + String(props.nftId)} >                                
                                     <Typography align="center" variant="caption" style={{color: "#000000"}}> character sheet </Typography>
@@ -1270,7 +1367,7 @@ export default function DisplayChar(props) {
                                                         <Typography color="secondary" align="center" variant="subtitle2" style={{margin: 10}}> {move.description} </Typography>
 
                                                         {props.dcChars.includes(props.nftId) ?
-                                                            <Button variant="contained" color="secondary"  style={{display: "flex", margin: "auto"}} onClick={() => [props.setChar(props.nftId), props.setMoveSelect(index)]} >
+                                                            <Button variant="contained" color="secondary"  style={{display: "flex", margin: "auto"}} onClick={() => [props.setChar(props.nftId), props.setMoveSelect(index), props.setMessage("Select target of move...")]} >
                                                                 <Typography color="primary" align="center" variant="subtitle1"> Select </Typography>
                                                             </Button>
                                                             :
@@ -1297,12 +1394,12 @@ export default function DisplayChar(props) {
                                     </Grid>
 
 
-                            </Card>
+                            </div>
                             : 
-                            <div onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}  style={{position: "absolute", left: (-(Math.sin(radians)*props.width/3) + (props.width/5)), top: (-(Math.cos(radians)*props.height/50) + (props.height/20))}}>
-                                <Typography color="secondary" align="center" variant="subtitle1"> {charObject ? charObject["name"] : nft.name.substring(18)} </Typography>
-                                <img style={{zIndex: 0, width: String((100 / (props.length + 3))) + "vw", borderRadius: 5, border: props.dcChars.includes(props.nftId) ? "1px solid white" : null}} src={nftUrl} />
-                                <ProgressHealth variant="determinate" style={{color: "white"}} value={charObject.currentHealth / charObject.health * 100} />
+                            <div onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}  style={{zIndex: 1}}>
+                                {/* <Typography color="secondary" align="center" variant="subtitle1"> {charObject ? charObject["name"] : nft.name.substring(18)} </Typography> */}
+                                <img style={{width: props.dcChars.includes(props.nftId) ? String((150 / (props.length + 3))) + "vw" : String((100 / (props.length + 3))) + "vw", borderRadius: 5, border: props.dcChars.includes(props.nftId) ? "1px solid white" : null}} src={nftUrl} />
+                                <ProgressHealth variant="determinate" style={{color: "white", width: props.dcChars.includes(props.nftId) ? String((150 / (props.length + 3))) + "vw" : String((100 / (props.length + 3))) + "vw"}} value={charObject.currentHealth / charObject.health * 100} />
 
                             </div>
                             }

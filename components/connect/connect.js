@@ -118,14 +118,12 @@ export default function Connect(props) {
       }
     })
 
-    console.log(addrAssets)
-    console.log(dc)
 
 
   
 
   return (
-    <div style={{position: "relative", right: 20, top: 20, zIndex: 50, backgroundColor: "black", borderRadius: 15}}>
+    <div style={{position: "relative", zIndex: 50, backgroundColor: "black", borderRadius: 15}}>
 
       <Button onClick={() => setOpen(!open)} style={{}}>
 

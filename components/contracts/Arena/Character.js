@@ -854,7 +854,11 @@ if (charObject) {
 
                 </div> */}
 
-                <div style={{marginTop: 100, marginBottom: 50}}>
+                <Button style={{backgroundColor: "white", fontFamily: "Jacques", padding: 10, marginTop: 40}} onClick={() => props.deleteChar(props.nftId)}>
+                    <Typography variant="h6" > Delete Character </Typography>
+                </Button>
+
+                <div style={{marginTop: 40, marginBottom: 50}}>
                     <Typography color="secondary" align="center" variant="h4" style={{fontFamily: "Jacques", margin: 20}}> {charObject.name} </Typography>
                     <img style={{width: "50%", borderRadius: 5, display: "flex", margin: "auto", maxWidth: 500}} src={nftUrl} />
                     

@@ -267,13 +267,13 @@ export default function DisplayAsset(props) {
                         </Button>
                         <br />
                         <Grid container>
-                            <Grid item xs={6}>
+                            <Grid item xs={12}>
                                 <Button style={{display: "flex", margin: "auto"}} onClick={() => window.open("https://explorer.perawallet.app/asset/" + props.nftId)}>
                                     <Typography variant="h5" color="primary" style={{background: "#FFFFFF", borderRadius: 15, padding: 10, margin: 20}}>  List ID </Typography>
                                 </Button>
                             </Grid>
                             {props.costId > 0 ?
-                            <Grid item xs={6}>
+                            <Grid item xs={12}>
                                 <Button style={{display: "flex", margin: "auto"}} onClick={() => window.open("https://explorer.perawallet.app/asset/" + props.costId)}>
                                     <Typography variant="h5" color="primary" style={{background: "#FFFFFF", borderRadius: 15, padding: 10, margin: 20}}> Cost ID </Typography>
                                 </Button>

@@ -143,13 +143,13 @@ export default function Connect(props) {
               </motion.video>
 
               {activeAccount ?
-                <Typography component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{color: "#FFFFFF", position: "fixed", fontFamily: "Jacques",  left: windowDimensions.width / 2 + 40, padding: 20}} > Connected </Typography>
+                <Typography component={motion.div} animate={{opacity: [0,0,0,0,0,1], color: ["#000000", "#000000", "#000000", "#FFFFFF"]}} transition={{duration: 10}} style={{color: "#FFFFFF", position: "fixed", fontFamily: "Jacques",  left: windowDimensions.width / 2 + 40, padding: 20}} > Connected </Typography>
               :
-                <Typography component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{color: "#FFFFFF", position: "fixed", fontFamily: "Jacques", left: windowDimensions.width / 2 + 40, padding: 20}} > Connect Wallet </Typography>
+                <Typography component={motion.div} animate={{opacity: [0,0,0,0,0,1], color: ["#000000", "#000000", "#000000", "#FFFFFF"]}} transition={{duration: 10}} style={{color: "#FFFFFF", position: "fixed", fontFamily: "Jacques", left: windowDimensions.width / 2 + 40, padding: 20}} > Connect Wallet </Typography>
               }
 
               {addrAssets.length > 0 ?
-                <Typography component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{color: "#FFFFFF", position: "fixed", fontFamily: "Jacques", left: windowDimensions.width / 2 + 40, padding: 20, paddingTop: 50}} > {dc.toLocaleString()} DARKCOIN </Typography>
+                <Typography component={motion.div} animate={{opacity: [0,0,0,0,0,1], color: ["#000000", "#000000", "#000000", "#FFFFFF"]}} transition={{duration: 10}} style={{position: "fixed", fontFamily: "Jacques", left: windowDimensions.width / 2 + 40, padding: 20, paddingTop: 50}} > {dc.toLocaleString()} DARKCOIN </Typography>
               :
               null              
               }

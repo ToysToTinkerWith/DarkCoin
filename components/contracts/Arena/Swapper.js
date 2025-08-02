@@ -383,6 +383,61 @@ export default function Swapper(props) {
           return value;
       };
 
+      const deleteChar = async (nftId) => {
+
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+
+        let params = await client.getTransactionParams().do();
+
+        let txns = []
+
+        const appArgs = []
+        appArgs.push(
+            new Uint8Array(Buffer.from("deleteCharacter"))
+        )
+        const accounts = []
+        const foreignApps = []
+            
+        const foreignAssets = [nftId]
+
+        let assetInt = longToByteArray(nftId)
+      
+        let assetBox = new Uint8Array(assetInt)
+
+        let assetBoxCurrent = new Uint8Array([...assetInt, ...new Uint8Array(Buffer.from("current"))])    
+
+        const boxes = [{appIndex: 0, name: assetBox}, {appIndex: 0, name: assetBox}, {appIndex: 0, name: assetBoxCurrent}, {appIndex: 0, name: assetBoxCurrent}]
+
+        props.setMessage("Sign Transaction...")
+
+        let txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.dragonshorde, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+
+        txns.push(txn)
+
+        let txgroup = algosdk.assignGroupID(txns)
+
+        let encodedTxns= []
+  
+        txns.forEach((txn) => {
+            let encoded = algosdk.encodeUnsignedTransaction(txn)
+            encodedTxns.push(encoded)
+    
+        })
+    
+        const signedTransactions = await signTransactions(encodedTxns)
+
+        props.setMessage("Sending Transaction...")
+
+        const { id } = await sendTransactions(signedTransactions)
+
+        let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+
+        props.setMessage("Transaction Confirmed, character deleted")
+
+        await fetchData()
+
+      }
+
         const changeImg = async (action, type) => {
 
           
@@ -495,7 +550,7 @@ export default function Swapper(props) {
         
         }
 
-        const mint = async () => {
+        const mint = async (genChar) => {
 
           try {
 
@@ -575,7 +630,7 @@ export default function Swapper(props) {
           }
 
 
-       
+         if (genChar) {
 
           let ftxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
             activeAccount.address, 
@@ -590,6 +645,10 @@ export default function Swapper(props) {
 
           txns.push(ftxn)
           signingIndex.push(signingIndex.length)
+
+         }
+
+          
 
           if (newBackgroundId != 0) {
 
@@ -1225,146 +1284,147 @@ export default function Swapper(props) {
   
           let session1 = await response1.json()
 
-          props.setMessage("Generating character...")
-          props.setProgress(20)
+          if (genChar) {
 
-          let responseChar = await fetch('/api/arena/generateChar', {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                charId: props.nftId,
-                url: session1.url
-            }),
-            
+            props.setMessage("Generating character...")
+            props.setProgress(20)
+
+            let responseChar = await fetch('/api/arena/generateChar', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  charId: props.nftId,
+                  url: session1.url
+              }),
               
-          });
+                
+            });
 
-          props.setMessage("Generating moves...")
-          props.setProgress(30)
+            props.setMessage("Generating moves...")
+            props.setProgress(30)
 
 
-          let sessionChar = await responseChar.json()
+            let sessionChar = await responseChar.json()
 
-          let responseMove1 = await fetch('/api/arena/generateMove', {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                charId: props.nftId,
-                url: session1.url,
-                charMove: 0
-            
-            }),
-            
+            let responseMove1 = await fetch('/api/arena/generateMove', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  charId: props.nftId,
+                  url: session1.url,
+                  charMove: 0
               
-          });
-
-          let sessionMove1 = await responseMove1.json()
-
-          props.setProgress(50)
-
-          let responseMove2 = await fetch('/api/arena/generateMove', {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                charId: props.nftId,
-                url: session1.url,
-                charMove: 1
-            
-            }),
-            
+              }),
               
-          });
+                
+            });
 
-          let sessionMove2 = await responseMove2.json()
+            let sessionMove1 = await responseMove1.json()
 
-          props.setProgress(70)
+            props.setProgress(50)
 
-          let responseMove3 = await fetch('/api/arena/generateMove', {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                charId: props.nftId,
-                url: session1.url,
-                charMove: 2
-            
-            }),
-            
+            let responseMove2 = await fetch('/api/arena/generateMove', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  charId: props.nftId,
+                  url: session1.url,
+                  charMove: 1
               
-          });
-
-          let sessionMove3 = await responseMove3.json()
-
-          props.setProgress(90)
-
-          let responseMove4 = await fetch('/api/arena/generateMove', {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                charId: props.nftId,
-                url: session1.url,
-                charMove: 3
-            
-            }),
-            
+              }),
               
-          });
+                
+            });
 
-          let sessionMove4 = await responseMove4.json()
+            let sessionMove2 = await responseMove2.json()
 
-          let charObj
+            props.setProgress(70)
 
-          const docRef = doc(db, "chars", props.nftId + String("object"));
-          const docSnap = await getDoc(docRef);
+            let responseMove3 = await fetch('/api/arena/generateMove', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  charId: props.nftId,
+                  url: session1.url,
+                  charMove: 2
+              
+              }),
+              
+                
+            });
 
-          if (docSnap.exists()) {
-            charObj = docSnap.data().charObj
-          } else {
-          // docSnap.data() will be undefined in this case
-          //console.log("No such document!");
+            let sessionMove3 = await responseMove3.json()
+
+            props.setProgress(90)
+
+            let responseMove4 = await fetch('/api/arena/generateMove', {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                  charId: props.nftId,
+                  url: session1.url,
+                  charMove: 3
+              
+              }),
+              
+                
+            });
+
+            let sessionMove4 = await responseMove4.json()
+
+            let charObj
+
+            const docRef = doc(db, "chars", props.nftId + String("object"));
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+              charObj = docSnap.data().charObj
+            } else {
+            // docSnap.data() will be undefined in this case
+            //console.log("No such document!");
+            }
+
+            charObj.moves[0] = charObj.moves[0].name
+            charObj.moves[1] = charObj.moves[1].name
+            charObj.moves[2] = charObj.moves[2].name
+            charObj.moves[3] = charObj.moves[3].name
+
+
+            let charString = JSON.stringify(charObj)
+
+            appArgs = []
+            appArgs.push(
+              new Uint8Array(Buffer.from("updateCharacter")),
+              new Uint8Array(Buffer.from(charString))
+
+            )
+
+            accounts = []
+            foreignApps = []
+                
+            foreignAssets = [props.nftId]
+
+            intBox = longToByteArray(props.nftId)
+        
+            Box = new Uint8Array([...intBox])
+
+            boxes = [{appIndex: 0, name: Box}, {appIndex: 0, name: Box}, {appIndex: 0, name: Box}]
+
+            let ctxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.dragonshorde, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+            txns.push(ctxn)
+            signingIndex.push(signingIndex.length)
+
           }
-
-          charObj.moves[0] = charObj.moves[0].name
-          charObj.moves[1] = charObj.moves[1].name
-          charObj.moves[2] = charObj.moves[2].name
-          charObj.moves[3] = charObj.moves[3].name
-
-
-          let charString = JSON.stringify(charObj)
-
-          appArgs = []
-          appArgs.push(
-            new Uint8Array(Buffer.from("updateCharacter")),
-            new Uint8Array(Buffer.from(charString))
-
-          )
-
-          accounts = []
-          foreignApps = []
-              
-          foreignAssets = [props.nftId]
-
-          intBox = longToByteArray(props.nftId)
-      
-          Box = new Uint8Array([...intBox])
-
-          boxes = [{appIndex: 0, name: Box}, {appIndex: 0, name: Box}, {appIndex: 0, name: Box}]
-
-          let ctxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.dragonshorde, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-          txns.push(ctxn)
-          signingIndex.push(signingIndex.length)
-
-
-          
   
           let reserve = algosdk.encodeAddress(
             multihash.decode(
@@ -1472,10 +1532,25 @@ export default function Swapper(props) {
                       <img style={{width: "100%", maxWidth: 500, border: "3px solid black", borderRadius: 15}} src={nftUrl} />
                   </Button>
                 }
+                </Grid>
+                <Grid item xs={12} sm={12} md={6}>
+
                 {displayRoll == true ? 
-                <Button style={{backgroundColor: "white", fontFamily: "Jacques", padding: 10}} onClick={() => mint()}>
+                <Button style={{backgroundColor: "white", fontFamily: "Jacques", padding: 10}} onClick={() => mint(true)}>
                   <Typography variant="h6" > Roll 10,000 </Typography>
                   <img src="/invDC.svg" style={{display: "flex", margin: "auto", width: 50, padding: 10}} />
+
+                </Button>
+                :
+                <Typography variant="h6" color="secondary" > {displayRoll} </Typography>
+
+                }
+                </Grid>
+                <Grid item xs={12} sm={12} md={6}>
+
+                {!charObject && (BackgroundChange != "None" || WeaponChange != "None" || MagicChange != "None" || HeadChange != "None" || ArmourChange != "None" || ExtraChange != "None") ? 
+                <Button style={{backgroundColor: "white", fontFamily: "Jacques", padding: 10, margin: 20}} onClick={() => mint(false)}>
+                  <Typography variant="h6" > swap </Typography>
 
                 </Button>
                 :
@@ -1725,8 +1800,13 @@ export default function Swapper(props) {
                   </Button>
                 </Grid>
 
+
                 {charObject ? 
-                  <Character nftId={props.nftId} contracts={props.contracts} setMessage={props.setMessage} />
+                  <div>
+                    
+                    <Character nftId={props.nftId} deleteChar={deleteChar} contracts={props.contracts} setMessage={props.setMessage} />
+
+                  </div>
                   :
                   null
                 }

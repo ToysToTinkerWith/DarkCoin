@@ -54,7 +54,7 @@ def approval_program():
     # don't need any real fancy initialization
     handle_creation = Return(
         Seq(
-            Assert(Txn.sender() == Addr("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE")),
+            Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
             App.globalPut(Bytes("amendNum"), Int(0)),
             App.globalPut(Bytes("round"), Txn.first_valid()),
             Int(1)
@@ -64,7 +64,7 @@ def approval_program():
     i = ScratchVar(TealType.uint64)
 
     propose = Seq(
-        Assert(Txn.sender() == Addr("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE")),
+        Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
         Assert(Len(Txn.application_args[1]) >= Int(50)),
         Assert(Len(Txn.application_args[1]) <= Int(2000)),
         App.box_put(Bytes("Proposal"), Txn.application_args[1]),
@@ -77,7 +77,7 @@ def approval_program():
 
     amend = Seq(
         Assert(Txn.first_valid() <= Add(App.globalGet(Bytes("round")), Int(183000))),
-        Assert(Txn.sender() == Addr("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE")),
+        Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
         Assert(Len(Txn.application_args[1]) >= Int(25)),
         Assert(Len(Txn.application_args[1]) <= Int(1000)),
         App.box_put(Concat(Bytes("Amend"), itoa(App.globalGet(Bytes("amendNum")))), Txn.application_args[1]),
@@ -86,19 +86,16 @@ def approval_program():
         Int(1)
     )
 
-    #366000
-    #Assert(Txn.first_valid() <= Add(App.globalGet(Bytes("created")), Int(366000))),
-    #Assert(Txn.first_valid() >= Add(App.globalGet(Bytes("created")), Int(183000))),
+    #549000
+
 
     voteProp = Seq(
         box := App.box_get(Bytes("Amend0")),
         If(box.hasValue(),
         Seq(
-            Assert(Txn.first_valid() <= Add(App.globalGet(Bytes("round")), Int(549000))),
             Assert(Txn.first_valid() >= Add(App.globalGet(Bytes("round")), Int(366000))),
         ),
         Seq(
-            Assert(Txn.first_valid() <= Add(App.globalGet(Bytes("round")), Int(366000))),
             Assert(Txn.first_valid() >= Add(App.globalGet(Bytes("round")), Int(183000))),
         )
         ),
@@ -163,9 +160,9 @@ def approval_program():
             Assert(Txn.first_valid() >= Add(App.globalGet(Bytes("round")), Int(366000))),
         )
         ),
-        Assert(Txn.sender() == Addr("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE")),
+        Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
         If(Txn.application_args[1] == Bytes("accept"),
-        App.box_put(Bytes("Draft"), Txn.application_args[1]),
+        App.box_put(Bytes("Draft"), Txn.application_args[2]),
         App.globalPut(Bytes("round"), Txn.first_valid()),
         ),
         Int(1)

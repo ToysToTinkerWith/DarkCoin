@@ -30,7 +30,7 @@ def approval_program():
 
 
     propose = Seq(
-        Assert(Txn.sender() == Addr("YRVK422KP65SU4TBAHY34R7YT3OYFOL4DUSFR4UADQEQHS2HMXKORIC6TE")),
+        Assert(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM")),
         App.box_put(Concat(Bytes("Proposal"), itoa(App.globalGet(Bytes("proposalNum"))), Bytes(" "), Txn.application_args[1]), itoa(Txn.applications[1])),
         App.globalPut(Bytes("proposalNum"), Add(App.globalGet(Bytes("proposalNum")), Int(1))),
         InnerTxnBuilder.Begin(),
@@ -38,6 +38,19 @@ def approval_program():
             TxnField.type_enum: TxnType.Payment,
             TxnField.receiver: Txn.accounts[1],
             TxnField.amount: Int(20000000),
+        }),
+        InnerTxnBuilder.Submit(),
+        Int(1)
+    )
+
+    opt = Seq(
+        Assert(Txn.sender() == Global.creator_address()),
+        InnerTxnBuilder.Begin(),
+        InnerTxnBuilder.SetFields({
+            TxnField.type_enum: TxnType.AssetTransfer,
+            TxnField.xfer_asset: Txn.assets[0],
+            TxnField.asset_receiver: Global.current_application_address(),
+            TxnField.asset_amount: Int(0),
         }),
         InnerTxnBuilder.Submit(),
         Int(1)
@@ -64,7 +77,8 @@ def approval_program():
         [Txn.on_completion() == OnComplete.CloseOut, handle_closeout],
         [Txn.on_completion() == OnComplete.UpdateApplication, handle_updateapp],
         [Txn.on_completion() == OnComplete.DeleteApplication, handle_deleteapp],
-        [Txn.application_args[0] == Bytes("propose"), Return(propose)]
+        [Txn.application_args[0] == Bytes("propose"), Return(propose)],
+        [Txn.application_args[0] == Bytes("opt"), Return(opt)]
 
     )
     

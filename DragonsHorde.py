@@ -43,6 +43,16 @@ def approval_program():
     )
 
     deleteCharacter = Seq(
+        senderAssetBalance := AssetHolding.balance(Txn.sender(), Txn.assets[0]),
+        Assert(senderAssetBalance.value() == Int(1)),
+        box := App.box_get(Itob(Txn.assets[0])),
+        If(box.hasValue(), Assert(App.box_delete(Itob(Txn.assets[0])))),
+        boxCurrent := App.box_get(Concat(Itob(Txn.assets[0]), Bytes("current"))),
+        If(boxCurrent.hasValue(), Assert(App.box_delete(Concat(Itob(Txn.assets[0]), Bytes("current"))))),
+        Int(1)
+    )
+
+    deleteCurrentCharacter = Seq(
         Assert(Or(Txn.sender() == Addr("762FFO2SIDJG2H7SXU5BQLQJ4Q5BQPGKKJGS2LEDQSJ7N5EMB2VVZMSMXM"), Txn.sender() == Addr("NSPLIQLVYV7US34UDYGYPZD7QGSHWND7AWSWPD4FTLRGW5IF2P2R3IF3EQ"))),
         box := App.box_get(Concat(Itob(Txn.assets[0]), Bytes("current"))),
         If(box.hasValue(), Assert(App.box_delete(Concat(Itob(Txn.assets[0]), Bytes("current"))))),
@@ -161,6 +171,7 @@ def approval_program():
         [Txn.application_args[0] == Bytes("optin"), Return(opt_in)],
         [Txn.application_args[0] == Bytes("joinBrawl"), Return(joinBrawl)],
         [Txn.application_args[0] == Bytes("updateCurrentCharacter"), Return(updateCurrentCharacter)],
+        [Txn.application_args[0] == Bytes("deleteCurrentCharacter"), Return(deleteCurrentCharacter)],
         [Txn.application_args[0] == Bytes("updateCharacter"), Return(updateCharacter)],
         [Txn.application_args[0] == Bytes("deleteCharacter"), Return(deleteCharacter)],
         [Txn.application_args[0] == Bytes("updateDragon"), Return(updateDragon)],

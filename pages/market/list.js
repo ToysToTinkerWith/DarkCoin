@@ -283,7 +283,7 @@ export default function List(props){
                         </Button>
                     </Grid>
                     <Grid item xs={4}>
-                        <Typography variant="h6" color="secondary"> Showing assets {listNum + 1} - {listNum + 50 > allAssets.length ? allAssets.length : listNum + 51} </Typography>
+                        <Typography variant="h6" color="secondary"> Showing assets {listNum + 1} - {listNum + 50 > allAssets.length ? allAssets.length : listNum + 51} ({allAssets.length}) </Typography>
                     </Grid>
                     <Grid item xs={4}>
                         <Button style={{}} onClick={() => listNum + 50 < allAssets.length ? setListNum(prevState => prevState + 50) : null}>

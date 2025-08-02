@@ -33,6 +33,15 @@ const longToByteArray = (long) => {
     return byteArray;
 };
 
+function generateId(length = 10) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 
 export default function Browse(props){
 
@@ -53,6 +62,9 @@ export default function Browse(props){
 
         try {
 
+        setAssets([])
+        setAllAssets([])
+
         const response = await fetch('/api/council/getBoxes', {
             method: "POST",
             body: JSON.stringify({
@@ -68,8 +80,17 @@ export default function Browse(props){
 
         console.log(session)
 
-        setAssets(session.boxes.slice(listNum, listNum + 50))
-        setAllAssets(session.boxes)
+        let parsedAssets = []
+
+        session.boxes.forEach((box) => {
+
+            parsedAssets.push({id: generateId(), assetId: byteArrayToLong(Object.values(box.name).slice(0,8)), amount: byteArrayToLong(Object.values(box.name).slice(8,16)), costId: byteArrayToLong(Object.values(box.name).slice(16,24)), costAmount: byteArrayToLong(Object.values(box.name).slice(24,32)), listingAddress: Object.values(box.name).slice(32,64)})
+
+        })
+
+        console.log(parsedAssets)
+        setAssets(parsedAssets.slice(listNum, listNum + 50))
+        setAllAssets(parsedAssets)
 
         }
         catch(error) {
@@ -103,6 +124,10 @@ export default function Browse(props){
         console.log(buyAmount, id, amount, costId, costAmount, address)
 
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+
+        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+                
+        let params = await client.getTransactionParams().do();
                     
         const stringAddress = algosdk.encodeAddress(address)
 
@@ -120,6 +145,16 @@ export default function Browse(props){
 
         if (!optedin) {
 
+            console.log(activeAccount.address, 
+                activeAccount.address, 
+                undefined,
+                undefined,
+                0, 
+                undefined,
+                Number(id),
+                params
+            );
+
             let otxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
                 activeAccount.address, 
                 activeAccount.address, 
@@ -127,7 +162,7 @@ export default function Browse(props){
                 undefined,
                 0, 
                 undefined,
-                id,
+                Number(id),
                 params
             );
 
@@ -135,9 +170,7 @@ export default function Browse(props){
             
         }
 
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-                
-        let params = await client.getTransactionParams().do();
+        
 
         console.log(listAsset)
 
@@ -270,7 +303,7 @@ export default function Browse(props){
                         </Button>
                     </Grid>
                     <Grid item xs={4}>
-                        <Typography variant="h6" color="secondary"> Showing assets {listNum + 1} - {listNum + 50 > allAssets.length ? allAssets.length : listNum + 51} </Typography>
+                        <Typography variant="h6" color="secondary"> Showing assets {listNum + 1} - {listNum + 50 > allAssets.length ? allAssets.length : listNum + 51} ({allAssets.length}) </Typography>
                     </Grid>
                     <Grid item xs={4}>
                         <Button style={{}} onClick={() => listNum + 50 < allAssets.length ? setListNum(prevState => prevState + 50) : null}>
@@ -283,10 +316,11 @@ export default function Browse(props){
                 :
                     <Grid container>
                         {assets.length > 0 ? 
-                            assets.map((asset, index) => {
+                            assets.map((asset) => {
+                                console.log(asset)
                                 return (
-                                    <Grid id={index} item xs={6} sm={4} md={3} lg={2}>
-                                        <DisplayAsset nftId={byteArrayToLong(Object.values(asset.name).slice(0,8))} amount={byteArrayToLong(Object.values(asset.name).slice(8,16))} costId={byteArrayToLong(Object.values(asset.name).slice(16,24))} costAmount={byteArrayToLong(Object.values(asset.name).slice(24,32))} listingAddress={Object.values(asset.name).slice(32,64)} listing={true} setListAsset={setListAsset} search={search}/>
+                                    <Grid key={asset.id} item xs={6} sm={4} md={3} lg={2}>
+                                        <DisplayAsset nftId={asset.assetId} amount={asset.amount} costId={asset.costId} costAmount={asset.costAmount} listingAddress={asset.listingAddress} listing={true} setListAsset={setListAsset} search={search}/>
                                     </Grid>
                                 )
                             })

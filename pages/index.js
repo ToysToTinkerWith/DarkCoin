@@ -13,6 +13,9 @@ export default function Index(props) {
 
         const arenaRef = useRef(null);
         const councilRef = useRef(null);
+
+        const marketRef = useRef(null);
+
         const mailboxRef = useRef(null);
 
         const discordRef = useRef(null);
@@ -39,6 +42,15 @@ export default function Index(props) {
           const handleMouseLeaveCouncil = () => {
             councilRef.current.pause();
             councilRef.current.currentTime = 0;
+          };
+
+          const handleMouseEnterMarket = () => {
+            marketRef.current.play();
+          };
+        
+          const handleMouseLeaveMarket = () => {
+            marketRef.current.pause();
+            marketRef.current.currentTime = 0;
           };
         
           const handleMouseEnterMailbox = () => {
@@ -151,6 +163,33 @@ export default function Index(props) {
 
 
                         <Button component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
+                        onClick={() => window.location.href = "/market"}
+                        >
+
+                        
+                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: 20, bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Market </Typography>
+                            
+                            <video  
+                                ref={marketRef}
+                                muted
+                                loop
+                                playsInline
+                                preload="metadata"
+                                onMouseEnter={handleMouseEnterMarket}
+                                onMouseLeave={handleMouseLeaveMarket} 
+                                style={{width: "100%", border: "3px solid white", display: "flex", margin: "auto"}}>
+                                <source src={"home/market.mp4"} type='video/mp4'  />
+                            </video>      
+                        
+
+                        </Button>
+
+                    </Grid>
+
+                    <Grid item xs={6} sm={4} md={4} >
+
+
+                        <Button component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
                         onClick={() => window.location.href = "/tools/mailbox"}
                         >
 
@@ -235,8 +274,6 @@ export default function Index(props) {
                         <Button component={motion.div} animate={{opacity: [0,0,0,0,0,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
                         onClick={() => window.location.href = "https://github.com/ToysToTinkerWith/DarkCoin"}
                         >
-
-                        
                             <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: 20, bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Github </Typography>
                             
                             <video  

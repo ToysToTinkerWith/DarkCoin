@@ -2,13 +2,21 @@ import React, {useState, useEffect} from "react"
 
 import algosdk, { assignGroupID } from "algosdk"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import { Card, Typography, Button, Grid, TextField, Link } from "@mui/material"
 
 export default function Load(props) {
 
-  const { activeAccount, signTransactions, sendTransactions } = useWallet()
+  const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+  } = useWallet()
 
   const [credits, setCredits] = useState([])
   const [loadAmount, setLoadAmount] = useState("")

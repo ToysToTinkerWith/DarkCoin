@@ -2,7 +2,7 @@ import React, { useState } from "react"
 
 //43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 
 import algosdk from "algosdk"
@@ -11,7 +11,15 @@ import { Typography, Button, TextField, Grid } from "@mui/material"
 
 export default function Gift(props) { 
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
     
     const [asset, setAsset] = useState("")
     const [amount, setAmount] = useState("")
@@ -30,7 +38,7 @@ export default function Gift(props) {
       }
 
 
-    }, [activeAccount])
+    }, [activeAddress])
 
 
     const handleChange = (event) => {
@@ -79,22 +87,24 @@ export default function Gift(props) {
           let nextTokenAddr
 
           responseAddr = await indexerClient.lookupAccountAssets("5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q").do();
-          nextTokenAddr = responseAddr["next-token"]
+          console.log(responseAddr)
+          nextTokenAddr = responseAddr.nextToken
           
           responseAddr.assets.forEach((asset) => {
-            if (asset.amount >= 0) {
-              addrOptedAssets.push(asset["asset-id"])
+            if (Number(asset.amount) >= 0) {
+              addrOptedAssets.push(Number(asset.assetId))
             }
           })
 
           while (responseAddr.assets.length == 1000) {
             responseAddr = await indexerClient.lookupAccountAssets("5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q").nextToken(nextTokenAddr).limit(1000).do();
-            nextTokenAddr = responseAddr["next-token"]
+            nextTokenAddr = responseAddr.nextToken
+          
             responseAddr.assets.forEach((asset) => {
-                if (asset.amount >= 0) {
-                  addrOptedAssets.push(asset["asset-id"])
-                }
-            })  
+              if (Number(asset.amount) >= 0) {
+                addrOptedAssets.push(Number(asset.assetId))
+              }
+            })
           }
 
           console.log(addrOptedAssets)
@@ -107,14 +117,17 @@ export default function Gift(props) {
 
           if (!opted) {
 
-            let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
-              activeAccount.address, 
-              "5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q", 
-              100000, 
-              undefined,
-              undefined,
-              params
-            );
+            const ftxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+              sender: activeAddress,
+              receiver: "5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q",
+              amount: 100000,
+              suggestedParams: params,
+
+              // these were `undefined` in your positional call:
+              // note: undefined,
+              // closeRemainderTo: undefined,
+            });
+
 
             txns.push(ftxn)
 
@@ -128,8 +141,21 @@ export default function Gift(props) {
               
             let foreignAssets = [asset]
           
-            
-            let otxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, 2638261330, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined);
+            const otxn = algosdk.makeApplicationNoOpTxnFromObject({
+              sender: activeAddress,
+              suggestedParams: params,
+              appIndex: 2638261330,
+
+              appArgs,
+              accounts,
+              foreignApps,
+              foreignAssets,
+
+              // these were `undefined` in your positional call:
+              // note: undefined,
+              // lease: undefined,
+              // rekeyTo: undefined,
+            });
 
             txns.push(otxn)
 
@@ -141,16 +167,19 @@ export default function Gift(props) {
             let div = 10**decimals
         
           
-        let atxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            activeAccount.address, 
-            "5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q", 
-            undefined, 
-            undefined,
-            amount * div,  
-            undefined, 
-            asset, 
-            params
-          );
+            const atxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+              sender: activeAddress,
+              receiver: "5U3SSPACPICLNX4KDZGG6CED7C6R6VVXEIJN7YXBYHDNAUXDINONRIT65Q",
+              amount: amount * div,
+              assetIndex: asset,
+              suggestedParams: params,
+
+              // these were `undefined` in your positional call:
+              // closeRemainderTo: undefined,
+              // revocationTarget: undefined,
+              // note: undefined,
+            });
+
 
           txns.push(atxn)
             
@@ -175,7 +204,22 @@ export default function Gift(props) {
         
           const boxes = [{appIndex: 0, name: accountBox}]
         
-          let txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, 2638261330, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+          const txn = algosdk.makeApplicationNoOpTxnFromObject({
+            sender: activeAddress,
+            suggestedParams: params,
+            appIndex: 2638261330,
+
+            appArgs,
+            accounts,
+            foreignApps,
+            foreignAssets,
+            boxes,
+
+            // these were `undefined` in your positional call:
+            // note: undefined,
+            // lease: undefined,
+            // rekeyTo: undefined,
+          });
 
           txns.push(txn)
         
@@ -196,9 +240,9 @@ export default function Gift(props) {
 
           props.setMessage("Sending Transaction...")
           
-          const { id } = await sendTransactions(signedTransactions)
+          const { txid } = await client.sendRawTransaction(signedTransactions).do()
 
-          let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+          let confirmedTxn = await algosdk.waitForConfirmation(client, txid, 4);
 
           console.log(confirmedTxn)
 
@@ -210,7 +254,7 @@ export default function Gift(props) {
           }catch(err){
             console.log(err)
             props.setMessage(err)
-            props.sendDiscordMessage("Rewards/Gift", activeAccount.address, err)
+            props.sendDiscordMessage("Rewards/Gift", activeAddress, err)
           }
          
   

@@ -4,8 +4,6 @@ import algosdk from "algosdk"
 
 import { Typography, Button, TextField, Card, Grid, LinearProgress, linearProgressClasses, styled } from "@mui/material"
 
-import { useWallet } from '@txnlab/use-wallet'
-
 
 import { CID } from 'multiformats/cid'
 
@@ -22,8 +20,6 @@ function formatNumber(num) {
 }
 
 export default function DisplayAsset(props) {
-
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
 
     const [ nft, setNft ] = useState(null)
     const [ nftUrl, setNftUrl ] = useState(null)
@@ -51,7 +47,8 @@ export default function DisplayAsset(props) {
             const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
             console.log(props.listingAddress)
             if (props.listingAddress) {
-                const stringAddress = algosdk.encodeAddress(props.listingAddress);
+                const stringAddress = algosdk.encodeAddress(Uint8Array.from(props.listingAddress));
+                console.log(stringAddress)
                 setListingAddress(stringAddress)
             }
 
@@ -105,9 +102,9 @@ export default function DisplayAsset(props) {
 
             }
             
-            let nft = await indexerClient.searchForAssets().index(props.nftId).do();
+            let nft = await indexerClient.searchForAssets().index(props.nftId).limit(1).do();
 
-            console.log(nft)
+            console.log(nft.assets[0].params)
 
             setNft(nft)
 

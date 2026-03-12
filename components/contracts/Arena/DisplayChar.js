@@ -4,7 +4,7 @@ import algosdk from "algosdk"
 
 import { Typography, Button, TextField, Card, Grid, LinearProgress, linearProgressClasses, styled } from "@mui/material"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -56,7 +56,15 @@ import * as digest from 'multiformats/hashes/digest'
 
 export default function DisplayChar(props) {
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
 
     const [ nft, setNft ] = useState(null)
     const [ nftUrl, setNftUrl ] = useState(null)
@@ -93,76 +101,44 @@ export default function DisplayChar(props) {
                     
                 });
         
-        let session = await response.json()
+                let session = await response.json()
 
-        if (session.charObject != "none") {
-            setCharObject(session.charObject)
-        }
-        if (session.action) {
-            setAction(session.action)
-        }
-    
-        if (session.nft.assets[0].params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
-            const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
 
-            const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
-
-            const ocid = CID.create(0, 0x70, mhdigest)
-
-            let char = JSON.parse(session.charStats)
+                if (session.charObject != "none") {
+                    setCharObject(session.charObject)
+                }
+                if (session.action) {
+                    setAction(session.action)
+                }
             
-            let properties = JSON.stringify(char.properties)
-            setNft(session.nft.assets[0].params)
-            setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
-            setCharStats(properties)
+                if (session.nft.assets[0].params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
+                    const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
+
+                    const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
+
+                    const ocid = CID.create(0, 0x70, mhdigest)
+
+                    let char = JSON.parse(session.charStats)
+                    
+                    let properties = JSON.stringify(char.properties)
+                    setNft(session.nft.assets[0].params)
+                    setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
+                    setCharStats(properties)
+                    
+                }
+                else {
+                    setNft(session.nft.assets[0].params)
+                    setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
+                    setCharStats(session.charStats)
+                }
+
             
-        }
-        else {
-            setNft(session.nft.assets[0].params)
-            setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
-            setCharStats(session.charStats)
-        }
+                }
+                catch(error) {
+                        console.log(error.toString())
+                }
 
-        
-        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
-
-            const txns = await indexerClient.searchForTransactions(1870514811).do();
-
-            const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-            let assetBox = algosdk.encodeUint64(props.nftId)
-
-            try {
-
-                let accountBoxXp = await client.getApplicationBoxByName(props.contracts.dragonshorde, new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("xp"))])).do();
-                
-                var length = accountBoxXp.value.length;
-
-                let buffer = Buffer.from(accountBoxXp.value);
-                var result = buffer.readUIntBE(0, length);
-
-                setXp(result)
-
-                let accountBoxPoints = await client.getApplicationBoxByName(props.contracts.dragonshorde, new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("points"))])).do();
-                                
-
-                setPoints(accountBoxPoints.value)
-
-                
-            }
-            catch(err) {
-                //console.log(err)
-            }
-        
-    
-            }
-            catch(error) {
-                    //props.sendDiscordMessage(error, "Fetch Char", activeAccount.address)
-                
-               
-               }
-
-        }
+                }
 
             fetchData();
 
@@ -170,225 +146,8 @@ export default function DisplayChar(props) {
     }, [props.nftId])
 
 
-      const chooseCharacter = async () => {
-
-        try {
-
       
-        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
-
-        let optedin = false
-
-        let response = await indexerClient.lookupAccountAppLocalStates(activeAccount.address).do();
-        response["apps-local-states"].forEach((localstate) => {
-            if (localstate.id == props.contracts.arena) {
-                optedin = true
-            }
-        })
-
-
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)  
-              
-        let params = await client.getTransactionParams().do()
-
-        const appArgs = []
-        
-
-        const accounts = []
-        const foreignApps = []
-            
-        const foreignAssets = [props.nftId]
-
-        const boxes = []
-
-        props.setMessage("Sign Transaction...")
-
-        if (optedin) {
-
-            appArgs.push(
-                new Uint8Array(Buffer.from("select")),
-                new Uint8Array(Buffer.from(nft.name))
-            )
-
-            let txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.arena, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-
-            let encoded = algosdk.encodeUnsignedTransaction(txn)
-        
-            const signedTransactions = await signTransactions([encoded])
-    
-            props.setMessage("Sending Transaction...")
-
-            const { id } = await sendTransactions(signedTransactions)
-
-            let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-
-            props.setMessage("Transaction Confirmed, Character Successfully Chosen")
-
-        }
-
-        else {
-
-            appArgs.push(
-                new Uint8Array(Buffer.from(nft.name))
-            )
-
-            let txn = algosdk.makeApplicationOptInTxn(activeAccount.address, params, props.contracts.arena, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-
-            let encoded = algosdk.encodeUnsignedTransaction(txn)
-        
-            const signedTransactions = await signTransactions([encoded])
-    
-            props.setMessage("Sending Transaction...")
-
-            const { id } = await sendTransactions(signedTransactions)
-
-            let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-
-            props.setMessage("Transaction Confirmed, Application Opted In")
-        }
-    }
-    catch(error) {
-        await props.sendDiscordMessage(error, "Select Char", activeAccount.address)
-       }
-        
-
-
-
-      }
-
-      const handleChange = (event) => {
-        const target = event.target;
-        let value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-
-        if (name == "price") {
-            setPrice(value)
-        }
-
-        
-
-        
-    
-        
-      }
-
-      const sendToMarket = async () => {
-
-        try {
-
-            props.setMessage("Sign Transaction...")
-
-
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-        let params = await client.getTransactionParams().do()
-
-        let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
-            activeAccount.address, 
-            "VI66S7AN2G4HKUD7DXJUSVEP54MDJ42NGDOUUD3LQJSCU7WT5UU2KAIHAU", 
-            300000, 
-            undefined,
-            undefined,
-            params
-          );
-
-          let encoded = algosdk.encodeUnsignedTransaction(ftxn)
-        
-        const signedTransactions = await signTransactions([encoded])
-
-        props.setMessage("Sending Transaction...")
-
-        const { id } = await sendTransactions(signedTransactions)
-
-        let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-
-        props.setMessage("Listing in marketplace...")
-
-
-        const response = await fetch('/api/arena/sellChar', {
-            method: "POST",
-            body: JSON.stringify({
-              address: activeAccount.address,
-              nftId: props.nftId,
-              price: price
-            }),
-            headers: {
-              "Content-Type": "application/json",
-            }
-              
-          });
-        
-          const session = await response.json()
-    
-         
-
-        props.setMessage("Asset listed in marketplace.")
-        }
-        catch(error) {
-            await props.sendDiscordMessage(error, "Send Char To Market", activeAccount.address)
-           }
-
-      }
-
-      const claimNft = async () => {
-
-        try {
-
-            props.setMessage("Sign Transaction...")
-
-
-            const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-
-            let params = await client.getTransactionParams().do()
-
-            let otxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-                activeAccount.address, 
-                activeAccount.address, 
-                undefined,
-                undefined,
-                0, 
-                undefined,
-                props.nftId,
-                params
-            );
-
-            let encoded = algosdk.encodeUnsignedTransaction(otxn)
-            
-            const signedTransactions = await signTransactions([encoded])
-
-            props.setMessage("Sending Transaction...")
-
-            const { id } = await sendTransactions(signedTransactions)
-
-            let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
-
-            props.setMessage("Transfering Asset...")
-
-
-            const response = await fetch('/api/arena/claimChar', {
-                method: "POST",
-                body: JSON.stringify({
-                  address: activeAccount.address,
-                  nftId: props.nftId
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                }
-                  
-              });
-            
-              const session = await response.json()
-        
-        
-
-          props.setMessage("Asset Transfered.")
-        }
-        catch(error) {
-            await props.sendDiscordMessage(error, "Claim Char NFT", activeAccount.address)
-           }
-
-      }
-
+      
       const longToByteArray = (long) => {
         // we want to represent the input as a 8-bytes array
         var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -548,16 +307,12 @@ export default function DisplayChar(props) {
                                     null
                                     :
                                     <Grid container>
-                                        <Grid item xs={6}>
-                                            <Button color="primary" style={{backgroundColor: "white", display: "flex", margin: "auto"}} onClick={() => props.setNft(props.nftId)} >                                
-                                                <Typography align="center" variant="caption" style={{color: "#000000"}}> Join Fight </Typography>
-                                            </Button>
-                                        </Grid>
-                                        <Grid item xs={6}>
+                                       
+                                        <Grid item xs={12}>
                                         <Button color="primary" style={{backgroundColor: "white", display: "grid", margin: "auto"}} onClick={() => props.startFight(props.nftId)} >                                
                                             <Typography  variant="caption"> Start Fight </Typography>
                                             <Typography color="primary" align="center" variant="caption" style={{display: "inline-flex"}}> {(10000).toLocaleString()} <img src="/invDC.svg" style={{display: "inline-flex", width: 30, paddingLeft: 10}} />
- </Typography>
+                                            </Typography>
                                         </Button>
                                         </Grid>
                                     </Grid>

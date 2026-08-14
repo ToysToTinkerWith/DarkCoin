@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Quest">
+  <defs>
+    <linearGradient id="questGold" x1="12" y1="8" x2="52" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0b8"/>
+      <stop offset="0.52" stop-color="#e1b864"/>
+      <stop offset="1" stop-color="#875d1f"/>
+    </linearGradient>
+  </defs>
+  <path d="M17 10h24l6 6v35c0 2-1.6 3.6-3.6 3.6H17c-2 0-3.6-1.6-3.6-3.6V13.6C13.4 11.6 15 10 17 10Z" fill="#111" stroke="url(#questGold)" stroke-width="3"/>
+  <path d="M40.5 10v7.5H48" fill="none" stroke="url(#questGold)" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M22 25h20M22 34h15M22 43h18" stroke="#f7df9c" stroke-width="3" stroke-linecap="round"/>
+  <path d="M12 52c8-4.5 13.3-3.8 20 0 6.7 3.8 12 4.5 20 0" fill="none" stroke="#e1b864" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -8,6 +8,18 @@ const { Readable } = require('stream');
 
 const Jimp = require('jimp') ;
 
+function isFarmersHead(headUrl) {
+    return /(?:^|[\/%5c%2f_\-\s])farmer(?:$|[._\-\s%?&#/])/i.test(String(headUrl || ""))
+}
+
+function compositeLayer(base, layer) {
+    base.composite(layer, 0, 0, {
+        mode: Jimp.BLEND_SOURCE_OVER,
+        opacityDest: 1,
+        opacitySource: 1
+    })
+}
+
 import { initializeApp, getApps } from "firebase/app"
 import { getStorage, ref, uploadBytes, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { getFirestore, doc, setDoc } from "firebase/firestore";
@@ -80,51 +92,33 @@ async function getHash(req, res) {
                 }
                 let head = await Jimp.read(req.body.Head)
                 head = head.resize(1080,1080)
+                const farmersHeadOnTop = isFarmersHead(req.body.Head)
                 let skin = await Jimp.read(req.body.Skin)
                 skin = skin.resize(1080,1080)
                 let background = await Jimp.read(req.body.Background)
                 background = background.resize(1080,1080)
                 
-                background.composite(skin, 0, 0, {
-                    mode: Jimp.BLEND_SOURCE_OVER,
-                    opacityDest: 1,
-                    opacitySource: 1
-                })
+                compositeLayer(background, skin)
 
                 if (req.body.Weapon != "None") {
-                    background.composite(weapon, 0, 0, {
-                        mode: Jimp.BLEND_SOURCE_OVER,
-                        opacityDest: 1,
-                        opacitySource: 1
-                    })
+                    compositeLayer(background, weapon)
                 }
                 if (req.body.Magic != "None") {
-                    background.composite(magic, 0, 0, {
-                        mode: Jimp.BLEND_SOURCE_OVER,
-                        opacityDest: 1,
-                        opacitySource: 1
-                    })
+                    compositeLayer(background, magic)
                 }
                 
-                background.composite(head, 0, 0, {
-                    mode: Jimp.BLEND_SOURCE_OVER,
-                    opacityDest: 1,
-                    opacitySource: 1
-                })
+                if (!farmersHeadOnTop) {
+                    compositeLayer(background, head)
+                }
 
                 if (req.body.Armour != "None") {
-                    background.composite(armour, 0, 0, {
-                        mode: Jimp.BLEND_SOURCE_OVER,
-                        opacityDest: 1,
-                        opacitySource: 1
-                    })
+                    compositeLayer(background, armour)
                 }
                 if (req.body.Extra != "None") {
-                    background.composite(extra, 0, 0, {
-                        mode: Jimp.BLEND_SOURCE_OVER,
-                        opacityDest: 1,
-                        opacitySource: 1
-                    })
+                    compositeLayer(background, extra)
+                }
+                if (farmersHeadOnTop) {
+                    compositeLayer(background, head)
                 }
 
                 background.getBuffer(Jimp.MIME_PNG, (err, buffer) => {

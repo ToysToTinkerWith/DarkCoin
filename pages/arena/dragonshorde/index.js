@@ -5,7 +5,7 @@ import algosdk from "algosdk"
 
 import { Grid, Typography, Button, Card, styled, LinearProgress, linearProgressClasses } from "@mui/material"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import DisplayChar from "../../../components/contracts/Arena/DisplayChar"
 
@@ -63,8 +63,16 @@ import FeedIcon from '@mui/icons-material/Feed';
 
 export default function DragonsHorde(props) {
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
-
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
+    
     const [dcChars, setDcChars] = useState([])
 
     const [brawlChars, setBrawlChars] = useState([])
@@ -621,7 +629,7 @@ export default function DragonsHorde(props) {
                                 </div>
                             }                        </Grid>
                         <Grid item xs={6}>
-                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.svg"} />
+                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.png"} />
                             {speedAdj == 0 ?
                                 <Typography color="secondary" align="center" variant="subtitle1"> {Number(drag.speed).toFixed(1)} </Typography>
                                 :
@@ -632,7 +640,7 @@ export default function DragonsHorde(props) {
                             }
                         </Grid>
                         <Grid item xs={6}>
-                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.svg"} />
+                            <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.png"} />
                             {resistAdj == 0 ?
                                 <Typography color="secondary" align="center" variant="subtitle1"> {Number(drag.resist).toFixed(1)} </Typography>
                                 :
@@ -1056,12 +1064,12 @@ export default function DragonsHorde(props) {
                         <Typography color="secondary" align="center" variant="subtitle1"> Health is the characters lifeforce. Taking damage causes loss of health. When a character hits 0 they will be eliminated. </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 60, maxWidth: 80, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.svg"} />
+                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 60, maxWidth: 80, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.png"} />
                         <Typography color="secondary" align="center" variant="h6"> Speed </Typography>
                         <Typography color="secondary" align="center" variant="subtitle1"> Speed determines the characters turn order. </Typography>
                     </Grid>
                     <Grid item xs={6}>
-                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 60, maxWidth: 80, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.svg"} />
+                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 60, maxWidth: 80, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.png"} />
                         <Typography color="secondary" align="center" variant="h6"> Resist </Typography>
                         <Typography color="secondary" align="center" variant="subtitle1"> Resist determines the characters ability to avoid an applied negative effect. </Typography>
                     </Grid>

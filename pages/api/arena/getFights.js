@@ -14,45 +14,59 @@ async function getFights(req, res) {
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
     });
 
-    function base64ToNumber(base64) {
-        const binary = atob(base64); // decode base64 to binary string
-        let result = 0;
-        for (let i = 0; i < binary.length; i++) {
-            result = (result << 8) + binary.charCodeAt(i);
+    function u8_8_toInt(u8, { littleEndian = false, asNumberIfSafe = true } = {}) {
+        if (!(u8 instanceof Uint8Array) || u8.length !== 8) {
+            throw new TypeError("Expected Uint8Array(8)");
         }
-        return result;
-    }
+
+        let n = 0n;
+
+        if (littleEndian) {
+            for (let i = 7; i >= 0; i--) n = (n << 8n) | BigInt(u8[i]);
+        } else {
+            for (let i = 0; i < 8; i++) n = (n << 8n) | BigInt(u8[i]);
+        }
+
+        if (asNumberIfSafe && n <= BigInt(Number.MAX_SAFE_INTEGER)) return Number(n);
+        return n; // BigInt
+        }
+    
+
 
     //D4SDJ7CVANGHXBF2IDQFPEX2TNWWRQBZAWRMUHSEXQ63V7VW2ZEK4QBMJU
     const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
+    console.log(req.body.contract)
+
     let global = await indexerClient.lookupApplications(req.body.contract).do();
 
-    let globalState = global.application.params["global-state"]
+    console.log(global)
+
+    let globalState = global.application.params.globalState
+
 
     let fights = []
 
-    globalState.forEach(async (keyVal) => {
-        if (keyVal.key[0] == 'A') {
-            console.log(keyVal.key)
-            let asset = base64ToNumber(keyVal.key)
-            let wager = keyVal.value.uint
-            fights.push({asset: asset, wager: wager})
+    if (globalState) {
+
+        globalState.forEach(async (keyVal) => {
+                console.log(keyVal)
+                let asset = u8_8_toInt(keyVal.key)
+                console.log(asset)
+                let wager = keyVal.value.uint
+                console.log(wager)
+                fights.push({asset: asset, wager: Number(wager)})
+                
             
-        }
-    })
+        })
+
+    }
+
+    
    
     
     res.json({fights: fights});
     
-
-        
-
-
-  
-  
-  
-
    
 }
 

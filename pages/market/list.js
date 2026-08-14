@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { Grid, Typography, Button, TextField } from "@mui/material"
 
-import { useWallet } from "@txnlab/use-wallet"
+import { useWallet } from "@txnlab/use-wallet-react"
 
 import DisplayAsset from "../../components/contracts/Market/displayAsset"
 
@@ -24,15 +24,19 @@ const longToByteArray = (long) => {
     return byteArray;
 };
 
-async function sleep(msec) {
-    return new Promise(resolve => setTimeout(resolve, msec));
-}
-
 
 
 export default function List(props){
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
 
     const [ allAssets, setAllAssets ] = useState([])
     const [ assets, setAssets ] = useState([])
@@ -54,7 +58,7 @@ export default function List(props){
         const response = await fetch('/api/getAddrAssets', {
             method: "POST",
             body: JSON.stringify({
-                activeAccount: activeAccount.address
+                activeAccount: activeAddress
             }),
             headers: {
                 "Content-Type": "application/json",
@@ -63,6 +67,8 @@ export default function List(props){
         });
 
         const session = await response.json()
+
+        console.log(session)
 
         setAssets(session.slice(listNum, listNum + 50))
         setAllAssets(session)
@@ -77,14 +83,14 @@ export default function List(props){
 
     useEffect(() => {
         
-        if (activeAccount) {
+        if (activeAddress) {
 
             fetchData()
             
         }
         
     
-    }, [listNum, activeAccount])
+    }, [listNum, activeAddress])
 
     const handleChange = (event) => {
         
@@ -126,27 +132,25 @@ export default function List(props){
                 
         let params = await client.getTransactionParams().do();
 
-        let ftxn = algosdk.makePaymentTxnWithSuggestedParams(
-            activeAccount.address,
-            "HZ2SGTDNOACVJXJ5HP3BM7O3HVEQDH4HYRRWW6ZM5GYOCLIXNMDPN74FAY", 
-            100000, 
-            undefined,
-            undefined,
-            params
-        );
+        const ftxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+            sender: activeAddress,
+            receiver: "HZ2SGTDNOACVJXJ5HP3BM7O3HVEQDH4HYRRWW6ZM5GYOCLIXNMDPN74FAY",
+            amount: 100000,
+            suggestedParams: params,
+            // note: `closeRemainderTo`, `rekeyTo`, and `note` are optional and omitted here
+        });
 
         console.log(listAsset)
 
-        let ltxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            activeAccount.address, 
-            "HZ2SGTDNOACVJXJ5HP3BM7O3HVEQDH4HYRRWW6ZM5GYOCLIXNMDPN74FAY", 
-            undefined,
-            undefined,
-            listAtomicAmount, 
-            undefined,
-            listAsset,
-            params
-        );
+        const ltxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+            sender: activeAddress,
+            receiver: "HZ2SGTDNOACVJXJ5HP3BM7O3HVEQDH4HYRRWW6ZM5GYOCLIXNMDPN74FAY",
+            amount: listAtomicAmount,
+            assetIndex: listAsset,
+            suggestedParams: params,
+            // optional fields omitted: note, closeRemainderTo, revocationTarget, rekeyTo
+        });
+
 
         let appArgs = []
         appArgs.push(
@@ -160,7 +164,7 @@ export default function List(props){
             
         let foreignAssets = [listAsset]
 
-        let listingAddress = algosdk.decodeAddress(activeAccount.address).publicKey
+        let listingAddress = algosdk.decodeAddress(activeAddress).publicKey
 
         let listBox = new Uint8Array([...longToByteArray(listAsset), ...longToByteArray(listAtomicAmount), ...longToByteArray(costId), ...longToByteArray(costAtomicAmount), ...listingAddress])
 
@@ -168,7 +172,22 @@ export default function List(props){
 
         let boxes = [{appIndex: 0, name: listBox}]
         
-        let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.market, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+        const atxn = algosdk.makeApplicationNoOpTxnFromObject({
+            sender: activeAddress,
+            suggestedParams: params,
+            appIndex: props.contracts.market,
+
+            appArgs,
+            accounts,
+            foreignApps,
+            foreignAssets,
+            boxes,
+
+            // These were `undefined` in your positional version:
+            // note: undefined,
+            // lease: undefined,
+            // rekeyTo: undefined,
+        });
         
         let txns = [ftxn, ltxn, atxn]
 
@@ -198,7 +217,21 @@ export default function List(props){
 
             let boxes = []
             
-            let otxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.market, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+            const otxn = algosdk.makeApplicationNoOpTxnFromObject({
+                sender: activeAddress,
+                suggestedParams: params,
+                appIndex: props.contracts.market,
+
+                appArgs,
+                accounts,
+                foreignApps,
+                foreignAssets,
+                boxes,
+
+                // note: undefined,
+                // lease: undefined,
+                // rekeyTo: undefined,
+            });
 
             txns.unshift(otxn)
             
@@ -222,9 +255,9 @@ export default function List(props){
 
         props.setMessage("Sending transaction...")
 
-        const { id } = await sendTransactions(signedTransactions)
+        const { txid } = await client.sendRawTransaction(signedTransactions).do()
 
-        let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+        let confirmedTxn = await algosdk.waitForConfirmation(client, txid, 4);
 
         props.setMessage("Asset listed")
 
@@ -232,10 +265,6 @@ export default function List(props){
         fetchData()
 
     }
-
-  
-
-
     
         return (
             <div>
@@ -300,9 +329,10 @@ export default function List(props){
                     <Grid container>
                         {assets.length > 0 ? 
                             assets.map((asset, index) => {
+                                console.log(asset)
                                 return (
-                                    <Grid id={asset["asset-id"]} item xs={4} sm={3} md={2} lg={1}>
-                                        <DisplayAsset nftId={asset["asset-id"]} amount={asset.amount} setListAsset={setListAsset} search={search}/>
+                                    <Grid id={asset.assetId} item xs={4} sm={3} md={2} lg={1}>
+                                        <DisplayAsset nftId={asset.assetId} amount={asset.amount} setListAsset={setListAsset} search={search}/>
                                     </Grid>
                                 )
                             })

@@ -14,6 +14,11 @@ import { CID } from 'multiformats/cid'
 
 import * as mfsha2 from 'multiformats/hashes/sha2'
 import * as digest from 'multiformats/hashes/digest'
+import {
+    POINTS_BYTE_LENGTH,
+    getSkillPointStatAdjustments,
+    normalizePointsArray,
+} from "./Trees.js";
 
 
   const BorderLinearProgressHealth = styled(LinearProgress)(({ theme }) => ({
@@ -52,6 +57,18 @@ import * as digest from 'multiformats/hashes/digest'
     },
   }));
 
+const DEFAULT_CRIT_CHANCE = 25
+const DEFAULT_CRIT_DAMAGE = 200
+
+function getCharacterPercentStat(charObj, key, fallbackValue) {
+  const raw = charObj?.[key]
+  const value = Number(raw)
+
+  return raw === undefined || raw === null || raw === "" || !Number.isFinite(value)
+    ? fallbackValue
+    : value
+}
+
 
 
 export default function DisplayChar(props) {
@@ -73,7 +90,7 @@ export default function DisplayChar(props) {
     const [ charObject, setCharObject ] = useState(null)
     const [ action, setAction ] = useState(null)
 
-    const [ points, setPoints ] = useState(new Uint8Array(1600))
+    const [ points, setPoints ] = useState(new Uint8Array(POINTS_BYTE_LENGTH))
     const [ xp, setXp ] = useState(0)
 
 
@@ -131,6 +148,17 @@ export default function DisplayChar(props) {
                     setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
                     setCharStats(session.charStats)
                 }
+
+                try {
+                    const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
+                    const assetBox = algosdk.encodeUint64(props.nftId)
+                    const accountBoxPoints = await client.getApplicationBoxByName(
+                        props.contracts.dragonshorde,
+                        new Uint8Array([...assetBox, ...new Uint8Array(Buffer.from("points"))])
+                    ).do();
+
+                    setPoints(normalizePointsArray(accountBoxPoints.value))
+                } catch (err) {}
 
             
                 }
@@ -450,6 +478,8 @@ export default function DisplayChar(props) {
                 let dexterityAdj = 0
                 let intelligenceAdj = 0
                 let accuracyAdj = 0
+                let critChanceAdj = 0
+                let critDamageAdj = 0
 
                 if (charObject.effects) {
                     
@@ -509,8 +539,20 @@ export default function DisplayChar(props) {
                     }
                     if (charObject.effects["focus"]) {
                         accuracyAdj += charObject.effects["focus"] * 0.3
+                        critChanceAdj += charObject.effects["focus"] * 0.04
                     }
                 }
+
+                const skillPointStatAdjustments = getSkillPointStatAdjustments(points)
+                healthAdj += skillPointStatAdjustments.health
+                speedAdj += skillPointStatAdjustments.speed
+                resistAdj += skillPointStatAdjustments.resist
+                strengthAdj += skillPointStatAdjustments.strength
+                dexterityAdj += skillPointStatAdjustments.dexterity
+                intelligenceAdj += skillPointStatAdjustments.intelligence
+                accuracyAdj += skillPointStatAdjustments.accuracy
+                critChanceAdj += skillPointStatAdjustments.critChance
+                critDamageAdj += skillPointStatAdjustments.critDamage
 
                 let poisonAdj = points[0]
                 let bleedAdj = points[100]
@@ -707,7 +749,7 @@ export default function DisplayChar(props) {
                                         }
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.svg"} />
+                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.png"} />
                                         {speedAdj == 0 ?
                                             <Typography color="secondary" align="center" variant="subtitle1"> {Number(charObject.speed).toFixed(1)} </Typography>
                                             :
@@ -718,7 +760,7 @@ export default function DisplayChar(props) {
                                         }                                
                                     </Grid>
                                     <Grid item xs={6}>
-                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.svg"} />
+                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.png"} />
                                         {resistAdj == 0 ?
                                             <Typography color="secondary" align="center" variant="subtitle1"> {Number(charObject.resist).toFixed(1)} </Typography>
                                             :
@@ -727,6 +769,28 @@ export default function DisplayChar(props) {
                                             :
                                             <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(charObject.resist + resistAdj).toFixed(1)} </Typography>
                                         }                                
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/critChance.svg"} />
+                                        {critChanceAdj == 0 ?
+                                            <Typography color="secondary" align="center" variant="subtitle1"> {getCharacterPercentStat(charObject, "critChance", DEFAULT_CRIT_CHANCE).toFixed(1)}% </Typography>
+                                            :
+                                            critChanceAdj < 0 ?
+                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(getCharacterPercentStat(charObject, "critChance", DEFAULT_CRIT_CHANCE) + critChanceAdj).toFixed(1)}% </Typography>
+                                            :
+                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(getCharacterPercentStat(charObject, "critChance", DEFAULT_CRIT_CHANCE) + critChanceAdj).toFixed(1)}% </Typography>
+                                        }
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/critDamage.svg"} />
+                                        {critDamageAdj == 0 ?
+                                            <Typography color="secondary" align="center" variant="subtitle1"> {getCharacterPercentStat(charObject, "critDamage", DEFAULT_CRIT_DAMAGE).toFixed(1)}% </Typography>
+                                            :
+                                            critDamageAdj < 0 ?
+                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(getCharacterPercentStat(charObject, "critDamage", DEFAULT_CRIT_DAMAGE) + critDamageAdj).toFixed(1)}% </Typography>
+                                            :
+                                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(getCharacterPercentStat(charObject, "critDamage", DEFAULT_CRIT_DAMAGE) + critDamageAdj).toFixed(1)}% </Typography>
+                                        }
                                     </Grid>
                                 </Grid>
 
@@ -1276,21 +1340,9 @@ export default function DisplayChar(props) {
             
             else {
                 return (
-                    <Button style={{display: "block"}} onClick={() => props.setNft(props.nftId, props.price)} >
-                        <Typography color="secondary" style={{position: "absolute", bottom: props.price ? 55 : 15, left: 15}} align="left" variant="caption"> {nft.name} </Typography>
+                    <div style={{display: "block"}} >
                         <img style={{width: "100%", borderRadius: 5}} src={nftUrl} />
-                        {props.price ? 
-                        <Typography color="secondary" align="center" variant="h6"> 
-                        <img style={{width: 50, paddingRight: 20}} src="./invDC.svg"/>
-                        {(props.price).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
- 
-                        </Typography>
-                        :
-                        null
-                        }
-                       
-
-                    </Button>
+                    </div>
         
                 )
             }

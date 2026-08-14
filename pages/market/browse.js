@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { Grid, Typography, Button, TextField } from "@mui/material"
 
-import { useWallet } from "@txnlab/use-wallet"
+import { useWallet } from "@txnlab/use-wallet-react"
 
 import DisplayAsset from "../../components/contracts/Market/displayAsset"
 
@@ -45,7 +45,15 @@ function generateId(length = 10) {
 
 export default function Browse(props){
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
 
     const [ assets, setAssets ] = useState([])
     const [ allAssets, setAllAssets ] = useState([])
@@ -105,7 +113,7 @@ export default function Browse(props){
             fetchData()
         
     
-    }, [listNum, activeAccount])
+    }, [listNum, activeAddress])
 
     const handleChange = (event) => {
         
@@ -129,7 +137,7 @@ export default function Browse(props){
                 
         let params = await client.getTransactionParams().do();
                     
-        const stringAddress = algosdk.encodeAddress(address)
+        const stringAddress = algosdk.encodeAddress(Uint8Array.from(address))
 
         let txns = []
 
@@ -138,33 +146,30 @@ export default function Browse(props){
         let optedin = false
         
         opted.balances.forEach((account) => {
-            if(account.address == activeAccount.address) {
+            if(account.address == activeAddress) {
             optedin = true
             }
         })
 
         if (!optedin) {
 
-            console.log(activeAccount.address, 
-                activeAccount.address, 
-                undefined,
-                undefined,
-                0, 
-                undefined,
-                Number(id),
-                params
-            );
+    
 
-            let otxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-                activeAccount.address, 
-                activeAccount.address, 
-                undefined,
-                undefined,
-                0, 
-                undefined,
-                Number(id),
-                params
-            );
+            const otxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+                sender: activeAddress,
+                receiver: activeAddress,
+                amount: 0,
+                assetIndex: Number(id),
+                suggestedParams: params,
+
+                // optional fields matching your previous `undefined`s:
+                closeRemainderTo: undefined,
+                revocationTarget: undefined,
+                note: undefined,
+                assetSender: undefined, // (older name for revocationTarget in some examples)
+                lease: undefined,
+                rekeyTo: undefined,
+            })
 
             txns.push(otxn)
             
@@ -177,26 +182,34 @@ export default function Browse(props){
         let ptxn
 
         if (costId == 0) {
-            ptxn = algosdk.makePaymentTxnWithSuggestedParams(
-                activeAccount.address,
-                stringAddress, 
-                costAmount * buyAmount, 
-                undefined,
-                undefined,
-                params
-            );
+            ptxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+                sender: activeAddress,
+                receiver: stringAddress,
+                amount: costAmount * buyAmount,
+                suggestedParams: params,
+
+                // optional fields (were `undefined` in your original call)
+                closeRemainderTo: undefined,
+                note: undefined,
+                lease: undefined,
+                rekeyTo: undefined,
+            })
         }
         else {
-            ptxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-                activeAccount.address, 
-                stringAddress, 
-                undefined,
-                undefined,
-                costAmount * buyAmount, 
-                undefined,
-                costId,
-                params
-            );
+            ptxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+                sender: activeAddress,
+                receiver: stringAddress,
+                amount: costAmount * buyAmount,
+                assetIndex: Number(costId),
+                suggestedParams: params,
+
+                // optional fields (were `undefined` in your original call)
+                closeRemainderTo: undefined,
+                revocationTarget: undefined,
+                note: undefined,
+                lease: undefined,
+                rekeyTo: undefined,
+            })
         }
 
 
@@ -224,8 +237,22 @@ export default function Browse(props){
 
         let boxes = [{appIndex: 0, name: listBox}, {appIndex: 0, name: newListBox}]
         
-        let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.market, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+        const atxn = algosdk.makeApplicationNoOpTxnFromObject({
+            sender: activeAddress,
+            suggestedParams: params,
+            appIndex: props.contracts.market,
 
+            appArgs,                 // Uint8Array[]
+            accounts,                // string[] | undefined
+            foreignApps,             // number[] | undefined
+            foreignAssets,           // number[] | undefined
+            boxes,                   // { appIndex: number, name: Uint8Array }[] | undefined
+
+            // optional fields (were `undefined` in your original call)
+            note: undefined,
+            lease: undefined,
+            rekeyTo: undefined,
+        })
         txns.push(atxn)
 
         let txgroup = algosdk.assignGroupID(txns)
@@ -246,9 +273,9 @@ export default function Browse(props){
 
         props.setMessage("Sending transaction...")
 
-        const { txId } = await sendTransactions(signedTransactions)
+        const { txid } = await client.sendRawTransaction(signedTransactions).do()
 
-        let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
+        let confirmedTxn = await algosdk.waitForConfirmation(client, txid, 4);
 
         props.setMessage("Asset bought")
 

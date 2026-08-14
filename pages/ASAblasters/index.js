@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Canvas from '../../components/contracts/ASAblasters/Canvas.js';
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import algosdk from "algosdk"
 
@@ -14,8 +14,16 @@ import { doc, setDoc, onSnapshot, serverTimestamp, increment, updateDoc } from "
 
 export default function ASAblasters(props) {
 
-  const { activeAccount, signTransactions, sendTransactions } = useWallet()
-
+  const {
+    wallets,
+    activeWallet,
+    activeAddress,
+    isReady,
+    signTransactions,
+    transactionSigner,
+    algodClient,
+  } = useWallet()
+  
   const [ready, setReady] = useState(false)
 
   const [highScore, setHighScore] = useState(0)

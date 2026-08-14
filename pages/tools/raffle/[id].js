@@ -2,20 +2,27 @@ import React, {useState} from "react"
 
 import algosdk from "algosdk"
 
-import { Grid, Typography, Button, Slider, TextField } from "@mui/material"
+import { Typography, Button, TextField } from "@mui/material"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import { BarChart, XAxis, YAxis, Bar, Tooltip, ResponsiveContainer, PieChart, Pie} from "recharts"
 
 import { useRouter } from 'next/router'
-import { gridSortedRowEntriesSelector } from "@mui/x-data-grid"
 
 
 export default function Raffle(props) {
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
-
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
+    
     const [currentRound, setCurrentRound] = useState(null)
     const [blockTime, setBlockTime] = useState(null)
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { Grid, Typography, Button, TextField } from "@mui/material"
 
-import { useWallet } from "@txnlab/use-wallet"
+import { useWallet } from "@txnlab/use-wallet-react"
 
 import DisplayAsset from "../../components/contracts/Market/displayAsset"
 
@@ -36,7 +36,15 @@ const longToByteArray = (long) => {
 
 export default function Stall(props){
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
 
     const [ assets, setAssets ] = useState([])
 
@@ -75,9 +83,10 @@ export default function Stall(props){
 
         session.boxes.forEach((listing) => {
             console.log(listing)
-            let address = algosdk.encodeAddress(Object.values(listing.name).slice(32))
+            let address = algosdk.encodeAddress(new Uint8Array(Object.values(listing.name).slice(32)))
             console.log(address)
-            if (activeAccount.address == address) {
+            console.log(activeAddress)
+            if (activeAddress == address) {
                 assets.push(listing)
             }
         })
@@ -95,11 +104,11 @@ export default function Stall(props){
 
     useEffect(() => {
 
-        if (activeAccount) {
+        if (activeAddress) {
             fetchData()
         }
     
-    }, [listNum, activeAccount])
+    }, [listNum, activeAddress])
 
     const handleChange = (event) => {
         
@@ -118,7 +127,7 @@ export default function Stall(props){
 
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
                     
-        const stringAddress = algosdk.encodeAddress(address)
+        const stringAddress = algosdk.encodeAddress(new Uint8Array(address))
 
         let txns = []
 
@@ -127,23 +136,26 @@ export default function Stall(props){
         let optedin = false
         
         opted.balances.forEach((account) => {
-            if(account.address == activeAccount.address) {
+            if(account.address == activeAddress) {
             optedin = true
             }
         })
 
         if (!optedin) {
 
-            let otxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-                activeAccount.address, 
-                activeAccount.address, 
-                undefined,
-                undefined,
-                0, 
-                undefined,
-                id,
-                params
-            );
+            const otxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+                sender: activeAddress,
+                receiver: activeAddress,
+                amount: 0,
+                assetIndex: id,
+                suggestedParams: params,
+
+                // these were `undefined` in your positional call:
+                // closeRemainderTo: undefined,
+                // revocationTarget: undefined,
+                // note: undefined,
+            });
+
 
             txns.push(otxn)
             
@@ -173,7 +185,22 @@ export default function Stall(props){
 
         let boxes = [{appIndex: 0, name: listBox}]
         
-        let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.market, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+        const atxn = algosdk.makeApplicationNoOpTxnFromObject({
+            sender: activeAddress,
+            suggestedParams: params,
+            appIndex: props.contracts.market,
+
+            appArgs,
+            accounts,
+            foreignApps,
+            foreignAssets,
+            boxes,
+
+            // these were `undefined` in your positional call:
+            // note: undefined,
+            // lease: undefined,
+            // rekeyTo: undefined,
+        });
 
         txns.push(atxn)
 
@@ -195,9 +222,9 @@ export default function Stall(props){
 
         props.setMessage("Sending transaction...")
 
-        const { txId } = await sendTransactions(signedTransactions)
+        const { txid } = await client.sendRawTransaction(signedTransactions).do()
 
-        let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
+        let confirmedTxn = await algosdk.waitForConfirmation(client, txid, 4);
 
         props.setMessage("Asset delisted")
 

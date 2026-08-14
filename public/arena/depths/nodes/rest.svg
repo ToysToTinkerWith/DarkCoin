@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Rest node">
+  <defs>
+    <filter id="greenGlow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="2.4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <circle cx="32" cy="32" r="25" fill="#06110a" stroke="#9fe870" stroke-width="2.8"/>
+  <path d="M20 47h24" stroke="#dfffc9" stroke-width="4" stroke-linecap="round"/>
+  <path d="M24 45l16-19M40 45L24 26" stroke="#8b5f37" stroke-width="4.2" stroke-linecap="round"/>
+  <path d="M32 13c-6 7-8 12-8 16 0 5 3.6 9 8 9s8-4 8-9c0-4-2-9-8-16z" fill="#9fe870" filter="url(#greenGlow)"/>
+  <path d="M32 20c-2.8 4-3.7 6.6-3.7 8.7 0 2.4 1.5 4.2 3.7 4.2s3.7-1.8 3.7-4.2c0-2.1-.9-4.7-3.7-8.7z" fill="#ffffff"/>
+</svg>

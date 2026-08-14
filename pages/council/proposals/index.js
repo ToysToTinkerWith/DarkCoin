@@ -4,14 +4,22 @@ import algosdk from "algosdk"
 
 import { Typography, Button, Grid } from "@mui/material"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 
 
 export default function Proposals(props) {
 
-  const { activeAccount, signTransactions, sendTransactions } = useWallet()
-
+  const {
+    wallets,
+    activeWallet,
+    activeAddress,
+    isReady,
+    signTransactions,
+    transactionSigner,
+    algodClient,
+  } = useWallet()
+  
   const [ proposals, setProposals ] = useState([])
   
 

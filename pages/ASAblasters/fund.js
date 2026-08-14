@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import algosdk from "algosdk"
 
@@ -9,7 +9,15 @@ import { Typography, Button, TextField, Grid} from "@mui/material"
 
 export default function fund(props) {
 
-  const { activeAccount, signTransactions, sendTransactions } = useWallet()
+  const {
+    wallets,
+    activeWallet,
+    activeAddress,
+    isReady,
+    signTransactions,
+    transactionSigner,
+    algodClient,
+  } = useWallet()
 
   const [address, setAddress] = useState("")
 

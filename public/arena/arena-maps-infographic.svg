@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="2800" viewBox="0 0 2400 2800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#121212"/>
+      <stop offset="52%" stop-color="#050505"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <linearGradient id="cardFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#191919"/>
+      <stop offset="100%" stop-color="#050505"/>
+    </linearGradient>
+    <radialGradient id="headerGlow" cx="50%" cy="0%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.24"/>
+      <stop offset="56%" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      text { font-family: Georgia, "Times New Roman", serif; }
+    </style>
+  </defs>
+
+  <rect width="2400" height="2800" fill="url(#bg)"/>
+  <rect width="2400" height="2800" fill="url(#headerGlow)"/>
+  <path d="M0 254 C520 205 820 330 1200 270 C1620 203 1940 246 2400 180" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="3"/>
+  <path d="M0 267 C530 221 833 354 1212 290 C1630 225 1954 270 2400 205" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
+
+  <text x="1200" y="92" text-anchor="middle" fill="rgba(255,255,255,0.66)" font-size="26" font-weight="700" letter-spacing="13">DARK COIN ARENA</text>
+  <text x="1200" y="178" text-anchor="middle" fill="#ffffff" font-size="78" font-weight="900" letter-spacing="10">BATTLE MAPS</text>
+  <text x="1200" y="236" text-anchor="middle" fill="rgba(255,255,255,0.72)" font-size="30" font-weight="500">Every fight rolls a battlefield with a passive boost and an end game judgment.</text>
+
+  
+    <g transform="translate(100 338)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#66d66f" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#66d66f" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M34 12 h36 l-7 24 v42 c0 19-14 34-29 34S5 97 5 78V36L-2 12h36" stroke="#66d66f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M17 68c14-12 33 11 47-1" stroke="#66d66f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.75"/>
+        <circle cx="23" cy="85" r="6" fill="#66d66f"/>
+        <circle cx="50" cy="80" r="4" fill="#66d66f" opacity="0.8"/>
+      </g></g>
+      <rect x="360" y="34" width="132" height="36" fill="#66d66f" opacity="0.13" stroke="#66d66f" stroke-width="1.5"/>
+      <text x="426" y="58" text-anchor="middle" fill="#66d66f" font-size="18" font-weight="800" letter-spacing="3">POISON</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">MIRE OF SLUDGE</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#66d66f" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Poison applied by attacks gains +1</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">flat stack.</text>
+
+      <text x="30" y="365" fill="#66d66f" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Venom Cascade</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Exponential poison stacks hit both</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">champions until one falls.</text>
+    </g>
+  
+
+    <g transform="translate(660 338)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#f05b5b" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#f05b5b" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M42 4C19 35 11 51 11 70c0 20 14 34 31 34s31-14 31-34C73 51 65 35 42 4z" fill="#f05b5b" opacity="0.18" stroke="#f05b5b" stroke-width="7"/>
+        <path d="M64 18l26 26M80 8l20 20-45 45-20-20z" stroke="#f05b5b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g></g>
+      <rect x="366" y="34" width="126" height="36" fill="#f05b5b" opacity="0.13" stroke="#f05b5b" stroke-width="1.5"/>
+      <text x="429" y="58" text-anchor="middle" fill="#f05b5b" font-size="18" font-weight="800" letter-spacing="3">BLEED</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">KNIFE CHAMBER</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#f05b5b" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Melee hits apply +2 flat bleed</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stacks.</text>
+
+      <text x="30" y="365" fill="#f05b5b" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Blood Cascade</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Exponential bleed stacks hit both</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">champions until one falls.</text>
+    </g>
+  
+
+    <g transform="translate(1220 338)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#ff9b3d" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#ff9b3d" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M50 106c24-10 34-31 22-54-5-10-13-17-14-33-17 11-20 25-16 39-11-6-16-16-17-27C4 55 11 92 50 106z" fill="#ff9b3d" opacity="0.18" stroke="#ff9b3d" stroke-width="7"/>
+        <path d="M48 98c11-10 15-22 7-34-8 8-12 18-7 34z" fill="#ff9b3d" opacity="0.75"/>
+      </g></g>
+      <rect x="366" y="34" width="126" height="36" fill="#ff9b3d" opacity="0.13" stroke="#ff9b3d" stroke-width="1.5"/>
+      <text x="429" y="58" text-anchor="middle" fill="#ff9b3d" font-size="18" font-weight="800" letter-spacing="3">BURN</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">ASHEN CRUCIBLE</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#ff9b3d" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Burn damage ticks are 35% stronger.</text>
+
+      <text x="30" y="365" fill="#ff9b3d" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Inferno Cascade</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Exponential burn stacks hit both</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">champions until one falls.</text>
+    </g>
+  
+
+    <g transform="translate(1780 338)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#80e8ff" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#80e8ff" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M50 4v100M8 26l84 56M92 26L8 82M28 16l22 22 22-22M28 94l22-22 22 22" stroke="#80e8ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="50" cy="54" r="11" fill="#80e8ff" opacity="0.2"/>
+      </g></g>
+      <rect x="360" y="34" width="132" height="36" fill="#80e8ff" opacity="0.13" stroke="#80e8ff" stroke-width="1.5"/>
+      <text x="426" y="58" text-anchor="middle" fill="#80e8ff" font-size="18" font-weight="800" letter-spacing="3">FREEZE</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">GLACIER COURT</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#80e8ff" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Freeze speed penalties are 50%</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stronger.</text>
+
+      <text x="30" y="365" fill="#80e8ff" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Whiteout Collapse</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with lower speed at the end</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(100 917)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#d6b35b" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#d6b35b" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M18 8h64M18 104h64M28 8c0 25 17 32 22 46-5 14-22 21-22 50M72 8c0 25-17 32-22 46 5 14 22 21 22 50" stroke="#d6b35b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M38 35h24M38 78h24" stroke="#d6b35b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/>
+      </g></g>
+      <rect x="366" y="34" width="126" height="36" fill="#d6b35b" opacity="0.13" stroke="#d6b35b" stroke-width="1.5"/>
+      <text x="429" y="58" text-anchor="middle" fill="#d6b35b" font-size="18" font-weight="800" letter-spacing="3">SLOW</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">HOURGLASS RUINS</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#d6b35b" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Slow applications gain +2 flat</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stacks, and magic hits apply +2 flat</text>
+<text x="30" y="316" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">slow stacks.</text>
+
+      <text x="30" y="365" fill="#d6b35b" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Last Grain</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with fewer slow stacks at</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">the end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(660 917)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#5bb7ff" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#5bb7ff" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M7 72c13-18 27-18 40 0s27 18 46 0" stroke="#5bb7ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M7 92c13-18 27-18 40 0s27 18 46 0" stroke="#5bb7ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.72"/>
+        <path d="M49 7c-19 25-27 41-27 57 0 16 12 28 27 28s27-12 27-28C76 48 68 32 49 7z" fill="#5bb7ff" opacity="0.18" stroke="#5bb7ff" stroke-width="7"/>
+      </g></g>
+      <rect x="366" y="34" width="126" height="36" fill="#5bb7ff" opacity="0.13" stroke="#5bb7ff" stroke-width="1.5"/>
+      <text x="429" y="58" text-anchor="middle" fill="#5bb7ff" font-size="18" font-weight="800" letter-spacing="3">DROWN</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">ABYSSAL CAUSEWAY</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#5bb7ff" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Drown accuracy penalties are 30%</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stronger, and ranged attacks apply</text>
+<text x="30" y="316" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">+1 flat drown stack.</text>
+
+      <text x="30" y="365" fill="#5bb7ff" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Tide Claim</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with higher dexterity at the</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(1220 917)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#d7d05b" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#d7d05b" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M58 5L18 60h32l-9 47 43-61H54z" fill="#d7d05b" opacity="0.22" stroke="#d7d05b" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M16 16l15 10M82 86l-15-10M89 28l-17 7M10 80l17-7" stroke="#d7d05b" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.75"/>
+      </g></g>
+      <rect x="332" y="34" width="160" height="36" fill="#d7d05b" opacity="0.13" stroke="#d7d05b" stroke-width="1.5"/>
+      <text x="412" y="58" text-anchor="middle" fill="#d7d05b" font-size="18" font-weight="800" letter-spacing="3">PARALYZE</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">STORMCOIL SPIRE</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#d7d05b" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Paralyze accuracy penalties are 40%</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stronger, and melee hits apply +2</text>
+<text x="30" y="316" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">flat paralyze stacks.</text>
+
+      <text x="30" y="365" fill="#d7d05b" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Lightning Rod</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with fewer paralyze stacks</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">at the end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(1780 917)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#b06cff" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#b06cff" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <circle cx="52" cy="55" r="42" fill="#b06cff" opacity="0.18" stroke="#b06cff" stroke-width="7"/>
+        <circle cx="70" cy="45" r="42" fill="#050505"/>
+        <path d="M19 82c14 14 38 19 60 4" stroke="#b06cff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.68"/>
+      </g></g>
+      <rect x="366" y="34" width="126" height="36" fill="#b06cff" opacity="0.13" stroke="#b06cff" stroke-width="1.5"/>
+      <text x="429" y="58" text-anchor="middle" fill="#b06cff" font-size="18" font-weight="800" letter-spacing="3">DOOM</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">ECLIPSE SEPULCHER</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#b06cff" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Doom applications gain +1 flat</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stack, and doom resist penalties are</text>
+<text x="30" y="316" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">30% stronger.</text>
+
+      <text x="30" y="365" fill="#b06cff" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Eclipse Cascade</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Exponential doom stacks hit both</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">champions until one falls.</text>
+    </g>
+  
+
+    <g transform="translate(100 1496)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#c8d3dd" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#c8d3dd" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M50 6l38 14v31c0 28-15 48-38 58-23-10-38-30-38-58V20z" fill="#c8d3dd" opacity="0.18" stroke="#c8d3dd" stroke-width="7"/>
+        <path d="M50 18v76M28 43h44" stroke="#c8d3dd" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.74"/>
+      </g></g>
+      <rect x="360" y="34" width="132" height="36" fill="#c8d3dd" opacity="0.13" stroke="#c8d3dd" stroke-width="1.5"/>
+      <text x="426" y="58" text-anchor="middle" fill="#c8d3dd" font-size="18" font-weight="800" letter-spacing="3">SHIELD</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">AEGIS BASTION</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#c8d3dd" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Shield gains block 40% more damage.</text>
+
+      <text x="30" y="365" fill="#c8d3dd" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Bastion Lock</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with more shield stacks at</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">the end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(660 1496)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#d99b60" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#d99b60" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M24 62h52v34H24zM30 43h40v19H30zM38 24h24v19H38z" fill="#d99b60" opacity="0.18" stroke="#d99b60" stroke-width="7"/>
+        <path d="M14 96h72M50 24V6" stroke="#d99b60" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g></g>
+      <rect x="304" y="34" width="188" height="36" fill="#d99b60" opacity="0.13" stroke="#d99b60" stroke-width="1.5"/>
+      <text x="398" y="58" text-anchor="middle" fill="#d99b60" font-size="18" font-weight="800" letter-spacing="3">STRENGTHEN</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">TITAN RING</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#d99b60" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Strengthen potency is 40% stronger.</text>
+
+      <text x="30" y="365" fill="#d99b60" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Titan's Measure</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with higher strength at the</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(1220 1496)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#f2e17a" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#f2e17a" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M8 55c14-22 29-33 44-33s30 11 44 33c-14 22-29 33-44 33S22 77 8 55z" fill="#f2e17a" opacity="0.18" stroke="#f2e17a" stroke-width="7"/>
+        <circle cx="52" cy="55" r="18" stroke="#f2e17a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M52 14v18M52 78v18M11 55h18M75 55h18" stroke="#f2e17a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.8"/>
+      </g></g>
+      <rect x="366" y="34" width="126" height="36" fill="#f2e17a" opacity="0.13" stroke="#f2e17a" stroke-width="1.5"/>
+      <text x="429" y="58" text-anchor="middle" fill="#f2e17a" font-size="18" font-weight="800" letter-spacing="3">FOCUS</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">EAGLE-EYE PERCH</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#f2e17a" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Missed attacks grant +1 flat focus</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stack.</text>
+
+      <text x="30" y="365" fill="#f2e17a" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">True Shot</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with highest dexterity at</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">the end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(1780 1496)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#d27dff" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#d27dff" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <circle cx="50" cy="55" r="42" stroke="#d27dff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M50 13l23 42-23 42-23-42z" fill="#d27dff" opacity="0.18" stroke="#d27dff" stroke-width="7"/>
+        <circle cx="50" cy="55" r="8" fill="#d27dff"/>
+      </g></g>
+      <rect x="346" y="34" width="146" height="36" fill="#d27dff" opacity="0.13" stroke="#d27dff" stroke-width="1.5"/>
+      <text x="419" y="58" text-anchor="middle" fill="#d27dff" font-size="18" font-weight="800" letter-spacing="3">EMPOWER</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">ARCANE CONDUIT</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#d27dff" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Empower applications gain +2 flat</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stack.</text>
+
+      <text x="30" y="365" fill="#d27dff" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Mana Overload</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with higher intelligence at</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">the end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(100 2075)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#66d98a" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#66d98a" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M18 91c47-1 72-31 73-77-45 4-76 28-73 77z" fill="#66d98a" opacity="0.18" stroke="#66d98a" stroke-width="7"/>
+        <path d="M24 86c18-24 36-42 62-65M43 65l-20-2M58 50l-2-21" stroke="#66d98a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g></g>
+      <rect x="346" y="34" width="146" height="36" fill="#66d98a" opacity="0.13" stroke="#66d98a" stroke-width="1.5"/>
+      <text x="419" y="58" text-anchor="middle" fill="#66d98a" font-size="18" font-weight="800" letter-spacing="3">NURTURE</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">VERDANT HOLLOW</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#66d98a" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Nurture healing is 20% stronger.</text>
+
+      <text x="30" y="365" fill="#66d98a" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Overgrowth</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with the most speed at the</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(660 2075)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#ffe16a" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#ffe16a" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <circle cx="50" cy="55" r="24" fill="#ffe16a" opacity="0.18" stroke="#ffe16a" stroke-width="7"/>
+        <path d="M50 4v20M50 86v20M0 55h20M80 55h20M15 20l14 14M71 76l14 14M85 20L71 34M29 76L15 90" stroke="#ffe16a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g></g>
+      <rect x="366" y="34" width="126" height="36" fill="#ffe16a" opacity="0.13" stroke="#ffe16a" stroke-width="1.5"/>
+      <text x="429" y="58" text-anchor="middle" fill="#ffe16a" font-size="18" font-weight="800" letter-spacing="3">BLESS</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">SUN-BLESSED DAIS</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#ffe16a" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">First bless gained each battle</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">grants +20 flat stacks.</text>
+
+      <text x="30" y="365" fill="#ffe16a" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Radiant Decree</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with more bless stacks at</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">the end game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(1220 2075)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#72f0ff" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#72f0ff" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M13 31h36M5 55h42M13 79h36" stroke="#72f0ff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.75"/>
+        <path d="M48 16l43 39-43 39V70H25V40h23z" fill="#72f0ff" opacity="0.18" stroke="#72f0ff" stroke-width="7"/>
+      </g></g>
+      <rect x="360" y="34" width="132" height="36" fill="#72f0ff" opacity="0.13" stroke="#72f0ff" stroke-width="1.5"/>
+      <text x="426" y="58" text-anchor="middle" fill="#72f0ff" font-size="18" font-weight="800" letter-spacing="3">HASTEN</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">QUICKGLASS TRACK</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#72f0ff" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Hasten speed bonuses are 40%</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">stronger.</text>
+
+      <text x="30" y="365" fill="#72f0ff" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Final Dash</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with higher speed at the end</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">game round wins.</text>
+    </g>
+  
+
+    <g transform="translate(1780 2075)">
+      <rect x="0" y="0" width="520" height="545" rx="0" fill="url(#cardFill)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+      <rect x="0" y="0" width="520" height="6" fill="#d9fbff" opacity="0.85"/>
+      <circle cx="68" cy="78" r="55" fill="#d9fbff" opacity="0.08"/>
+      <g transform="translate(27 34) scale(0.82)">
+      <g filter="url(#softGlow)">
+        <path d="M50 7C30 34 19 54 19 72c0 20 14 34 31 34s31-14 31-34C81 54 70 34 50 7z" fill="#d9fbff" opacity="0.18" stroke="#d9fbff" stroke-width="7"/>
+        <path d="M83 12v20M73 22h20M22 17v14M15 24h14" stroke="#d9fbff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </g></g>
+      <rect x="346" y="34" width="146" height="36" fill="#d9fbff" opacity="0.13" stroke="#d9fbff" stroke-width="1.5"/>
+      <text x="419" y="58" text-anchor="middle" fill="#d9fbff" font-size="18" font-weight="800" letter-spacing="3">CLEANSE</text>
+      <text x="142" y="116" fill="#ffffff" font-size="34" font-weight="800">PURITY WELL</text>
+      <line x1="28" y1="164" x2="492" y2="164" stroke="rgba(255,255,255,0.17)" stroke-width="2"/>
+
+      <text x="30" y="214" fill="#d9fbff" font-size="20" font-weight="800" letter-spacing="3">PASSIVE EFFECT</text>
+      <text x="30" y="252" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">Cleanse removes +1 additional</text>
+<text x="30" y="284" fill="rgba(255,255,255,0.84)" font-size="25" font-weight="500">negative stack.</text>
+
+      <text x="30" y="365" fill="#d9fbff" font-size="20" font-weight="800" letter-spacing="3">END GAME</text>
+      <text x="30" y="404" fill="#ffffff" font-size="28" font-weight="800">Pure Reflection</text>
+      <text x="30" y="462" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">Champion with the highest resist at</text>
+<text x="30" y="493" fill="rgba(255,255,255,0.82)" font-size="24" font-weight="500">the end game round wins.</text>
+    </g>
+  
+
+  <rect x="100" y="2668" width="2200" height="74" fill="rgba(255,255,255,0.045)" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  <text x="1200" y="2715" text-anchor="middle" fill="rgba(255,255,255,0.78)" font-size="27" font-weight="700">
+    Tie breakers: higher current health wins, then the lowest champion NFT assetId wins.
+  </text>
+</svg>

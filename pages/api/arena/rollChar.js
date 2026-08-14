@@ -87,6 +87,8 @@ async function rollChar(req, res) {
     charObj["resist"] = charObj["resist"] + (Math.floor(charObj["intelligence"] / 2))
 
     charObj["currentHealth"] = charObj["health"]
+    charObj["critChance"] = Number.isFinite(Number(charObj["critChance"])) ? Number(charObj["critChance"]) : 25
+    charObj["critDamage"] = Number.isFinite(Number(charObj["critDamage"])) ? Number(charObj["critDamage"]) : 200
 
 
 

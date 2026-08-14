@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react"
 
-import algosdk, { assignGroupID } from "algosdk"
+import algosdk from "algosdk"
 
 import { Typography, Button, TextField, Card, Grid, LinearProgress, linearProgressClasses, styled } from "@mui/material"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
@@ -18,6 +18,13 @@ import RemoveIcon from '@mui/icons-material/Remove';
 
 import * as mfsha2 from 'multiformats/hashes/sha2'
 import * as digest from 'multiformats/hashes/digest'
+import {
+    POINTS_BYTE_LENGTH,
+    getSkillPointStatAdjustments,
+    normalizePointsArray,
+    trees as arenaSkillTrees,
+} from "../../../components/contracts/Arena/Trees";
+import { submitApplySkillPoints } from "../../../components/contracts/Arena/applySkillPoints";
 
 
   const BorderLinearProgressHealth = styled(LinearProgress)(({ theme }) => ({
@@ -44,11 +51,31 @@ import * as digest from 'multiformats/hashes/digest'
     },
   }));
 
+const DEFAULT_CRIT_CHANCE = 25
+const DEFAULT_CRIT_DAMAGE = 200
+
+function getCharacterPercentStat(charObj, key, fallbackValue) {
+    const raw = charObj?.[key]
+    const value = Number(raw)
+
+    return raw === undefined || raw === null || raw === "" || !Number.isFinite(value)
+        ? fallbackValue
+        : value
+}
+
 
 
 export default function Character(props) {
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
 
     const [ nft, setNft ] = useState(null)
     const [ nftUrl, setNftUrl ] = useState(null)
@@ -66,8 +93,8 @@ export default function Character(props) {
       ]);
 
     const [ tree, setTree ] = useState(null)
-    const [ points, setPoints ] = useState(new Uint8Array(1600))
-    const [ oldPoints, setOldPoints ] = useState(new Uint8Array(1600))
+    const [ points, setPoints ] = useState(new Uint8Array(POINTS_BYTE_LENGTH))
+    const [ oldPoints, setOldPoints ] = useState(new Uint8Array(POINTS_BYTE_LENGTH))
 
     const [ trees, setTrees ] = useState([
         {
@@ -442,6 +469,10 @@ export default function Character(props) {
 
     const router = useRouter()
 
+    useEffect(() => {
+        setTrees(arenaSkillTrees)
+    }, [])
+
     const fetchData = async () => {
 
         try {
@@ -526,8 +557,9 @@ export default function Character(props) {
         console.log(accountBoxPoints)
         
 
-        setOldPoints(accountBoxPoints.value)
-        setPoints(accountBoxPoints.value)
+        const normalizedPoints = normalizePointsArray(accountBoxPoints.value)
+        setOldPoints(normalizedPoints)
+        setPoints(normalizedPoints)
 
         
     }
@@ -651,26 +683,29 @@ export default function Character(props) {
         return typeof value === 'number' && value % 1 === 0;
       }
 
-    function incrementNumbers(str, byte) {
+    function incrementNumbers(str, byte, scalePercent = false) {
     return str
         // Split on spaces into "tokens"
         .split(" ")
         // Transform each token
         .map(token => {
 
-        if (token.slice(token.length - 1) == "%") {
+        const isPercent = token.slice(token.length - 1) == "%"
+        if (isPercent && !scalePercent) {
             return token
         }
         // Attempt to parse as a float
-        let num = parseFloat(token);
+        let num = parseFloat(isPercent ? token.slice(0, -1) : token);
         
         // If parsing was successful (not NaN), increment
         if (!isNaN(num)) {
+            const scaledValue = num * points[byte]
+            const formattedValue = isInt(num) ? String(scaledValue) : String(scaledValue.toFixed(1))
             if (isInt(num)) {
-                return String(num * points[byte]);
+                return isPercent ? `${formattedValue}%` : formattedValue;
             }
             else {
-                return String((num * points[byte]).toFixed(1));
+                return isPercent ? `${formattedValue}%` : formattedValue;
             }
             
         }
@@ -682,58 +717,19 @@ export default function Character(props) {
         .join(" ");
     }
 
-    const longToByteArray = (long) => {
-        // we want to represent the input as a 8-bytes array
-        var byteArray = [0, 0, 0, 0, 0, 0, 0, 0];
-    
-        for ( var index = byteArray.length - 1; index > 0; index -- ) {
-            var byte = long & 0xff;
-            byteArray [ index ] = byte;
-            long = (long - byte) / 256 ;
-        }
-    
-        return byteArray;
-    };
-
     const applyPoints = async () => {
 
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-        
-        let params = await client.getTransactionParams().do();
 
-        const appArgs = []
-
-        appArgs.push(
-            new Uint8Array(Buffer.from("applyPoints")),
-            points
-        )
-
-            
-        const accounts = []
-        const foreignApps = []
-            
-        const foreignAssets = [Number(router.query.id)]
-
-        let assetInt = longToByteArray(Number(router.query.id))
-        
-        let assetBox = new Uint8Array([...assetInt, ...new Uint8Array(Buffer.from("points"))])    
-        
-        const boxes = [{appIndex: 0, name: assetBox}, {appIndex: 0, name: assetBox}]
-
-        props.setMessage("Sign Transaction...")
-
-        
-        let txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.dragonshorde, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
-
-        let encoded = algosdk.encodeUnsignedTransaction(txn)
-    
-        const signedTransactions = await signTransactions([encoded])
-
-        props.setMessage("Sending Transaction...")
-
-        const { id } = await sendTransactions(signedTransactions)
-
-        let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+        await submitApplySkillPoints({
+            client,
+            activeAddress,
+            signTransactions,
+            appId: props.contracts.dragonshorde,
+            nftId: Number(router.query.id),
+            points,
+            setMessage: props.setMessage,
+        })
 
         props.setMessage("Transaction Confirmed, Skill Tree Updated")
 
@@ -768,6 +764,8 @@ if (charObject) {
     let dexterityAdj = 0
     let intelligenceAdj = 0
     let accuracyAdj = 0
+    let critChanceAdj = 0
+    let critDamageAdj = 0
 
     if (charObject.effects) {
         
@@ -827,8 +825,20 @@ if (charObject) {
         }
         if (charObject.effects["focus"]) {
             accuracyAdj += charObject.effects["focus"] * 0.3
+            critChanceAdj += charObject.effects["focus"] * 0.04
         }
     }
+
+    const skillPointStatAdjustments = getSkillPointStatAdjustments(oldPoints)
+    healthAdj += skillPointStatAdjustments.health
+    speedAdj += skillPointStatAdjustments.speed
+    resistAdj += skillPointStatAdjustments.resist
+    strengthAdj += skillPointStatAdjustments.strength
+    dexterityAdj += skillPointStatAdjustments.dexterity
+    intelligenceAdj += skillPointStatAdjustments.intelligence
+    accuracyAdj += skillPointStatAdjustments.accuracy
+    critChanceAdj += skillPointStatAdjustments.critChance
+    critDamageAdj += skillPointStatAdjustments.critDamage
 
     let poisonAdj = oldPoints[0]
     let bleedAdj = oldPoints[100]
@@ -869,7 +879,7 @@ if (charObject) {
                     return (
                         <div style={{position: "absolute", left: (-(Math.sin(radians)*windowSize[0]/3) + (windowSize[0]/2.3)), top: (-(Math.cos(radians)*200) + (500))}}>
                             <Button style={{position: "absolute", width: "5%"}} onClick={() => setTree(tree)}>
-                                <img src={"/dragonshorde/trees/" + tree.skill1.title + ".svg"} style={{width: "100%"}}/>
+                                <img src={tree.skill1.iconSrc || ("/dragonshorde/trees/" + tree.skill1.title + ".svg")} style={{width: "100%"}}/>
                             </Button>
                         </div>
                     )
@@ -918,7 +928,7 @@ if (charObject) {
                         }
                     </Grid>
                     <Grid item xs={6}>
-                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.svg"} />
+                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/speed.png"} />
                         {speedAdj == 0 ?
                             <Typography color="secondary" align="center" variant="subtitle1"> {Number(charObject.speed).toFixed(1)} </Typography>
                             :
@@ -929,7 +939,7 @@ if (charObject) {
                         }                                
                     </Grid>
                     <Grid item xs={6}>
-                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.svg"} />
+                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/resist.png"} />
                         {resistAdj == 0 ?
                             <Typography color="secondary" align="center" variant="subtitle1"> {Number(charObject.resist).toFixed(1)} </Typography>
                             :
@@ -938,6 +948,28 @@ if (charObject) {
                             :
                             <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(charObject.resist + resistAdj).toFixed(1)} </Typography>
                         }                                
+                    </Grid>
+                    <Grid item xs={6}>
+                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/critChance.svg"} />
+                        {critChanceAdj == 0 ?
+                            <Typography color="secondary" align="center" variant="subtitle1"> {getCharacterPercentStat(charObject, "critChance", DEFAULT_CRIT_CHANCE).toFixed(1)}% </Typography>
+                            :
+                            critChanceAdj < 0 ?
+                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(getCharacterPercentStat(charObject, "critChance", DEFAULT_CRIT_CHANCE) + critChanceAdj).toFixed(1)}% </Typography>
+                            :
+                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(getCharacterPercentStat(charObject, "critChance", DEFAULT_CRIT_CHANCE) + critChanceAdj).toFixed(1)}% </Typography>
+                        }
+                    </Grid>
+                    <Grid item xs={6}>
+                        <img style={{zIndex: 10, width: String((50 / (props.length + 3))) + "vw", minWidth: 50, maxWidth: 70, borderRadius: 5, display: "flex", margin: "auto", padding: 5}} src={"/dragonshorde/critDamage.svg"} />
+                        {critDamageAdj == 0 ?
+                            <Typography color="secondary" align="center" variant="subtitle1"> {getCharacterPercentStat(charObject, "critDamage", DEFAULT_CRIT_DAMAGE).toFixed(1)}% </Typography>
+                            :
+                            critDamageAdj < 0 ?
+                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#F8575A"}}> {Number(getCharacterPercentStat(charObject, "critDamage", DEFAULT_CRIT_DAMAGE) + critDamageAdj).toFixed(1)}% </Typography>
+                            :
+                            <Typography color="secondary" align="center" variant="subtitle1" style={{color: "#4EC83E"}}> {Number(getCharacterPercentStat(charObject, "critDamage", DEFAULT_CRIT_DAMAGE) + critDamageAdj).toFixed(1)}% </Typography>
+                        }
                     </Grid>
                 </Grid>
 
@@ -1363,7 +1395,7 @@ if (charObject) {
                         return (
                             <Grid item xs={3} sm={12/8} md={6/8} style={{}}>
                                 <Button style={{width: "5%"}} onClick={() => treeNode == tree ? setTree(null) : setTree(treeNode)}>
-                                    <img src={"/dragonshorde/trees/" + treeNode.skill1.title + ".svg"} style={{width: "100%"}}/>
+                                <img src={treeNode.skill1.iconSrc || ("/dragonshorde/trees/" + treeNode.skill1.title + ".svg")} style={{width: "100%"}}/>
                                 </Button>
                             </Grid>
                         )
@@ -1378,13 +1410,13 @@ if (charObject) {
                     {tree ? 
                     <Grid container >
                         <Grid item xs={12} sm={12} >
-                                <img src={"/dragonshorde/trees/" + tree.skill1.title + ".svg"} style={{width: "20%", display: "flex", margin: "auto"}}/>
+                                <img src={tree.skill1.iconSrc || ("/dragonshorde/trees/" + tree.skill1.title + ".svg")} style={{width: "20%", display: "flex", margin: "auto"}}/>
                                 <Typography color="secondary" align="center" variant="subtitle1" style={{marginTop: 10, paddingLeft: 30, paddingRight: 30}}> {tree.skill1.title} Practice </Typography>
                                 <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", textTransform: 'none', paddingLeft: 30, paddingRight: 30}}> {tree.skill1.effect} </Typography>
                           
                                 <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill1.byte]} / {tree.skill1.maxLevel} </Typography>
                            
-                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill1.effect, tree.skill1.byte)} </Typography>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill1.effect, tree.skill1.byte, Boolean(tree.skill1.scalePercent))} </Typography>
 
                         </Grid>
                         <Grid item xs={6} sm={6} >
@@ -1394,7 +1426,7 @@ if (charObject) {
                              
                                 <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill2.byte]} / {tree.skill2.maxLevel} </Typography>
                               
-                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill2.effect, tree.skill2.byte)} </Typography>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill2.effect, tree.skill2.byte, Boolean(tree.skill2.scalePercent))} </Typography>
 
                         </Grid>
                         <Grid item xs={6} sm={6} >
@@ -1404,7 +1436,7 @@ if (charObject) {
                              
                                 <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto"}}> {points[tree.skill3.byte]} / {tree.skill3.maxLevel} </Typography>
                               
-                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill3.effect, tree.skill3.byte)} </Typography>
+                                <Typography color="secondary" align="center" variant="subtitle1" style={{display: "grid", margin: "auto", paddingLeft: 30, paddingRight: 30}}> {incrementNumbers(tree.skill3.effect, tree.skill3.byte, Boolean(tree.skill3.scalePercent))} </Typography>
 
                         </Grid>
                         

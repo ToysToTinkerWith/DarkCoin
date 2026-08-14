@@ -7,14 +7,21 @@ import { Typography, Button } from "@mui/material"
 
 import Gift from "../../components/contracts/Tools/Gift"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 
 
 export default function Mailbox(props) { 
 
-  const { activeAccount, signTransactions, sendTransactions } = useWallet()
-  
+  const {
+      wallets,
+      activeWallet,
+      activeAddress,
+      isReady,
+      signTransactions,
+      transactionSigner,
+      algodClient,
+  } = useWallet()  
 
   const [ confirm, setConfirm ] = useState("")
 
@@ -55,7 +62,7 @@ export default function Mailbox(props) {
        boxes.boxes.forEach(async (box) => {
         if (box.name.length > 34) {
           let encoded = algosdk.encodeAddress(box.name.slice(0, 32))
-          if (encoded == activeAccount.address) {
+          if (encoded == activeAddress) {
             console.log("herer")
             const nft = algosdk.decodeUint64(box.name.slice(32), 'safe');
             console.log(nft)
@@ -79,11 +86,11 @@ export default function Mailbox(props) {
        setNFT(nfts)
 
           }
-          if (activeAccount) {
+          if (activeAddress) {
             fetchData();
           }  
             
-    }, [activeAccount])
+    }, [activeAddress])
 
     const fetchData = async () => {
 
@@ -102,7 +109,7 @@ export default function Mailbox(props) {
        boxes.boxes.forEach(async (box) => {
         if (box.name.length > 34) {
           let encoded = algosdk.encodeAddress(box.name.slice(0, 32))
-          if (encoded == activeAccount.address) {
+          if (encoded == activeAddress) {
             console.log("herer")
             const nft = algosdk.decodeUint64(box.name.slice(32), 'safe');
             console.log(nft)
@@ -144,23 +151,24 @@ export default function Mailbox(props) {
       let responseAddr
       let nextTokenAddr
 
-      responseAddr = await indexerClient.lookupAccountAssets(activeAccount.address).do();
-      nextTokenAddr = responseAddr["next-token"]
+      responseAddr = await indexerClient.lookupAccountAssets(activeAddress).do();
+      nextTokenAddr = responseAddr.nextToken
       
       responseAddr.assets.forEach((asset) => {
-        if (asset.amount >= 0) {
-          addrOptedAssets.push(asset["asset-id"])
+        if (Number(asset.amount) >= 0) {
+          addrOptedAssets.push(Number(asset.assetId))
         }
       })
 
       while (responseAddr.assets.length == 1000) {
-        responseAddr = await indexerClient.lookupAccountAssets(activeAccount.address).nextToken(nextTokenAddr).limit(1000).do();
-        nextTokenAddr = responseAddr["next-token"]
+        responseAddr = await indexerClient.lookupAccountAssets(activeAddress).nextToken(nextTokenAddr).limit(1000).do();
+        nextTokenAddr = responseAddr.nextToken
+      
         responseAddr.assets.forEach((asset) => {
-            if (asset.amount >= 0) {
-              addrOptedAssets.push(asset["asset-id"])
-            }
-        })  
+          if (Number(asset.amount) >= 0) {
+            addrOptedAssets.push(Number(asset.assetId))
+          }
+        })
       }
 
       let opted = addrOptedAssets.includes(asset)
@@ -169,16 +177,19 @@ export default function Mailbox(props) {
 
       if (!opted) {
 
-        let otxn = algosdk.makeAssetTransferTxnWithSuggestedParams(
-            activeAccount.address, 
-            activeAccount.address, 
-            undefined, 
-            undefined,
-            0,  
-            undefined, 
-            asset, 
-            params
-        );
+        const otxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+          sender: activeAddress,
+          receiver: activeAddress,
+          amount: 0,
+          assetIndex: asset,
+          suggestedParams: params,
+
+          // these were `undefined` in your positional call:
+          // closeRemainderTo: undefined,
+          // revocationTarget: undefined,
+          // note: undefined,
+        });
+
 
         txns.push(otxn)
 
@@ -197,7 +208,7 @@ export default function Mailbox(props) {
         const foreignAssets = [asset]
       
         
-        const pk = algosdk.decodeAddress(activeAccount.address);
+        const pk = algosdk.decodeAddress(activeAddress);
         const addrArray = pk.publicKey
 
         let encoded = algosdk.encodeUint64(asset);
@@ -209,7 +220,22 @@ export default function Mailbox(props) {
         const boxes = [{appIndex: 0, name: accountBox}]
       
         
-        let txn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.mailbox, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
+        const txn = algosdk.makeApplicationNoOpTxnFromObject({
+          sender: activeAddress,
+          suggestedParams: params,
+          appIndex: props.contracts.mailbox,
+
+          appArgs,
+          accounts,
+          foreignApps,
+          foreignAssets,
+          boxes,
+
+          // these were `undefined` in your positional call:
+          // note: undefined,
+          // lease: undefined,
+          // rekeyTo: undefined,
+        });
 
         txns.push(txn)
         
@@ -229,9 +255,9 @@ export default function Mailbox(props) {
 
         props.setMessage("Sending Transaction...")
 
-        const { id } = await sendTransactions(signedTransactions)
+        const { txid } = await client.sendRawTransaction(signedTransactions).do()
 
-        let confirmedTxn = await algosdk.waitForConfirmation(client, id, 4);
+        let confirmedTxn = await algosdk.waitForConfirmation(client, txid, 4);
 
         props.setMessage("Transaction Confirmed, asset recieved.")
 
@@ -243,8 +269,8 @@ export default function Mailbox(props) {
         
       <div>
         <Typography align="center" color="secondary"> Account </Typography>
-        {activeAccount ?
-        <Typography align="center" color="secondary"> {activeAccount.address} </Typography>
+        {activeAddress ?
+        <Typography align="center" color="secondary"> {activeAddress} </Typography>
         :
         null
         }

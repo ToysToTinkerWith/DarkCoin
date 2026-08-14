@@ -16,4 +16,13 @@
                               'embedded-opentype', and 'svg' */
   }
 
+  @font-face {
+    font-family: 'UncialAntiqua';
+    src: local('UncialAntiqua'), url("/fonts/UncialAntiqua-Regular.ttf") format('truetype');
+    /* other formats include: 'woff2', 'truetype, 'opentype',
+                              'embedded-opentype', and 'svg' */
+  }
+
+  
+
   

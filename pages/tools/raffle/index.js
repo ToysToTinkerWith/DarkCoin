@@ -4,14 +4,22 @@ import algosdk from "algosdk"
 
 import { Grid, Typography, Button, Slider, TextField } from "@mui/material"
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import { BarChart, XAxis, YAxis, Bar, Tooltip, ResponsiveContainer} from "recharts"
 
 
 export default function Raffle(props) {
 
-    const { activeAccount, signTransactions, sendTransactions } = useWallet()
+    const {
+        wallets,
+        activeWallet,
+        activeAddress,
+        isReady,
+        signTransactions,
+        transactionSigner,
+        algodClient,
+    } = useWallet()
 
     const [assetId1, setAssetId1] = useState("assetId1")
     const [assetId2, setAssetId2] = useState("assetId2")

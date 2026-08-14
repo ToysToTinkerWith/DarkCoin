@@ -2,7 +2,7 @@ import React, { useState } from "react"
 
 //43EVULWFT4RU2H7EZH377SAVQJSJO5NZP37N3Y5DZ7PGUXOETKW7VWDIOA
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import algosdk from "algosdk"
 
@@ -10,7 +10,15 @@ import { Typography, Button, TextField} from "@mui/material"
 
 export default function Propose(props) { 
 
-  const { activeAccount, signTransactions, sendTransactions } = useWallet()
+  const {
+    wallets,
+    activeWallet,
+    activeAddress,
+    isReady,
+    signTransactions,
+    transactionSigner,
+    algodClient,
+  } = useWallet()
 
   const [ proposal, setProposal ] = useState("")
   const [ currRound, setCurrRound ] = useState(0)

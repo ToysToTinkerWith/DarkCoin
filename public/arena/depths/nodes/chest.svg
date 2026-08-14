@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Chest node">
+  <defs>
+    <filter id="blueGlow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="2.1" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <circle cx="32" cy="32" r="25" fill="#061019" stroke="#7fc7ff" stroke-width="2.8"/>
+  <path d="M18 29h28c2.8 0 5 2.2 5 5v14H13V34c0-2.8 2.2-5 5-5z" fill="#7fc7ff" filter="url(#blueGlow)"/>
+  <path d="M19 24c1.5-6.2 6.2-10 13-10s11.5 3.8 13 10v5H19v-5z" fill="#1f5c84" stroke="#bfe7ff" stroke-width="2"/>
+  <path d="M13 35h38M23 29v19M41 29v19" stroke="#052033" stroke-width="3"/>
+  <rect x="27" y="34" width="10" height="11" rx="2" fill="#fff2bf" stroke="#052033" stroke-width="2"/>
+</svg>

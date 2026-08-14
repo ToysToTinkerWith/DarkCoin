@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Basic encounter node">
+  <defs>
+    <filter id="goldGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <circle cx="32" cy="32" r="25" fill="#100d06" stroke="#e1b864" stroke-width="2.8"/>
+  <path d="M19 48l-4-4 12.6-15.2 4.1 4.1L19 48zM45 48l4-4-12.6-15.2-4.1 4.1L45 48z" fill="#e1b864" filter="url(#goldGlow)"/>
+  <path d="M17 15l6 2 25 25-6 6-25-25-2-6 2-2zM47 15l-6 2-25 25 6 6 25-25 2-6-2-2z" fill="#fff2bf" stroke="#4b3715" stroke-width="1.4"/>
+</svg>

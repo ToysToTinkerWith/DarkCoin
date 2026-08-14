@@ -1,0 +1,517 @@
+#pragma version 8
+txn ApplicationID
+int 0
+==
+bnz main_l43
+txn OnCompletion
+int OptIn
+==
+bnz main_l42
+txn OnCompletion
+int CloseOut
+==
+bnz main_l41
+txn OnCompletion
+int UpdateApplication
+==
+bnz main_l40
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l39
+txna ApplicationArgs 0
+byte "optin"
+==
+bnz main_l38
+txna ApplicationArgs 0
+byte "loadReward"
+==
+bnz main_l28
+txna ApplicationArgs 0
+byte "rewardWallet"
+==
+bnz main_l16
+txna ApplicationArgs 0
+byte "grantDarkCoin"
+==
+bnz main_l12
+txna ApplicationArgs 0
+byte "claimReward"
+==
+bnz main_l11
+err
+main_l11:
+txn NumAppArgs
+int 1
+>=
+assert
+txn NumAssets
+int 1
+>=
+assert
+txn Sender
+box_get
+store 21
+store 20
+load 21
+assert
+load 20
+len
+int 16
+==
+assert
+load 20
+int 0
+callsub entryamount_1
+store 22
+load 20
+int 0
+callsub entryassetid_2
+store 23
+load 22
+int 0
+>
+assert
+load 23
+txna Assets 0
+==
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+load 23
+itxn_field XferAsset
+txn Sender
+itxn_field AssetReceiver
+load 22
+itxn_field AssetAmount
+itxn_submit
+txn Sender
+box_del
+assert
+int 1
+return
+main_l12:
+txn Sender
+global CreatorAddress
+==
+assert
+txn NumAppArgs
+int 2
+>=
+assert
+txn NumAccounts
+int 1
+>=
+assert
+txn NumAssets
+int 1
+>=
+assert
+txna ApplicationArgs 1
+btoi
+store 17
+load 17
+int 0
+>
+assert
+txna Accounts 1
+box_get
+store 19
+store 18
+load 19
+bnz main_l15
+txna Accounts 1
+load 17
+txna Assets 0
+callsub rewardentry_0
+box_put
+main_l14:
+int 1
+return
+main_l15:
+load 18
+len
+int 16
+==
+assert
+load 18
+int 0
+callsub entryassetid_2
+txna Assets 0
+==
+assert
+txna Accounts 1
+load 18
+int 0
+callsub entryamount_1
+load 17
++
+txna Assets 0
+callsub rewardentry_0
+box_put
+b main_l14
+main_l16:
+txn Sender
+global CreatorAddress
+==
+assert
+txn NumAccounts
+int 1
+>=
+assert
+byte "rewards"
+box_get
+store 6
+store 5
+load 6
+assert
+load 5
+len
+int 16
+>=
+assert
+load 5
+len
+int 16
+%
+int 0
+==
+assert
+int 0
+store 9
+int 0
+store 10
+main_l17:
+load 9
+load 5
+len
+<
+bnz main_l27
+load 10
+int 0
+>
+assert
+txn Sender
+txna Accounts 1
+concat
+global Round
+itob
+concat
+global LatestTimestamp
+itob
+concat
+load 5
+concat
+sha512_256
+store 16
+load 16
+extract 0 8
+btoi
+load 10
+%
+store 11
+load 11
+int 16
+*
+store 12
+load 5
+load 12
+callsub entryamount_1
+store 13
+load 5
+load 12
+callsub entryassetid_2
+store 14
+load 13
+int 1
+==
+bnz main_l24
+byte "rewards"
+load 12
+load 13
+int 1
+-
+itob
+box_replace
+main_l20:
+txna Accounts 1
+box_get
+store 8
+store 7
+load 8
+bnz main_l23
+txna Accounts 1
+int 1
+load 14
+callsub rewardentry_0
+box_put
+main_l22:
+int 1
+return
+main_l23:
+load 7
+len
+int 16
+==
+assert
+load 7
+int 0
+callsub entryassetid_2
+load 14
+==
+assert
+txna Accounts 1
+load 7
+int 0
+callsub entryamount_1
+int 1
++
+load 14
+callsub rewardentry_0
+box_put
+b main_l22
+main_l24:
+load 5
+int 0
+load 12
+substring3
+load 5
+load 12
+int 16
++
+load 5
+len
+substring3
+concat
+store 15
+load 15
+len
+int 0
+==
+bnz main_l26
+byte "rewards"
+load 15
+box_put
+b main_l20
+main_l26:
+byte "rewards"
+box_del
+assert
+b main_l20
+main_l27:
+load 5
+load 9
+callsub entryamount_1
+int 0
+>
+assert
+load 10
+int 1
++
+store 10
+load 9
+int 16
++
+store 9
+b main_l17
+main_l28:
+txn Sender
+global CreatorAddress
+==
+assert
+txn NumAssets
+int 1
+>=
+assert
+txn GroupIndex
+int 0
+>
+assert
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int axfer
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns XferAsset
+txna Assets 0
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns AssetReceiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns AssetAmount
+int 0
+>
+assert
+txn GroupIndex
+int 1
+-
+gtxns AssetAmount
+store 2
+byte "rewards"
+box_get
+store 4
+store 3
+load 4
+!
+bnz main_l37
+load 3
+len
+int 16
+%
+int 0
+==
+assert
+int 0
+store 0
+int 0
+store 1
+main_l30:
+load 0
+load 3
+len
+<
+bnz main_l34
+load 1
+int 0
+==
+bnz main_l33
+main_l32:
+int 1
+return
+main_l33:
+byte "rewards"
+load 3
+load 2
+txna Assets 0
+callsub rewardentry_0
+concat
+box_put
+b main_l32
+main_l34:
+load 3
+load 0
+callsub entryassetid_2
+txna Assets 0
+==
+bnz main_l36
+load 0
+int 16
++
+store 0
+b main_l30
+main_l36:
+byte "rewards"
+load 0
+load 3
+load 0
+callsub entryamount_1
+load 2
++
+itob
+box_replace
+int 1
+store 1
+load 3
+len
+store 0
+b main_l30
+main_l37:
+byte "rewards"
+load 2
+txna Assets 0
+callsub rewardentry_0
+box_put
+b main_l32
+main_l38:
+txn Sender
+global CreatorAddress
+==
+assert
+txn NumAssets
+int 1
+>=
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+txna Assets 0
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+itxn_submit
+int 1
+return
+main_l39:
+txn Sender
+global CreatorAddress
+==
+return
+main_l40:
+txn Sender
+global CreatorAddress
+==
+return
+main_l41:
+int 1
+return
+main_l42:
+int 1
+return
+main_l43:
+int 1
+return
+
+// reward_entry
+rewardentry_0:
+store 25
+store 24
+load 24
+itob
+load 25
+itob
+concat
+retsub
+
+// entry_amount
+entryamount_1:
+store 27
+store 26
+load 26
+load 27
+load 27
+int 8
++
+substring3
+btoi
+retsub
+
+// entry_asset_id
+entryassetid_2:
+store 29
+store 28
+load 28
+load 29
+int 8
++
+load 29
+int 16
++
+substring3
+btoi
+retsub

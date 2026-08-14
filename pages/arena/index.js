@@ -62,7 +62,7 @@ export default function Arena(props) {
                 <Grid container style={{marginTop: 150}}>
 
                 
-                    <Grid item xs={12} >
+                    {/* <Grid item xs={12} >
                         <Button component={motion.div} animate={{opacity: [0,1,1,1,1,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
                         onClick={() => window.location.href = "/arena/dragonshorde"}
                         >
@@ -86,7 +86,7 @@ export default function Arena(props) {
 
                         </Button>
 
-                    </Grid>
+                    </Grid> */}
 
                     <Grid item xs={4} >
                         <Button component={motion.div} animate={{opacity: [0,1,1,1,1,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
@@ -134,6 +134,26 @@ export default function Arena(props) {
                                 style={{width: "100%", border: "3px solid white", maxWidth: 1000}}>
                                 <source src={"arena/fight.mp4"} type='video/mp4'  />
                             </video>      
+                            
+
+                        </Button>
+
+                    </Grid>
+
+                    <Grid item xs={4} >
+                        <Button component={motion.div} animate={{opacity: [0,1,1,1,1,1]}} transition={{duration: 10}} style={{position: "relative", display: "grid", margin: "auto", width: "100%"}} 
+                        onClick={() => window.location.href = "/arena/depths"}
+                        >
+
+                        
+                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: "50%", transform: "translateX(-50%)", bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10, zIndex: 2}}> The Depths </Typography>
+                            
+                        
+                            <img
+                                src={"/arena/depths/depths-button.png"}
+                                alt="The Depths"
+                                style={{width: "100%", border: "3px solid white", maxWidth: 1000, aspectRatio: "1 / 1", objectFit: "cover"}}
+                            />      
                             
 
                         </Button>

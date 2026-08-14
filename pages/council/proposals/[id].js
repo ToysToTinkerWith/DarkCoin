@@ -6,7 +6,7 @@ import { Typography, Button, TextField, Slider, Grid } from "@mui/material"
 
 import { PieChart, Pie, Tooltip, ResponsiveContainer, Link } from 'recharts';
 
-import { useWallet } from '@txnlab/use-wallet'
+import { useWallet } from '@txnlab/use-wallet-react'
 
 import { useRouter } from 'next/router'
 
@@ -15,8 +15,16 @@ import { useRouter } from 'next/router'
 
 export default function Proposal(props) {
 
-  const { activeAccount, signTransactions, sendTransactions } = useWallet()
-
+  const {
+    wallets,
+    activeWallet,
+    activeAddress,
+    isReady,
+    signTransactions,
+    transactionSigner,
+    algodClient,
+  } = useWallet()
+  
   const [ address, setAddress ] = useState("")
 
   const [ assets, setAssets ] = useState([])

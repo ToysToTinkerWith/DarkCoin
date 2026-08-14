@@ -79,7 +79,6 @@ return new Promise(async (resolve) => {
     let moveTrait1 = propertyOptions[Math.floor(Math.random() * propertyOptions.length)]
     let moveTrait2 = propertyOptions[Math.floor(Math.random() * propertyOptions.length)]
     let moveTrait3 = propertyOptions[Math.floor(Math.random() * propertyOptions.length)]
-    let moveTrait4 = propertyOptions[Math.floor(Math.random() * propertyOptions.length)]
 
 
     let moveExample1 = JSON.stringify({
@@ -88,8 +87,9 @@ return new Promise(async (resolve) => {
         trait: moveTrait1,
         type: "(melee damage, ranged damage, magic damage, melee curse, ranged curse, magic curse, melee buff, ranged buff, magic buff)",
         effect: "('poison', 'bleed', 'burn', 'freeze', 'slow', 'paralyze', 'drown', or 'doom' if type of move is a curse or damage. 'shield', 'strengthen', 'empower', 'hasten', 'nurture', 'bless', 'focus', or 'cleanse' if type of move is buff)",
-        power: "(number between 10 and 40)",
-        accuracy: "(number between 25 and 100)"
+        power: "(positive number between 10 and 40)",
+        accuracy: "(positive number between 25 and 100)",
+        cooldown: "(positive number between 3 and 10)"
     })
     let moveExample2 = JSON.stringify({
         description: "(this move should be based on " + moveTrait2 + ". The character has weapon = " + properties.Weapon + ", head = " + properties.Head + ", and armour = " + properties.Armour + ". move should target a single character. description should describe move to be able to target anyone. dont mention turns in the description. IMPORTANT: Avoid any content that may be considered inappropriate or offensive, ensuring the image aligns with content policies.)",
@@ -97,8 +97,9 @@ return new Promise(async (resolve) => {
         trait: moveTrait2,
         type: "(melee damage, ranged damage, magic damage, melee curse, ranged curse, magic curse, melee buff, ranged buff, magic buff)",
         effect: "('poison', 'bleed', 'burn', 'freeze', 'slow', 'paralyze', 'drown', or 'doom' if type of move is a curse or damage. 'shield', 'strengthen', 'empower', 'hasten', 'nurture', 'bless', 'focus', or 'cleanse' if type of move is buff)",
-        power: "(number between 10 and 40)",
-        accuracy: "(number between 25 and 100)"
+        power: "(positive number between 10 and 40)",
+        accuracy: "(positive number between 25 and 100)",
+        cooldown: "(positive number between 3 and 10)"
     })
     let moveExample3 = JSON.stringify({
         description: "(this move should be based on " + moveTrait3 + ". The character has weapon = " + properties.Weapon + ", head = " + properties.Head + ", and armour = " + properties.Armour + ". move should target a single character. description should describe move to be able to target anyone. dont mention turns in the description. IMPORTANT: Avoid any content that may be considered inappropriate or offensive, ensuring the image aligns with content policies.)",
@@ -106,18 +107,11 @@ return new Promise(async (resolve) => {
         trait: moveTrait3,
         type: "(melee damage, ranged damage, magic damage, melee curse, ranged curse, magic curse, melee buff, ranged buff, magic buff)",
         effect: "('poison', 'bleed', 'burn', 'freeze', 'slow', 'paralyze', 'drown', or 'doom' if type of move is a curse or damage. 'shield', 'strengthen', 'empower', 'hasten', 'nurture', 'bless', 'focus', or 'cleanse' if type of move is buff)",
-        power: "(number between 10 and 40)",
-        accuracy: "(number between 25 and 100)"
+        power: "(positive number between 10 and 40)",
+        accuracy: "(positive number between 25 and 100)",
+        cooldown: "(positive number between 3 and 10)"
     })
-    let moveExample4 = JSON.stringify({
-        description: "(this move should be based on " + moveTrait4 + ". The character has weapon = " + properties.Weapon + ", head = " + properties.Head + ", and armour = " + properties.Armour + ". move should target a single character. description should describe move to be able to target anyone. dont mention turns in the description. IMPORTANT: Avoid any content that may be considered inappropriate or offensive, ensuring the image aligns with content policies.)",
-        name: "(string based on move description)",
-        trait: moveTrait4,
-        type: "(melee damage, ranged damage, magic damage, melee curse, ranged curse, magic curse, melee buff, ranged buff, magic buff)",
-        effect: "('poison', 'bleed', 'burn', 'freeze', 'slow', 'paralyze', 'drown', or 'doom' if type of move is a curse or damage. 'shield', 'strengthen', 'empower', 'hasten', 'nurture', 'bless', 'focus', or 'cleanse' if type of move is buff)",
-        power: "(number between 10 and 40)",
-        accuracy: "(number between 25 and 100)"
-    })
+
 
     let objectExample = JSON.stringify({
         name: "(name based on provided image and character properties: " + properties + ")",
@@ -131,8 +125,7 @@ return new Promise(async (resolve) => {
         moves: [
             moveExample1,
             moveExample2,
-            moveExample3,
-            moveExample4
+            moveExample3
         ]
     })
 
@@ -156,7 +149,7 @@ return new Promise(async (resolve) => {
     let response = await openai.chat.completions.create({
         model: "gpt-4.1-mini",
         messages: messages,
-        temperature: 0,
+        temperature: 0.1,
         response_format: { "type": "json_object" }
     })
 
@@ -172,6 +165,7 @@ return new Promise(async (resolve) => {
     charObj["moves"].forEach((move, index) => {
         charObj["moves"][index].power = Number(charObj["moves"][index].power)
         charObj["moves"][index].accuracy = Number(charObj["moves"][index].accuracy)
+        charObj["moves"][index].cooldown = Number(charObj["moves"][index].cooldown)
     })
 
 
@@ -204,6 +198,8 @@ return new Promise(async (resolve) => {
     charObj["resist"] = charObj["resist"] + (Math.floor(charObj["intelligence"] / 2))
 
     charObj["currentHealth"] = Number(charObj["health"])
+    charObj["critChance"] = Number.isFinite(Number(charObj["critChance"])) ? Number(charObj["critChance"]) : 25
+    charObj["critDamage"] = Number.isFinite(Number(charObj["critDamage"])) ? Number(charObj["critDamage"]) : 200
 
     let effectsArray = ['poison', 'bleed', 'burn', 'freeze', 'slow', 'paralyze', 'drown', 'doom', 'shield', 'strengthen', 'empower', 'hasten', 'nurture', 'bless', 'focus', 'cleanse']
 
@@ -212,6 +208,14 @@ return new Promise(async (resolve) => {
     })
 
     charObj["moves"].forEach((move, index) => {
+
+        if (charObj["moves"][index].cooldown < 0) {
+            charObj["moves"][index].cooldown = Math.abs(charObj["moves"][index].cooldown)
+        }
+        else if (charObj["moves"][index].cooldown < 3) {
+            charObj["moves"][index].cooldown = 3
+        }
+
         if (!effectsArray.includes(charObj["moves"][index].effect)) {
             charObj["moves"][index].effect = effectsArray[Math.floor(Math.random() * effectsArray.length)]
         }
@@ -233,13 +237,23 @@ return new Promise(async (resolve) => {
             }
 
             if (charObj["moves"][index].accuracy >= 90) {
-                charObj["moves"][index].power - 10
+                charObj["moves"][index].power = charObj["moves"][index].power - 10
             }
             else if (charObj["moves"][index].accuracy < 60) {
-                charObj["moves"][index].power + 10
+                charObj["moves"][index].power = charObj["moves"][index].power + 10
             }
             else if (charObj["moves"][index].accuracy < 40) {
-                charObj["moves"][index].power + 20
+                charObj["moves"][index].power = charObj["moves"][index].power + 20
+            }
+
+            if (charObj["moves"][index].power >= 90) {
+                charObj["moves"][index].cooldown = charObj["moves"][index].cooldown + 1
+            }
+            else if (charObj["moves"][index].power < 60) {
+                charObj["moves"][index].cooldown = charObj["moves"][index].cooldown - 1
+            }
+            else if (charObj["moves"][index].power < 40) {
+                charObj["moves"][index].cooldown = charObj["moves"][index].cooldown - 2
             }
     
         }
@@ -264,6 +278,8 @@ return new Promise(async (resolve) => {
         }
         
     })
+
+    console.log(charObj)
 
     await setDoc(doc(db, "chars",  req.body.charId + String("object")), {
         charObj

@@ -1,0 +1,15 @@
+substitutions:
+  _IMAGE: "gcr.io/$PROJECT_ID/dark-coin-fight-jobs:latest"
+
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-f"
+      - "cloud-run-jobs/Dockerfile"
+      - "-t"
+      - "${_IMAGE}"
+      - "."
+
+images:
+  - "${_IMAGE}"

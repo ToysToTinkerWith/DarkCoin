@@ -1,6 +1,56 @@
 import React from "react";
 
 /** ====== Data as a named export ====== */
+export const POINTS_BYTE_LENGTH = 2400;
+
+export function normalizePointsArray(value, length = POINTS_BYTE_LENGTH) {
+  const normalized = new Uint8Array(length);
+
+  if (!value) return normalized;
+
+  const source =
+    value instanceof Uint8Array
+      ? value
+      : Array.isArray(value)
+      ? Uint8Array.from(value)
+      : null;
+
+  if (!source) return normalized;
+
+  normalized.set(source.slice(0, length));
+  return normalized;
+}
+
+export function getSkillPointStatAdjustments(pointArray) {
+  const adjustments = {
+    health: 0,
+    speed: 0,
+    resist: 0,
+    strength: 0,
+    dexterity: 0,
+    intelligence: 0,
+    accuracy: 0,
+    critChance: 0,
+    critDamage: 0,
+  };
+
+  trees.forEach((tree) => {
+    [tree.skill1, tree.skill2, tree.skill3].forEach((skill) => {
+      if (!skill?.statAdjustments) return;
+
+      const level = Number(pointArray?.[skill.byte] || 0);
+      if (!level) return;
+
+      Object.entries(skill.statAdjustments).forEach(([statKey, amount]) => {
+        if (adjustments[statKey] === undefined) return;
+        adjustments[statKey] += Number(amount || 0) * level;
+      });
+    });
+  });
+
+  return adjustments;
+}
+
 export const trees = [
   {
     skill1: { title: "Poison", effect: "Poison + 1", level: 0, maxLevel: 3, byte: 0 },
@@ -81,6 +131,227 @@ export const trees = [
     skill1: { title: "Cleanse", effect: "Cleanse + 1", level: 0, maxLevel: 3, byte: 1500 },
     skill2: { title: "Washed Hands", effect: "Melee buffs apply 1 cleanse", level: 0, maxLevel: 3, byte: 1501 },
     skill3: { title: "Restored Judgement", effect: "Applying cleanse applies 1 empower", level: 0, maxLevel: 3, byte: 1502 },
+  },
+  {
+    skill1: {
+      title: "Health",
+      effect: "Health + 5",
+      level: 0,
+      maxLevel: 3,
+      byte: 1600,
+      iconSrc: "/dragonshorde/health.svg",
+      statAdjustments: { health: 5 },
+    },
+    skill2: {
+      title: "Iron Constitution",
+      effect: "First time below half health, gain 1 shield. Health + 4",
+      level: 0,
+      maxLevel: 3,
+      byte: 1601,
+      statAdjustments: { health: 4 },
+    },
+    skill3: {
+      title: "Second Wind",
+      effect: "Healing below half health also grants 1 nurture. Health + 3",
+      level: 0,
+      maxLevel: 3,
+      byte: 1602,
+      statAdjustments: { health: 3 },
+    },
+  },
+  {
+    skill1: {
+      title: "Speed",
+      effect: "Speed + 2",
+      level: 0,
+      maxLevel: 3,
+      byte: 1700,
+      iconSrc: "/dragonshorde/speed.png",
+      statAdjustments: { speed: 2 },
+    },
+    skill2: {
+      title: "Quickstep",
+      effect: "After this champion misses, gain 1 hasten. Speed + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 1701,
+      statAdjustments: { speed: 1 },
+    },
+    skill3: {
+      title: "Fast Recovery",
+      effect: "Cleanse on self also grants 1 hasten. Speed + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 1702,
+      statAdjustments: { speed: 1 },
+    },
+  },
+  {
+    skill1: {
+      title: "Resist",
+      effect: "Resist + 2",
+      level: 0,
+      maxLevel: 3,
+      byte: 1800,
+      iconSrc: "/dragonshorde/resist.png",
+      statAdjustments: { resist: 2 },
+    },
+    skill2: {
+      title: "Stone Skin",
+      effect: "When resisting an effect, gain 1 shield. Resist + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 1801,
+      statAdjustments: { resist: 1 },
+    },
+    skill3: {
+      title: "Bulwark Stance",
+      effect: "Shield on self also grants 1 bless. Resist + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 1802,
+      statAdjustments: { resist: 1 },
+    },
+  },
+  {
+    skill1: {
+      title: "Strength",
+      effect: "Strength + 2",
+      level: 0,
+      maxLevel: 3,
+      byte: 1900,
+      iconSrc: "/dragonshorde/strength.svg",
+      statAdjustments: { strength: 2 },
+    },
+    skill2: {
+      title: "Heavy Blows",
+      effect: "Melee hits apply 1 slow. Strength + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 1901,
+      statAdjustments: { strength: 1 },
+    },
+    skill3: {
+      title: "Battle Tempo",
+      effect: "Applying strengthen also grants 1 hasten. Strength + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 1902,
+      statAdjustments: { strength: 1 },
+    },
+  },
+  {
+    skill1: {
+      title: "Dexterity",
+      effect: "Dexterity + 2",
+      level: 0,
+      maxLevel: 3,
+      byte: 2000,
+      iconSrc: "/dragonshorde/dexterity.svg",
+      statAdjustments: { dexterity: 2 },
+    },
+    skill2: {
+      title: "Precise Aim",
+      effect: "Ranged hits apply 1 focus to self. Dexterity + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 2001,
+      statAdjustments: { dexterity: 1 },
+    },
+    skill3: {
+      title: "Evasive Footwork",
+      effect: "When this champion evades an effect, gain 1 hasten. Dexterity + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 2002,
+      statAdjustments: { dexterity: 1 },
+    },
+  },
+  {
+    skill1: {
+      title: "Intelligence",
+      effect: "Intelligence + 2",
+      level: 0,
+      maxLevel: 3,
+      byte: 2100,
+      iconSrc: "/dragonshorde/intelligence.svg",
+      statAdjustments: { intelligence: 2 },
+    },
+    skill2: {
+      title: "Arcane Study",
+      effect: "Magic hits apply 1 empower to self. Intelligence + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 2101,
+      statAdjustments: { intelligence: 1 },
+    },
+    skill3: {
+      title: "Mind Ward",
+      effect: "When cursed, gain 1 bless. Resist + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 2102,
+      statAdjustments: { resist: 1 },
+    },
+  },
+  {
+    skill1: {
+      title: "Crit Chance",
+      effect: "Crit Chance + 0.5%",
+      level: 0,
+      maxLevel: 3,
+      byte: 2200,
+      iconSrc: "/dragonshorde/critChance.svg",
+      scalePercent: true,
+      statAdjustments: { critChance: 0.5 },
+    },
+    skill2: {
+      title: "Killer Instinct",
+      effect: "Critical hits apply 1 bleed. Crit Chance + 0.5%",
+      level: 0,
+      maxLevel: 3,
+      byte: 2201,
+      scalePercent: true,
+      statAdjustments: { critChance: 0.5 },
+    },
+    skill3: {
+      title: "Perfect Opening",
+      effect: "First damaging move in a fight gains 1 focus. Accuracy + 1",
+      level: 0,
+      maxLevel: 3,
+      byte: 2202,
+      statAdjustments: { accuracy: 1 },
+    },
+  },
+  {
+    skill1: {
+      title: "Crit Damage",
+      effect: "Crit Damage + 10%",
+      level: 0,
+      maxLevel: 3,
+      byte: 2300,
+      iconSrc: "/dragonshorde/critDamage.svg",
+      scalePercent: true,
+      statAdjustments: { critDamage: 10 },
+    },
+    skill2: {
+      title: "Crushing Finale",
+      effect: "Critical hits apply 1 doom. Crit Damage + 5%",
+      level: 0,
+      maxLevel: 3,
+      byte: 2301,
+      scalePercent: true,
+      statAdjustments: { critDamage: 5 },
+    },
+    skill3: {
+      title: "Splinter Wound",
+      effect: "Critical hits against bleeding targets apply 1 bleed. Crit Damage + 5%",
+      level: 0,
+      maxLevel: 3,
+      byte: 2302,
+      scalePercent: true,
+      statAdjustments: { critDamage: 5 },
+    },
   },
 ];
 

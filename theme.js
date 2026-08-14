@@ -1,5 +1,6 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
+
 let theme = createTheme({
   palette: {
     primary: {
@@ -9,7 +10,12 @@ let theme = createTheme({
       main: "#FFFFFF",
     },
   },
-  
+  typography: {
+    fontFamily: [
+      '"Uncial Antiqua"',
+      
+    ]
+  },
 })
 
 theme = responsiveFontSizes(theme)

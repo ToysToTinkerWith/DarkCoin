@@ -1,0 +1,1218 @@
+{
+  "coordinateSystem": "metres; +Y up; +Z forward; bearing atan2(X,Z); positive toward champion right",
+  "measurements": [
+    {
+      "id": "dragon_longsword",
+      "name": "Dragon Long Sword",
+      "kind": "melee",
+      "cycleSeconds": 1.4,
+      "damageType": "fire",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 2.1799999999999997,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.2,
+          "endPhase": 0.65,
+          "startSeconds": 0.27999999999999997,
+          "endSeconds": 0.9099999999999999,
+          "startDegrees": -93.31673865363537,
+          "endDegrees": 50.02835138547397,
+          "minDegrees": -93.31673865363537,
+          "maxDegrees": 50.02835138547397,
+          "sweepDegrees": 143.34509003910932,
+          "netDegrees": 143.34509003910932,
+          "projectedHitboxSpanDegrees": 155.9169609510769,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 143.34509003910932,
+          "bladeYawDegrees": {
+            "min": -92.82187759798892,
+            "max": 57.93684092248594
+          },
+          "bladePitchDegrees": {
+            "min": 29.99962522672568,
+            "max": 30.016599862564682
+          },
+          "tipRadiusM": {
+            "min": 1.3680081083458533,
+            "max": 1.4710741124090247
+          },
+          "endpointHeightM": {
+            "min": 1.24759,
+            "max": 1.54922
+          },
+          "colliderOuterRadiusM": 1.5910741124090246,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.8710741124090247
+        }
+      ]
+    },
+    {
+      "id": "dragon_staff",
+      "name": "Dragon Staff",
+      "kind": "projectile",
+      "cycleSeconds": 1.65,
+      "damageType": "fire",
+      "sourceFrames": 121,
+      "releasePhase": 0.55,
+      "releaseSeconds": 0.9075,
+      "origin": [
+        -0.08851,
+        1.50133,
+        0.831
+      ],
+      "projectile": {
+        "speedMps": 9,
+        "widthM": 0.32,
+        "maxRangeM": 13,
+        "collider": "sweptSphere",
+        "widthDefinition": "Full collision diameter in metres; radius = widthM / 2. Visual must match.",
+        "radiusM": 0.16,
+        "flightSeconds": 1.4444444444444444,
+        "headingDegrees": 0
+      }
+    },
+    {
+      "id": "dual_katana",
+      "name": "Dual Katana",
+      "kind": "melee",
+      "cycleSeconds": 1.15,
+      "damageType": "slashing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.1,
+      "targetCenterReachCapM": 1.78,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.124,
+          "endPhase": 0.403,
+          "startSeconds": 0.14259999999999998,
+          "endSeconds": 0.46345,
+          "startDegrees": 91.32895067670884,
+          "endDegrees": -51.2948224060043,
+          "minDegrees": -51.2948224060043,
+          "maxDegrees": 91.32895067670884,
+          "sweepDegrees": 142.62377308271314,
+          "netDegrees": -142.62377308271314,
+          "projectedHitboxSpanDegrees": 154.03078774409704,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 142.62377308271314,
+          "bladeYawDegrees": {
+            "min": -67.67059243171582,
+            "max": 82.88485769599389
+          },
+          "bladePitchDegrees": {
+            "min": 31.847863026824335,
+            "max": 31.890305641438484
+          },
+          "tipRadiusM": {
+            "min": 1.2495569056165148,
+            "max": 1.3576983962415214
+          },
+          "endpointHeightM": {
+            "min": 1.33568,
+            "max": 1.48001
+          },
+          "colliderOuterRadiusM": 1.4576983962415215,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.7376983962415216
+        },
+        {
+          "index": 2,
+          "side": "L",
+          "startPhase": 0.536,
+          "endPhase": 0.797,
+          "startSeconds": 0.6164,
+          "endSeconds": 0.91655,
+          "startDegrees": -88.4346003809598,
+          "endDegrees": 50.939841320992116,
+          "minDegrees": -88.4346003809598,
+          "maxDegrees": 50.939841320992116,
+          "sweepDegrees": 139.37444170195192,
+          "netDegrees": 139.37444170195192,
+          "projectedHitboxSpanDegrees": 151.7643356122865,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 139.37444170195192,
+          "bladeYawDegrees": {
+            "min": -73.14223128854003,
+            "max": 74.14996939807685
+          },
+          "bladePitchDegrees": {
+            "min": 35.57341087585185,
+            "max": 35.62790173805335
+          },
+          "tipRadiusM": {
+            "min": 1.2549284167916512,
+            "max": 1.3619895021327002
+          },
+          "endpointHeightM": {
+            "min": 1.32025,
+            "max": 1.47568
+          },
+          "colliderOuterRadiusM": 1.4619895021327003,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.7419895021327003
+        }
+      ]
+    },
+    {
+      "id": "executioner_axe",
+      "name": "Executioner Axe",
+      "kind": "melee",
+      "cycleSeconds": 1.7,
+      "damageType": "slashing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.18,
+      "targetCenterReachCapM": 2.2800000000000002,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.22,
+          "endPhase": 0.72,
+          "startSeconds": 0.374,
+          "endSeconds": 1.224,
+          "startDegrees": -104.50384500575603,
+          "endDegrees": 66.3314470278226,
+          "minDegrees": -104.53524747454753,
+          "maxDegrees": 66.35567857074716,
+          "sweepDegrees": 170.8909260452947,
+          "netDegrees": 170.83529203357864,
+          "projectedHitboxSpanDegrees": 189.98991067252345,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 170.94656005701074,
+          "bladeYawDegrees": {
+            "min": -123.08612581557102,
+            "max": 66.13273944086151
+          },
+          "bladePitchDegrees": {
+            "min": -14.300249864561222,
+            "max": 33.132681326212655
+          },
+          "tipRadiusM": {
+            "min": 1.1528999581958532,
+            "max": 1.548043386736302
+          },
+          "endpointHeightM": {
+            "min": 0.967742,
+            "max": 1.937298
+          },
+          "colliderOuterRadiusM": 1.7280433867363019,
+          "effectiveTargetCenterRadiusUpperBoundM": 2.008043386736302
+        }
+      ]
+    },
+    {
+      "id": "scythe",
+      "name": "Scythe",
+      "kind": "melee",
+      "cycleSeconds": 1.55,
+      "damageType": "slashing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.14,
+      "targetCenterReachCapM": 2.58,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.2,
+          "endPhase": 0.76,
+          "startSeconds": 0.31000000000000005,
+          "endSeconds": 1.1780000000000002,
+          "startDegrees": -87.09456556617958,
+          "endDegrees": 36.39261522597343,
+          "minDegrees": -95.61388050233022,
+          "maxDegrees": 38.279033488106336,
+          "sweepDegrees": 133.89291399043657,
+          "netDegrees": 123.48718079215301,
+          "projectedHitboxSpanDegrees": 165.4891688471138,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 144.2986471887201,
+          "bladeYawDegrees": {
+            "min": -43.00949884250264,
+            "max": 93.62431989788337
+          },
+          "bladePitchDegrees": {
+            "min": -3.468252439669788,
+            "max": -1.2073262858033431
+          },
+          "tipRadiusM": {
+            "min": 1.6118319228753353,
+            "max": 1.6990319079074012
+          },
+          "endpointHeightM": {
+            "min": 1.213066,
+            "max": 1.3925648698884758
+          },
+          "colliderOuterRadiusM": 1.8390319079074011,
+          "effectiveTargetCenterRadiusUpperBoundM": 2.1190319079074014
+        }
+      ]
+    },
+    {
+      "id": "shield",
+      "name": "Shield",
+      "kind": "melee",
+      "cycleSeconds": 1.2,
+      "damageType": "blunt",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.33,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.18,
+          "endPhase": 0.6,
+          "startSeconds": 0.216,
+          "endSeconds": 0.72,
+          "startDegrees": -35.87161358477485,
+          "endDegrees": -22.84586989364024,
+          "minDegrees": -35.87161358477485,
+          "maxDegrees": -22.84586989364024,
+          "sweepDegrees": 13.025743691134608,
+          "netDegrees": 13.025743691134608,
+          "projectedHitboxSpanDegrees": 43.7955752515302,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 13.025743691134608,
+          "bladeYawDegrees": {
+            "min": 0,
+            "max": 0
+          },
+          "bladePitchDegrees": {
+            "min": -69.66842902305893,
+            "max": -69.66747167059827
+          },
+          "tipRadiusM": {
+            "min": 0.5075746410056358,
+            "max": 0.6825437714901514
+          },
+          "endpointHeightM": {
+            "min": 0.8460340000000001,
+            "max": 1.08309
+          },
+          "colliderOuterRadiusM": 0.8025437714901514,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0825437714901516
+        }
+      ]
+    },
+    {
+      "id": "sickle",
+      "name": "Sickle",
+      "kind": "melee",
+      "cycleSeconds": 1,
+      "damageType": "slashing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.7,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.2,
+          "endPhase": 0.65,
+          "startSeconds": 0.2,
+          "endSeconds": 0.65,
+          "startDegrees": -74.24027265683362,
+          "endDegrees": 69.92876783354967,
+          "minDegrees": -74.24027265683362,
+          "maxDegrees": 69.92876783354967,
+          "sweepDegrees": 144.16904049038328,
+          "netDegrees": 144.16904049038328,
+          "projectedHitboxSpanDegrees": 167.12910316392424,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 144.16904049038328,
+          "bladeYawDegrees": {
+            "min": -51.607563207602205,
+            "max": 99.15101113472724
+          },
+          "bladePitchDegrees": {
+            "min": 23.100387187484728,
+            "max": 23.11477774129755
+          },
+          "tipRadiusM": {
+            "min": 1.1276030750224122,
+            "max": 1.2860642629355656
+          },
+          "endpointHeightM": {
+            "min": 1.22917,
+            "max": 1.39876
+          },
+          "colliderOuterRadiusM": 1.4060642629355655,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.6860642629355655
+        }
+      ]
+    },
+    {
+      "id": "spear",
+      "name": "Spear",
+      "kind": "melee",
+      "cycleSeconds": 1.25,
+      "damageType": "piercing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.09,
+      "targetCenterReachCapM": 2.7800000000000002,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.4,
+          "endPhase": 0.62,
+          "startSeconds": 0.5,
+          "endSeconds": 0.775,
+          "startDegrees": -20.813463754775672,
+          "endDegrees": -9.010530285193738,
+          "minDegrees": -20.813463754775672,
+          "maxDegrees": -9.010530285193738,
+          "sweepDegrees": 11.802933469581934,
+          "netDegrees": 11.802933469581934,
+          "projectedHitboxSpanDegrees": 76.31240652383772,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 11.802933469581934,
+          "bladeYawDegrees": {
+            "min": 0.1209671647952641,
+            "max": 0.12096886744996027
+          },
+          "bladePitchDegrees": {
+            "min": -0.3322571846281672,
+            "max": -0.33225250817096236
+          },
+          "tipRadiusM": {
+            "min": 0.900579855482011,
+            "max": 2.04321413464179
+          },
+          "endpointHeightM": {
+            "min": 1.334,
+            "max": 1.33812
+          },
+          "colliderOuterRadiusM": 2.13321413464179,
+          "effectiveTargetCenterRadiusUpperBoundM": 2.41321413464179
+        }
+      ]
+    },
+    {
+      "id": "trident",
+      "name": "Trident",
+      "kind": "melee",
+      "cycleSeconds": 1.35,
+      "damageType": "water",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.14,
+      "targetCenterReachCapM": 2.63,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.4,
+          "endPhase": 0.62,
+          "startSeconds": 0.54,
+          "endSeconds": 0.8370000000000001,
+          "startDegrees": -17.357117023292084,
+          "endDegrees": -8.182935637879979,
+          "minDegrees": -17.357117023292084,
+          "maxDegrees": -8.182935637879979,
+          "sweepDegrees": 9.174181385412105,
+          "netDegrees": 9.174181385412105,
+          "projectedHitboxSpanDegrees": 67.8693538755904,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 9.174181385412105,
+          "bladeYawDegrees": {
+            "min": 0.40255940318328953,
+            "max": 0.40256473972689855
+          },
+          "bladePitchDegrees": {
+            "min": -0.03114154133111043,
+            "max": -0.03038158893875125
+          },
+          "tipRadiusM": {
+            "min": 1.0500240219156893,
+            "max": 2.2008071525011
+          },
+          "endpointHeightM": {
+            "min": 1.34,
+            "max": 1.34041
+          },
+          "colliderOuterRadiusM": 2.3408071525011,
+          "effectiveTargetCenterRadiusUpperBoundM": 2.6208071525011
+        }
+      ]
+    },
+    {
+      "id": "dark_sword",
+      "name": "Dark Sword",
+      "kind": "melee",
+      "cycleSeconds": 1.25,
+      "damageType": "shadow",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 2.13,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.2,
+          "endPhase": 0.65,
+          "startSeconds": 0.25,
+          "endSeconds": 0.8125,
+          "startDegrees": -93.33459367800891,
+          "endDegrees": 49.7231903711629,
+          "minDegrees": -93.33459367800891,
+          "maxDegrees": 49.7231903711629,
+          "sweepDegrees": 143.0577840491718,
+          "netDegrees": 143.0577840491718,
+          "projectedHitboxSpanDegrees": 155.96560717993896,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 143.0577840491718,
+          "bladeYawDegrees": {
+            "min": -92.82216352628825,
+            "max": 57.93659677355356
+          },
+          "bladePitchDegrees": {
+            "min": 29.630960564320567,
+            "max": 29.647878310963932
+          },
+          "tipRadiusM": {
+            "min": 1.3174864384121758,
+            "max": 1.4200543237848335
+          },
+          "endpointHeightM": {
+            "min": 1.23495,
+            "max": 1.5136
+          },
+          "colliderOuterRadiusM": 1.5400543237848336,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.8200543237848337
+        }
+      ]
+    },
+    {
+      "id": "elf_bow",
+      "name": "Elf Bow",
+      "kind": "projectile",
+      "cycleSeconds": 1.35,
+      "damageType": "piercing",
+      "sourceFrames": 121,
+      "releasePhase": 0.64,
+      "releaseSeconds": 0.8640000000000001,
+      "origin": [
+        -0.08,
+        1.49,
+        0.43
+      ],
+      "projectile": {
+        "speedMps": 16,
+        "widthM": 0.16,
+        "maxRangeM": 15,
+        "collider": "sweptSphere",
+        "widthDefinition": "Full collision diameter in metres; radius = widthM / 2. Visual must match.",
+        "radiusM": 0.08,
+        "flightSeconds": 0.9375,
+        "headingDegrees": 0
+      }
+    },
+    {
+      "id": "wooden_club",
+      "name": "Wooden Club",
+      "kind": "melee",
+      "cycleSeconds": 1.6,
+      "damageType": "blunt",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.2,
+      "targetCenterReachCapM": 2.1799999999999997,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.32,
+          "endPhase": 0.72,
+          "startSeconds": 0.512,
+          "endSeconds": 1.152,
+          "startDegrees": -178.84918015306206,
+          "endDegrees": -0.9310601776694227,
+          "minDegrees": -178.84918015306206,
+          "maxDegrees": -0.7447466061184684,
+          "sweepDegrees": 178.1044335469436,
+          "netDegrees": 177.91811997539264,
+          "projectedHitboxSpanDegrees": 360,
+          "projectionCrossesRoot": true,
+          "travelDegrees": 178.29074711849455,
+          "bladeYawDegrees": {
+            "min": -179.97608635028288,
+            "max": -0.023310127890425747
+          },
+          "bladePitchDegrees": {
+            "min": -28.87874323578689,
+            "max": 89.610119448297
+          },
+          "tipRadiusM": {
+            "min": 0.028135174230843465,
+            "max": 1.4471552505481227
+          },
+          "endpointHeightM": {
+            "min": 0.509286,
+            "max": 2.8154555
+          },
+          "colliderOuterRadiusM": 1.6471552505481226,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.9271552505481226
+        }
+      ]
+    },
+    {
+      "id": "snake_wings",
+      "name": "Snake Wings",
+      "kind": "punch",
+      "cycleSeconds": 1,
+      "damageType": "poison",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.33,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.18,
+          "endPhase": 0.36,
+          "startSeconds": 0.18,
+          "endSeconds": 0.36,
+          "startDegrees": 29.74456203713141,
+          "endDegrees": 14.482941406533598,
+          "minDegrees": 14.27562463990597,
+          "maxDegrees": 29.74456203713141,
+          "sweepDegrees": 15.468937397225439,
+          "netDegrees": -15.261620630597811,
+          "projectedHitboxSpanDegrees": 54.25605214057424,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 15.676254163853066,
+          "bladeYawDegrees": {
+            "min": -110.08513307920708,
+            "max": -74.09940712415045
+          },
+          "bladePitchDegrees": {
+            "min": 0.881799876484544,
+            "max": 11.586977363459352
+          },
+          "tipRadiusM": {
+            "min": 0.3098073603181974,
+            "max": 0.6294010156204072
+          },
+          "endpointHeightM": {
+            "min": 1.397082,
+            "max": 1.4489532413793105
+          },
+          "colliderOuterRadiusM": 0.7494010156204072,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0294010156204072
+        },
+        {
+          "index": 2,
+          "side": "L",
+          "startPhase": 0.36,
+          "endPhase": 0.53,
+          "startSeconds": 0.36,
+          "endSeconds": 0.53,
+          "startDegrees": -32.973819239874956,
+          "endDegrees": -22.160658480147163,
+          "minDegrees": -32.973819239874956,
+          "maxDegrees": -21.901331181642263,
+          "sweepDegrees": 11.072488058232693,
+          "netDegrees": 10.813160759727793,
+          "projectedHitboxSpanDegrees": 48.859974946717756,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 11.331815356737593,
+          "bladeYawDegrees": {
+            "min": -69.18973083523628,
+            "max": -41.60302551396164
+          },
+          "bladePitchDegrees": {
+            "min": 0.8238368526920705,
+            "max": 10.597009610867106
+          },
+          "tipRadiusM": {
+            "min": 0.4136988863460959,
+            "max": 0.6565343168487083
+          },
+          "endpointHeightM": {
+            "min": 1.39695,
+            "max": 1.4465400000000002
+          },
+          "colliderOuterRadiusM": 0.7765343168487083,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0565343168487082
+        }
+      ]
+    },
+    {
+      "id": "sketonian_sword",
+      "name": "Ske'tonian Sword",
+      "kind": "melee",
+      "cycleSeconds": 1.3,
+      "damageType": "slashing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 2.08,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.2,
+          "endPhase": 0.65,
+          "startSeconds": 0.26,
+          "endSeconds": 0.8450000000000001,
+          "startDegrees": -93.29799790711347,
+          "endDegrees": 50.25356540780132,
+          "minDegrees": -93.29799790711347,
+          "maxDegrees": 50.25356540780132,
+          "sweepDegrees": 143.5515633149148,
+          "netDegrees": 143.5515633149148,
+          "projectedHitboxSpanDegrees": 156.04426405556643,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 143.5515633149148,
+          "bladeYawDegrees": {
+            "min": -92.94773942946092,
+            "max": 57.81021687953631
+          },
+          "bladePitchDegrees": {
+            "min": 30.23592676224881,
+            "max": 30.253151510589667
+          },
+          "tipRadiusM": {
+            "min": 1.4067445098524465,
+            "max": 1.5101911370750392
+          },
+          "endpointHeightM": {
+            "min": 1.23952,
+            "max": 1.57547
+          },
+          "colliderOuterRadiusM": 1.6301911370750393,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.9101911370750393
+        }
+      ]
+    },
+    {
+      "id": "fire_wings",
+      "name": "Fire Wings",
+      "kind": "punch",
+      "cycleSeconds": 1.05,
+      "damageType": "fire",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.33,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.18,
+          "endPhase": 0.36,
+          "startSeconds": 0.189,
+          "endSeconds": 0.378,
+          "startDegrees": 29.74456203713141,
+          "endDegrees": 14.482941406533598,
+          "minDegrees": 14.27562463990597,
+          "maxDegrees": 29.74456203713141,
+          "sweepDegrees": 15.468937397225439,
+          "netDegrees": -15.261620630597811,
+          "projectedHitboxSpanDegrees": 54.25605214057424,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 15.676254163853066,
+          "bladeYawDegrees": {
+            "min": -110.08513307920708,
+            "max": -74.09940712415045
+          },
+          "bladePitchDegrees": {
+            "min": 0.881799876484544,
+            "max": 11.586977363459352
+          },
+          "tipRadiusM": {
+            "min": 0.3098073603181974,
+            "max": 0.6294010156204072
+          },
+          "endpointHeightM": {
+            "min": 1.397082,
+            "max": 1.4489532413793105
+          },
+          "colliderOuterRadiusM": 0.7494010156204072,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0294010156204072
+        },
+        {
+          "index": 2,
+          "side": "L",
+          "startPhase": 0.36,
+          "endPhase": 0.53,
+          "startSeconds": 0.378,
+          "endSeconds": 0.5565000000000001,
+          "startDegrees": -32.973819239874956,
+          "endDegrees": -22.160658480147163,
+          "minDegrees": -32.973819239874956,
+          "maxDegrees": -21.901331181642263,
+          "sweepDegrees": 11.072488058232693,
+          "netDegrees": 10.813160759727793,
+          "projectedHitboxSpanDegrees": 48.859974946717756,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 11.331815356737593,
+          "bladeYawDegrees": {
+            "min": -69.18973083523628,
+            "max": -41.60302551396164
+          },
+          "bladePitchDegrees": {
+            "min": 0.8238368526920705,
+            "max": 10.597009610867106
+          },
+          "tipRadiusM": {
+            "min": 0.4136988863460959,
+            "max": 0.6565343168487083
+          },
+          "endpointHeightM": {
+            "min": 1.39695,
+            "max": 1.4465400000000002
+          },
+          "colliderOuterRadiusM": 0.7765343168487083,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0565343168487082
+        }
+      ]
+    },
+    {
+      "id": "elder_wings",
+      "name": "Elder Wings",
+      "kind": "punch",
+      "cycleSeconds": 1.05,
+      "damageType": "arcane",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.33,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.18,
+          "endPhase": 0.36,
+          "startSeconds": 0.189,
+          "endSeconds": 0.378,
+          "startDegrees": 29.74456203713141,
+          "endDegrees": 14.482941406533598,
+          "minDegrees": 14.27562463990597,
+          "maxDegrees": 29.74456203713141,
+          "sweepDegrees": 15.468937397225439,
+          "netDegrees": -15.261620630597811,
+          "projectedHitboxSpanDegrees": 54.25605214057424,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 15.676254163853066,
+          "bladeYawDegrees": {
+            "min": -110.08513307920708,
+            "max": -74.09940712415045
+          },
+          "bladePitchDegrees": {
+            "min": 0.881799876484544,
+            "max": 11.586977363459352
+          },
+          "tipRadiusM": {
+            "min": 0.3098073603181974,
+            "max": 0.6294010156204072
+          },
+          "endpointHeightM": {
+            "min": 1.397082,
+            "max": 1.4489532413793105
+          },
+          "colliderOuterRadiusM": 0.7494010156204072,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0294010156204072
+        },
+        {
+          "index": 2,
+          "side": "L",
+          "startPhase": 0.36,
+          "endPhase": 0.53,
+          "startSeconds": 0.378,
+          "endSeconds": 0.5565000000000001,
+          "startDegrees": -32.973819239874956,
+          "endDegrees": -22.160658480147163,
+          "minDegrees": -32.973819239874956,
+          "maxDegrees": -21.901331181642263,
+          "sweepDegrees": 11.072488058232693,
+          "netDegrees": 10.813160759727793,
+          "projectedHitboxSpanDegrees": 48.859974946717756,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 11.331815356737593,
+          "bladeYawDegrees": {
+            "min": -69.18973083523628,
+            "max": -41.60302551396164
+          },
+          "bladePitchDegrees": {
+            "min": 0.8238368526920705,
+            "max": 10.597009610867106
+          },
+          "tipRadiusM": {
+            "min": 0.4136988863460959,
+            "max": 0.6565343168487083
+          },
+          "endpointHeightM": {
+            "min": 1.39695,
+            "max": 1.4465400000000002
+          },
+          "colliderOuterRadiusM": 0.7765343168487083,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0565343168487082
+        }
+      ]
+    },
+    {
+      "id": "chameleon_wings",
+      "name": "Chameleon Wings",
+      "kind": "punch",
+      "cycleSeconds": 1,
+      "damageType": "poison",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.33,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.18,
+          "endPhase": 0.36,
+          "startSeconds": 0.18,
+          "endSeconds": 0.36,
+          "startDegrees": 29.74456203713141,
+          "endDegrees": 14.482941406533598,
+          "minDegrees": 14.27562463990597,
+          "maxDegrees": 29.74456203713141,
+          "sweepDegrees": 15.468937397225439,
+          "netDegrees": -15.261620630597811,
+          "projectedHitboxSpanDegrees": 54.25605214057424,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 15.676254163853066,
+          "bladeYawDegrees": {
+            "min": -110.08513307920708,
+            "max": -74.09940712415045
+          },
+          "bladePitchDegrees": {
+            "min": 0.881799876484544,
+            "max": 11.586977363459352
+          },
+          "tipRadiusM": {
+            "min": 0.3098073603181974,
+            "max": 0.6294010156204072
+          },
+          "endpointHeightM": {
+            "min": 1.397082,
+            "max": 1.4489532413793105
+          },
+          "colliderOuterRadiusM": 0.7494010156204072,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0294010156204072
+        },
+        {
+          "index": 2,
+          "side": "L",
+          "startPhase": 0.36,
+          "endPhase": 0.53,
+          "startSeconds": 0.36,
+          "endSeconds": 0.53,
+          "startDegrees": -32.973819239874956,
+          "endDegrees": -22.160658480147163,
+          "minDegrees": -32.973819239874956,
+          "maxDegrees": -21.901331181642263,
+          "sweepDegrees": 11.072488058232693,
+          "netDegrees": 10.813160759727793,
+          "projectedHitboxSpanDegrees": 48.859974946717756,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 11.331815356737593,
+          "bladeYawDegrees": {
+            "min": -69.18973083523628,
+            "max": -41.60302551396164
+          },
+          "bladePitchDegrees": {
+            "min": 0.8238368526920705,
+            "max": 10.597009610867106
+          },
+          "tipRadiusM": {
+            "min": 0.4136988863460959,
+            "max": 0.6565343168487083
+          },
+          "endpointHeightM": {
+            "min": 1.39695,
+            "max": 1.4465400000000002
+          },
+          "colliderOuterRadiusM": 0.7765343168487083,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0565343168487082
+        }
+      ]
+    },
+    {
+      "id": "arctic_dual_katana",
+      "name": "Arctic Dual Katana",
+      "kind": "melee",
+      "cycleSeconds": 1.15,
+      "damageType": "frost",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.83,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.124,
+          "endPhase": 0.403,
+          "startSeconds": 0.14259999999999998,
+          "endSeconds": 0.46345,
+          "startDegrees": 91.52849256963988,
+          "endDegrees": -51.46982604838274,
+          "minDegrees": -51.46982604838274,
+          "maxDegrees": 91.52849256963988,
+          "sweepDegrees": 142.9983186180226,
+          "netDegrees": -142.9983186180226,
+          "projectedHitboxSpanDegrees": 156.91726431730373,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 142.9983186180226,
+          "bladeYawDegrees": {
+            "min": -61.104232232974596,
+            "max": 89.45215124763675
+          },
+          "bladePitchDegrees": {
+            "min": 29.813178506464766,
+            "max": 29.854018711873877
+          },
+          "tipRadiusM": {
+            "min": 1.3141950751700753,
+            "max": 1.4222804703501202
+          },
+          "endpointHeightM": {
+            "min": 1.22779,
+            "max": 1.51837
+          },
+          "colliderOuterRadiusM": 1.54228047035012,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.82228047035012
+        },
+        {
+          "index": 2,
+          "side": "L",
+          "startPhase": 0.536,
+          "endPhase": 0.797,
+          "startSeconds": 0.6164,
+          "endSeconds": 0.91655,
+          "startDegrees": -91.81013239049288,
+          "endDegrees": 47.701955546845284,
+          "minDegrees": -91.81013239049288,
+          "maxDegrees": 47.701955546845284,
+          "sweepDegrees": 139.51208793733815,
+          "netDegrees": 139.51208793733815,
+          "projectedHitboxSpanDegrees": 151.65381732882867,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 139.51208793733815,
+          "bladeYawDegrees": {
+            "min": -92.85075049981695,
+            "max": 54.44150168354247
+          },
+          "bladePitchDegrees": {
+            "min": 29.813387022790085,
+            "max": 29.862137949294958
+          },
+          "tipRadiusM": {
+            "min": 1.3265374267321974,
+            "max": 1.4229672749771305
+          },
+          "endpointHeightM": {
+            "min": 1.22779,
+            "max": 1.51837
+          },
+          "colliderOuterRadiusM": 1.5429672749771304,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.8229672749771304
+        }
+      ]
+    },
+    {
+      "id": "rusty_sword",
+      "name": "Rusty Sword",
+      "kind": "melee",
+      "cycleSeconds": 1.05,
+      "damageType": "slashing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.93,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.2,
+          "endPhase": 0.65,
+          "startSeconds": 0.21000000000000002,
+          "endSeconds": 0.6825000000000001,
+          "startDegrees": -93.30276697055389,
+          "endDegrees": 50.26503464647453,
+          "minDegrees": -93.30276697055389,
+          "maxDegrees": 50.26503464647453,
+          "sweepDegrees": 143.5678016170284,
+          "netDegrees": 143.5678016170284,
+          "projectedHitboxSpanDegrees": 155.99314115250172,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 143.5678016170284,
+          "bladeYawDegrees": {
+            "min": -92.82158318202862,
+            "max": 57.9364181995
+          },
+          "bladePitchDegrees": {
+            "min": 29.80776988490249,
+            "max": 29.82466131611865
+          },
+          "tipRadiusM": {
+            "min": 1.4099303886717243,
+            "max": 1.513393693161168
+          },
+          "endpointHeightM": {
+            "min": 1.24708,
+            "max": 1.56992
+          },
+          "colliderOuterRadiusM": 1.633393693161168,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.913393693161168
+        }
+      ]
+    },
+    {
+      "id": "lightning_staff",
+      "name": "Lightning Staff",
+      "kind": "projectile",
+      "cycleSeconds": 1.45,
+      "damageType": "lightning",
+      "sourceFrames": 121,
+      "releasePhase": 0.55,
+      "releaseSeconds": 0.7975,
+      "origin": [
+        -0.05204,
+        1.62891,
+        0.94092
+      ],
+      "projectile": {
+        "speedMps": 12,
+        "widthM": 0.26,
+        "maxRangeM": 12,
+        "collider": "sweptSphere",
+        "widthDefinition": "Full collision diameter in metres; radius = widthM / 2. Visual must match.",
+        "radiusM": 0.13,
+        "flightSeconds": 1,
+        "headingDegrees": 0
+      }
+    },
+    {
+      "id": "hedge_knight_sword",
+      "name": "Hedge-Knight Sword",
+      "kind": "melee",
+      "cycleSeconds": 1.25,
+      "damageType": "slashing",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 2.08,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "L",
+          "startPhase": 0.2,
+          "endPhase": 0.65,
+          "startSeconds": 0.25,
+          "endSeconds": 0.8125,
+          "startDegrees": -93.30276697055389,
+          "endDegrees": 50.26503464647453,
+          "minDegrees": -93.30276697055389,
+          "maxDegrees": 50.26503464647453,
+          "sweepDegrees": 143.5678016170284,
+          "netDegrees": 143.5678016170284,
+          "projectedHitboxSpanDegrees": 156.01610581579268,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 143.5678016170284,
+          "bladeYawDegrees": {
+            "min": -92.82137236570995,
+            "max": 57.93712334427576
+          },
+          "bladePitchDegrees": {
+            "min": 29.808735509316566,
+            "max": 29.82574603769437
+          },
+          "tipRadiusM": {
+            "min": 1.4099303886717243,
+            "max": 1.513393693161168
+          },
+          "endpointHeightM": {
+            "min": 1.24553,
+            "max": 1.56992
+          },
+          "colliderOuterRadiusM": 1.633393693161168,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.913393693161168
+        }
+      ]
+    },
+    {
+      "id": "unarmed",
+      "name": "Unarmed",
+      "kind": "punch",
+      "cycleSeconds": 1,
+      "damageType": "blunt",
+      "sourceFrames": 121,
+      "hitRadiusM": 0.12,
+      "targetCenterReachCapM": 1.33,
+      "strikes": [
+        {
+          "index": 1,
+          "side": "R",
+          "startPhase": 0.18,
+          "endPhase": 0.36,
+          "startSeconds": 0.18,
+          "endSeconds": 0.36,
+          "startDegrees": 29.74456203713141,
+          "endDegrees": 14.482941406533598,
+          "minDegrees": 14.27562463990597,
+          "maxDegrees": 29.74456203713141,
+          "sweepDegrees": 15.468937397225439,
+          "netDegrees": -15.261620630597811,
+          "projectedHitboxSpanDegrees": 54.25605214057424,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 15.676254163853066,
+          "bladeYawDegrees": {
+            "min": -110.08513307920708,
+            "max": -74.09940712415045
+          },
+          "bladePitchDegrees": {
+            "min": 0.881799876484544,
+            "max": 11.586977363459352
+          },
+          "tipRadiusM": {
+            "min": 0.3098073603181974,
+            "max": 0.6294010156204072
+          },
+          "endpointHeightM": {
+            "min": 1.397082,
+            "max": 1.4489532413793105
+          },
+          "colliderOuterRadiusM": 0.7494010156204072,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0294010156204072
+        },
+        {
+          "index": 2,
+          "side": "L",
+          "startPhase": 0.36,
+          "endPhase": 0.53,
+          "startSeconds": 0.36,
+          "endSeconds": 0.53,
+          "startDegrees": -32.973819239874956,
+          "endDegrees": -22.160658480147163,
+          "minDegrees": -32.973819239874956,
+          "maxDegrees": -21.901331181642263,
+          "sweepDegrees": 11.072488058232693,
+          "netDegrees": 10.813160759727793,
+          "projectedHitboxSpanDegrees": 48.859974946717756,
+          "projectionCrossesRoot": false,
+          "travelDegrees": 11.331815356737593,
+          "bladeYawDegrees": {
+            "min": -69.18973083523628,
+            "max": -41.60302551396164
+          },
+          "bladePitchDegrees": {
+            "min": 0.8238368526920705,
+            "max": 10.597009610867106
+          },
+          "tipRadiusM": {
+            "min": 0.4136988863460959,
+            "max": 0.6565343168487083
+          },
+          "endpointHeightM": {
+            "min": 1.39695,
+            "max": 1.4465400000000002
+          },
+          "colliderOuterRadiusM": 0.7765343168487083,
+          "effectiveTargetCenterRadiusUpperBoundM": 1.0565343168487082
+        }
+      ]
+    }
+  ]
+}

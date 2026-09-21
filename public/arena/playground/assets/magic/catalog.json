@@ -1,0 +1,335 @@
+[
+  {
+    "id": "dark_magic",
+    "name": "Dark Magic",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FMagic%2FDark%20Magic.png?alt=media&token=cf3daf5f-5a97-4d05-a771-a96bdc940d6b",
+    "parts": 19,
+    "vertices": 24222,
+    "sockets": [
+      {
+        "side": 1,
+        "shoulder_blender_m": [
+          0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      }
+    ],
+    "bounds_blender_m": [
+      [
+        0.12546278536319733,
+        0.4804215431213379
+      ],
+      [
+        -0.33320584893226624,
+        -0.21920590102672577
+      ],
+      [
+        1.4713375568389893,
+        1.8979718685150146
+      ]
+    ],
+    "attachment_bone": "chest"
+  },
+  {
+    "id": "fire_magic",
+    "name": "Fire Magic",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FMagic%2FFire%20Magic.png?alt=media&token=b2414986-a7f1-471d-9fe3-6fb23bfc99d2",
+    "parts": 2,
+    "vertices": 76843,
+    "sockets": [
+      {
+        "side": -1,
+        "shoulder_blender_m": [
+          -0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          -0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      },
+      {
+        "side": 1,
+        "shoulder_blender_m": [
+          0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      }
+    ],
+    "bounds_blender_m": [
+      [
+        -0.38498491048812866,
+        0.3972344696521759
+      ],
+      [
+        -0.33684277534484863,
+        -0.21556943655014038
+      ],
+      [
+        1.547317385673523,
+        1.7994165420532227
+      ]
+    ],
+    "attachment_bone": "chest"
+  },
+  {
+    "id": "lightning_magic",
+    "name": "Lightning Magic",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FMagic%2FLightning%20Magic.png?alt=media&token=9458d439-e105-45bf-9b42-72bd4b906797",
+    "parts": 16,
+    "vertices": 3924,
+    "sockets": [
+      {
+        "side": -1,
+        "shoulder_blender_m": [
+          -0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          -0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      },
+      {
+        "side": 1,
+        "shoulder_blender_m": [
+          0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      }
+    ],
+    "bounds_blender_m": [
+      [
+        -0.40315213799476624,
+        0.40448686480522156
+      ],
+      [
+        -0.32520592212677,
+        -0.22720590233802795
+      ],
+      [
+        1.5722697973251343,
+        1.796505093574524
+      ]
+    ],
+    "attachment_bone": "chest"
+  },
+  {
+    "id": "water_magic",
+    "name": "Water Magic",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FMagic%2FWater%20Magic.png?alt=media&token=5ba91bcb-5251-4990-8784-553f3434b0f1",
+    "parts": 2,
+    "vertices": 94678,
+    "sockets": [
+      {
+        "side": -1,
+        "shoulder_blender_m": [
+          -0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          -0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      },
+      {
+        "side": 1,
+        "shoulder_blender_m": [
+          0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      }
+    ],
+    "bounds_blender_m": [
+      [
+        -0.4039917588233948,
+        0.39742279052734375
+      ],
+      [
+        -0.351868212223053,
+        -0.20054376125335693
+      ],
+      [
+        1.5672662258148193,
+        1.7819342613220215
+      ]
+    ],
+    "attachment_bone": "chest"
+  },
+  {
+    "id": "ice_daggers",
+    "name": "Ice Daggers",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FMagic%2FIce%20Daggers.png?alt=media&token=d2c80675-ea01-4c81-a322-040886e7110a",
+    "parts": 4,
+    "vertices": 120,
+    "sockets": [
+      {
+        "side": 1,
+        "shoulder_blender_m": [
+          0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      }
+    ],
+    "bounds_blender_m": [
+      [
+        0.14953215420246124,
+        0.4823172986507416
+      ],
+      [
+        -0.39920175075531006,
+        -0.18225538730621338
+      ],
+      [
+        1.5363060235977173,
+        1.8384337425231934
+      ]
+    ],
+    "attachment_bone": "chest"
+  },
+  {
+    "id": "poison_cloud",
+    "name": "Poison Cloud",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FMagic%2FPoison%20Cloud.png?alt=media&token=2e2b180a-3d70-4cc6-9735-57eb54bd7538",
+    "parts": 2,
+    "vertices": 100424,
+    "sockets": [
+      {
+        "side": -1,
+        "shoulder_blender_m": [
+          -0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          -0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      },
+      {
+        "side": 1,
+        "shoulder_blender_m": [
+          0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      }
+    ],
+    "bounds_blender_m": [
+      [
+        -0.4635152816772461,
+        0.46529820561408997
+      ],
+      [
+        -0.31976866722106934,
+        -0.23264338076114655
+      ],
+      [
+        1.5576616525650024,
+        1.7918308973312378
+      ]
+    ],
+    "attachment_bone": "chest"
+  },
+  {
+    "id": "blood_shards",
+    "name": "Blood-Shards",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FMagic%2FBlood-Shards.png?alt=media&token=f91eb1c9-2a24-4ac2-ab0c-295a43c1511b",
+    "parts": 1,
+    "vertices": 46515,
+    "sockets": [
+      {
+        "side": 1,
+        "shoulder_blender_m": [
+          0.20635263621807098,
+          0.003794096875935793,
+          1.3941929340362549
+        ],
+        "center_blender_m": [
+          0.2963526248931885,
+          -0.2762058973312378,
+          1.6741929054260254
+        ],
+        "above_m": 0.28,
+        "forward_m": 0.28
+      }
+    ],
+    "bounds_blender_m": [
+      [
+        0.12595734000205994,
+        0.4606194794178009
+      ],
+      [
+        -0.32076922059059143,
+        -0.21802110970020294
+      ],
+      [
+        1.5469434261322021,
+        1.8028898239135742
+      ]
+    ],
+    "attachment_bone": "chest"
+  }
+]

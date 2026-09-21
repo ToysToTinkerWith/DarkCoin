@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 
-import { Grid, Button } from "@mui/material"
+import { Grid, Button, Typography } from "@mui/material"
 
 import Swapper from "../../components/contracts/Arena/Swapper"
 import { CHAMPION_ASSET_TRAITS } from "../../components/contracts/Arena/traitsData"
@@ -117,10 +117,31 @@ export default function Swap(props) {
         
                         {props.wallet.length > 0 ? props.wallet.map((warrior, index) => {
                             if (warrior.asset.params && warrior.asset.params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
+                                const championName = warrior.asset.params.name || `Champion #${warrior.asset.index}`
                                 return (
-                                    <Grid key={index} item xs={6} sm={4} md={3} lg={2} >
-                                        <Button onClick={() => setSelWarrior(warrior)}>
+                                    <Grid key={warrior.asset.index} item xs={6} sm={4} md={3} lg={2} >
+                                        <Button
+                                            aria-label={`Select ${championName}`}
+                                            onClick={() => setSelWarrior(warrior)}
+                                            sx={{
+                                                width: "100%", height: "100%", minWidth: 0,
+                                                flexDirection: "column", justifyContent: "flex-start",
+                                                color: "white", textTransform: "none",
+                                                "& > div": { width: "100%", minWidth: 0 },
+                                            }}
+                                        >
                                             <Swapper nftId={warrior.asset.index} traits={traits} zoom={false} contracts={props.contracts} sendErrorMessage={props.sendErrorMessage}/>
+                                            <Typography
+                                                component="span"
+                                                sx={{
+                                                    mt: 1, width: "100%", minWidth: 0,
+                                                    fontSize: { xs: 12, sm: 14 }, fontWeight: 600,
+                                                    lineHeight: 1.4, textAlign: "center",
+                                                    whiteSpace: "normal", overflowWrap: "anywhere",
+                                                }}
+                                            >
+                                                {championName}
+                                            </Typography>
                                         </Button>
                                     </Grid>
                                 )

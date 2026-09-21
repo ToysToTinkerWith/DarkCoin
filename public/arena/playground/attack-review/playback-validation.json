@@ -1,0 +1,161 @@
+{
+  "passed": true,
+  "base": "http://127.0.0.1:8841",
+  "clips": [
+    {
+      "url": "dragon_longsword.mp4?v=blade-fit-2",
+      "duration": 3.234933,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "dragon_staff.mp4?v=blade-fit-2",
+      "duration": 3.384133,
+      "width": 1100,
+      "height": 850,
+      "frames": 7
+    },
+    {
+      "url": "dual_katana.mp4?v=blade-fit-2",
+      "duration": 2.8647,
+      "width": 1100,
+      "height": 850,
+      "frames": 7
+    },
+    {
+      "url": "executioner_axe.mp4?v=blade-fit-2",
+      "duration": 3.3639,
+      "width": 1100,
+      "height": 850,
+      "frames": 8
+    },
+    {
+      "url": "scythe.mp4?v=blade-fit-2",
+      "duration": 3.413667,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "shield.mp4?v=blade-fit-2",
+      "duration": 2.930667,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "sickle.mp4?v=blade-fit-2",
+      "duration": 2.613467,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "spear.mp4?v=blade-fit-2",
+      "duration": 2.9948,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "trident.mp4?v=blade-fit-2",
+      "duration": 3.179767,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "dark_sword.mp4?v=blade-fit-2",
+      "duration": 2.999,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "elf_bow.mp4?v=blade-fit-2",
+      "duration": 3.380133,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "wooden_club.mp4?v=blade-fit-2",
+      "duration": 3.363567,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "snake_wings.mp4?v=blade-fit-2",
+      "duration": 2.616833,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "sketonian_sword.mp4?v=blade-fit-2",
+      "duration": 3.081333,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "fire_wings.mp4?v=blade-fit-2",
+      "duration": 2.697933,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "elder_wings.mp4?v=blade-fit-2",
+      "duration": 2.713433,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "chameleon_wings.mp4?v=blade-fit-2",
+      "duration": 2.6142,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "arctic_dual_katana.mp4?v=blade-fit-2",
+      "duration": 2.833067,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "rusty_sword.mp4?v=blade-fit-2",
+      "duration": 2.711833,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "lightning_staff.mp4?v=blade-fit-2",
+      "duration": 3.3805,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "hedge_knight_sword.mp4?v=blade-fit-2",
+      "duration": 3.015433,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "unarmed.mp4?v=blade-fit-2",
+      "duration": 2.614433,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    }
+  ],
+  "errors": []
+}

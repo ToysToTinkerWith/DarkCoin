@@ -96,3 +96,22 @@ contracts/updated_assets_info.csv
 
 # dataconnect generated files
 .dataconnect
+
+# Isolated playground development build
+.next-arena-dev/
+functions-arena-dev/.next/
+functions-arena-dev/node_modules/
+functions-arena-dev/.env*
+
+# Recovery snapshot: regenerate caches and keep credentials private.
+.env*
+!.env.example
+**/.env*
+!**/.env.example
+.next*/
+.tmp-pyteal-venv/
+output/
+service*.json
+*credentials*.json
+*.pem
+*.key

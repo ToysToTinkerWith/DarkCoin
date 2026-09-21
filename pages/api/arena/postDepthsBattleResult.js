@@ -9,6 +9,17 @@ const RUN_COLLECTION = "depthsRuns";
 const BATTLE_COLLECTION = "depthsBattles";
 const ENDED_RUN_STATUSES = new Set(["completed", "defeated", "abandoned"]);
 const PERA_TX_EXPLORER_BASE = "https://explorer.perawallet.app/tx";
+const DARK_COIN_REWARD_TIERS = [
+  { id: "small-cache", label: "Small Cache", basisPoints: 100, weight: 7000 },
+  { id: "deep-cache", label: "Deep Cache", basisPoints: 250, weight: 2000 },
+  { id: "vault-cache", label: "Vault Cache", basisPoints: 500, weight: 800 },
+  { id: "royal-cache", label: "Royal Cache", basisPoints: 1000, weight: 180 },
+  { id: "abyss-jackpot", label: "Abyss Jackpot", basisPoints: 2500, weight: 20 },
+];
+const DARK_COIN_REWARD_TOTAL_WEIGHT = DARK_COIN_REWARD_TIERS.reduce(
+  (total, tier) => total + Number(tier.weight || 0),
+  0
+);
 
 function parseBody(req) {
   if (!req.body) return {};
@@ -69,6 +80,40 @@ function requireString(value, fieldName) {
     throw error;
   }
   return text;
+}
+
+function formatPercent(percent) {
+  const value = Number(percent || 0);
+  return `${value.toLocaleString("en-US", {
+    minimumFractionDigits: value > 0 && value < 1 ? 2 : 0,
+    maximumFractionDigits: 2,
+  })}%`;
+}
+
+function getRewardTierByStoredReward(reward = {}) {
+  return (
+    DARK_COIN_REWARD_TIERS.find(
+      (tier) => tier.id === String(reward.tierId || reward.darkCoinRewardTierId || "").trim()
+    ) ||
+    DARK_COIN_REWARD_TIERS.find((tier) => tier.label === (reward.label || reward.darkCoinRewardLabel)) ||
+    DARK_COIN_REWARD_TIERS.find(
+      (tier) => Number(tier.basisPoints) === Number(reward.basisPoints ?? reward.darkCoinRewardBasisPoints)
+    ) ||
+    null
+  );
+}
+
+function getRewardChanceDisplay(reward = {}) {
+  const stored = String(reward.chanceDisplay || reward.darkCoinRewardChanceDisplay || "").trim();
+  if (stored) return stored;
+
+  const chance = Number(reward.chance ?? reward.darkCoinRewardChance);
+  if (Number.isFinite(chance) && chance > 0) return formatPercent(chance);
+
+  const tier = getRewardTierByStoredReward(reward);
+  if (!tier || DARK_COIN_REWARD_TOTAL_WEIGHT <= 0) return "";
+
+  return formatPercent((Number(tier.weight || 0) / DARK_COIN_REWARD_TOTAL_WEIGHT) * 100);
 }
 
 async function requireRunWriteToken(runId, token) {
@@ -254,6 +299,10 @@ function getRunDarkCoinReward(run = {}) {
     tierId: run.darkCoinRewardTierId || "",
     basisPoints: run.darkCoinRewardBasisPoints || null,
     percentDisplay: run.darkCoinRewardPercentDisplay || "",
+    weight: run.darkCoinRewardWeight || null,
+    totalWeight: run.darkCoinRewardTotalWeight || null,
+    chance: run.darkCoinRewardChance ?? null,
+    chanceDisplay: run.darkCoinRewardChanceDisplay || "",
     amountAtomic,
     amountDisplay,
     grantTxId: run.darkCoinRewardGrantTxId || "",
@@ -288,13 +337,17 @@ function formatDarkCoinReward(reward = null) {
   if (!reward) return "None";
   const amount = reward.amountDisplay || (reward.amountAtomic ? `${reward.amountAtomic} atomic` : "");
   const label = reward.label ? ` (${reward.label})` : "";
-  const percent = reward.percentDisplay ? ` | ${reward.percentDisplay} roll` : "";
+  const roll = getRewardChanceDisplay(reward);
+  const rollChance = roll ? ` | ${roll} roll` : "";
+  const payout = reward.percentDisplay ? ` | ${reward.percentDisplay} of balance` : "";
   const status = reward.status ? ` | ${reward.status}` : "";
   const txLinks = [
     formatTransactionLink("Grant TX", reward.grantTxId),
     formatTransactionLink("Claim TX", reward.claimTxId),
   ].filter(Boolean);
-  const summary = amount ? `${amount} Dark Coin${label}${percent}${status}` : `Dark Coin reward ${reward.status || "pending"}`;
+  const summary = amount
+    ? `${amount} Dark Coin${label}${rollChance}${payout}${status}`
+    : `Dark Coin reward ${reward.status || "pending"}`;
   return txLinks.length ? `${summary}\n${txLinks.join("\n")}` : summary;
 }
 

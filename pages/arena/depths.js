@@ -27,9 +27,8 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { CID } from "multiformats/cid";
-import * as mfsha2 from "multiformats/hashes/sha2";
-import * as digest from "multiformats/hashes/digest";
+import { assetImageUrl } from "../../lib/ipfsMedia";
+import { getDepthsMoveId } from "../../lib/depthsMoves";
 import DepthsBattle from "../../components/contracts/Arena/DepthsBattle";
 import Character from "../../components/contracts/Arena/Character";
 import DisplayChar from "../../components/contracts/Arena/DisplayChar";
@@ -2070,8 +2069,8 @@ function pickNumberMapValues(map = {}) {
     }, {});
 }
 
-function compactDepthsMoveForRun(move = {}) {
-  const moveId = String(move?.id || move?.moveId || move?.cardId || move?.depthsCardId || move?.name || "");
+function compactDepthsMoveForRun(move = {}, index = 0) {
+  const moveId = getDepthsMoveId(move, index);
   return {
     id: moveId,
     name: String(move?.name || moveId || "Move"),
@@ -2479,7 +2478,15 @@ async function postDepthsState(payload) {
     body: JSON.stringify(cleanForFirestore(payload)),
   });
 
-  const body = await response.json().catch(() => ({}));
+  const responseText = await response.text().catch(() => "");
+  let body = {};
+  if (responseText) {
+    try {
+      body = JSON.parse(responseText);
+    } catch {
+      body = { error: responseText };
+    }
+  }
   if (!response.ok) {
     const error = new Error(body?.error || `Depths state API failed with status ${response.status}`);
     error.status = response.status;
@@ -3504,30 +3511,7 @@ function getCharObjectFromGetNftSession(session) {
 }
 
 function getNftImageUrl(session) {
-  const asset = session?.nft?.assets?.[0];
-  const params = asset?.params || {};
-  const name = String(params.name || "");
-
-  try {
-    if (name.substring(0, 18) === "Dark Coin Champion" && params.reserve) {
-      const addr = algosdk.decodeAddress(params.reserve);
-      const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey);
-      const ocid = CID.create(0, 0x70, mhdigest);
-      return `https://ipfs.dark-coin.io/ipfs/${ocid.toString()}`;
-    }
-  } catch (error) {
-    console.warn("Unable to derive champion image from reserve address:", error);
-  }
-
-  if (params.url && String(params.url).startsWith("ipfs://")) {
-    return `https://ipfs.dark-coin.io/ipfs/${String(params.url).replace("ipfs://", "")}`;
-  }
-
-  if (params.url && String(params.url).includes("/ipfs/")) {
-    return `https://ipfs.dark-coin.io/ipfs/${String(params.url).split("/ipfs/")[1]}`;
-  }
-
-  return null;
+  return assetImageUrl(session?.nft?.assets?.[0]?.params) || null;
 }
 
 function normalizeMonsterDoc(data, docId) {
@@ -9265,7 +9249,9 @@ function NodeResultPanel({
                       </Box>
                     </Box>
                     <Typography sx={{ color: THEME.muted, fontSize: 13, mt: 0.7 }}>
-                      {darkCoinReward.label || "Depths Reward"} rolled {darkCoinReward.percentDisplay || "a percentage"} of the contract balance.
+                      {darkCoinReward.label || "Depths Reward"} pays {darkCoinReward.percentDisplay || "a percentage"} of the contract
+                      balance
+                      {darkCoinReward.chanceDisplay ? ` and has a ${darkCoinReward.chanceDisplay} roll chance.` : "."}
                     </Typography>
                     {darkCoinReward.grantTxId ? (
                       <Typography sx={{ color: THEME.faint, fontSize: 11, mt: 1 }}>
@@ -10241,6 +10227,17 @@ export default function DepthsPage(props) {
     } else if (status === "active" && latestBattleVerifiedComplete) {
       const completionResult = buildSavedBattleCompletionResult(latestBattle);
       if (completionResult) {
+        completionResult.runState = {
+          room: Number(runData.room || 1),
+          depthsMap: savedMap,
+          currentNodeId: savedNodeId,
+          visitedNodeIds: savedVisited,
+          champion: nextChampion,
+          artifacts,
+          cards: cardsForRun,
+          cardUpgrades,
+          cardRemovals,
+        };
         window.setTimeout(() => {
           handleBattleComplete(completionResult);
         }, 0);
@@ -10801,27 +10798,27 @@ export default function DepthsPage(props) {
     async function loadChampionEntryInfo() {
       try {
         setChampionEntryInfoLoading(true);
-        const entries = await Promise.all(
-          playableChampions.map(async (record) => {
-            const assetId = String(record.assetId || "");
-            if (!assetId) return null;
-
-            try {
-              const entryInfo = await postDepthsState({
-                action: "getEntryInfo",
-                activeAddress,
-                championAssetId: record.assetId || null,
-              });
-              return [assetId, entryInfo];
-            } catch (error) {
-              console.warn("Failed to load Depths entry info", record.assetId, error);
-              return [assetId, { error: error?.message || "Could not load Depths run status." }];
-            }
-          })
-        );
+        const result = await postDepthsState({
+          action: "getEntryInfoBatch",
+          activeAddress,
+          championAssetIds: playableChampions.map((record) => record.assetId).filter(Boolean),
+        });
 
         if (!cancelled) {
-          setChampionEntryInfoByAssetId(Object.fromEntries(entries.filter(Boolean)));
+          setChampionEntryInfoByAssetId(result?.entries || {});
+        }
+      } catch (error) {
+        console.warn("Failed to load Depths entry info batch", error);
+        if (!cancelled) {
+          const entries = playableChampions
+            .map((record) => {
+              const assetId = String(record.assetId || "");
+              return assetId
+                ? [assetId, { error: error?.message || "Could not load Depths run status." }]
+                : null;
+            })
+            .filter(Boolean);
+          setChampionEntryInfoByAssetId(Object.fromEntries(entries));
         }
       } finally {
         if (!cancelled) setChampionEntryInfoLoading(false);
@@ -12334,23 +12331,39 @@ export default function DepthsPage(props) {
 
     battleAdvanceTimeoutRef.current = window.setTimeout(() => {
       battleAdvanceTimeoutRef.current = null;
+      const resumeState = result?.runState || {};
+      const activeRoom = Number.isFinite(Number(resumeState.room)) ? Number(resumeState.room) : room;
+      const activeDepthsMap = resumeState.depthsMap || depthsMap;
+      const activeNodeId = resumeState.currentNodeId || currentNodeId;
+      const activeVisitedNodeIds = Array.isArray(resumeState.visitedNodeIds)
+        ? resumeState.visitedNodeIds
+        : visitedNodeIds;
+      const activeBaseChampion = resumeState.champion || runChampion || selectedChampion;
+      const activeArtifacts = Array.isArray(resumeState.artifacts) ? resumeState.artifacts : runArtifacts;
+      const activeCards = Array.isArray(resumeState.cards) ? resumeState.cards : runCards;
+      const activeCardUpgrades = Array.isArray(resumeState.cardUpgrades)
+        ? resumeState.cardUpgrades
+        : runCardUpgrades;
+      const activeCardRemovals = Array.isArray(resumeState.cardRemovals)
+        ? resumeState.cardRemovals
+        : runCardRemovals;
       const battleChampion = result?.battle?.fighters?.A
-        ? setDepthsChampionCurrentHp(runChampion || selectedChampion, result.battle.fighters.A.hp)
-        : runChampion;
+        ? setDepthsChampionCurrentHp(activeBaseChampion, result.battle.fighters.A.hp)
+        : activeBaseChampion;
       if (result?.winner === "champion") {
         setResumedBattle(null);
-        const completedDepths = isDepthsFinalNode(depthsMap, currentNodeId);
+        const completedDepths = isDepthsFinalNode(activeDepthsMap, activeNodeId);
 
         setRunChampion(battleChampion);
 
         if (completedDepths) {
           const completedRunId = runDocRef.current;
           const completedRunToken = runTokenRef.current;
-          const completedChampionAssetId = selectedChampion?.assetId || battleChampion?.assetId;
-          const completedNode = getDepthsMapNode(depthsMap, currentNodeId);
+          const completedChampionAssetId = battleChampion?.assetId || selectedChampion?.assetId;
+          const completedNode = getDepthsMapNode(activeDepthsMap, activeNodeId);
           const finalChampionFighter = result?.battle?.fighters?.A || null;
           const completedEncounterCount =
-            getDepthsCompletedBattleNodeCount(depthsMap, visitedNodeIds) || Math.max(1, room);
+            getDepthsCompletedBattleNodeCount(activeDepthsMap, activeVisitedNodeIds) || Math.max(1, activeRoom);
 
           setCurrentMonsters([]);
           setDarkCoinReward(null);
@@ -12361,16 +12374,16 @@ export default function DepthsPage(props) {
             text: `${battleChampion?.name || selectedChampion?.name || "Your champion"} has cleared the final encounter.`,
             detail: "Rolling reward",
             completed: true,
-            room,
+            room: activeRoom,
             champion: battleChampion,
             championAssetId: completedChampionAssetId,
-            artifacts: runArtifacts,
-            cards: runCards,
-            cardUpgrades: runCardUpgrades,
-            cardRemovals: runCardRemovals,
-            depthsMap,
-            currentNodeId,
-            visitedNodeIds,
+            artifacts: activeArtifacts,
+            cards: activeCards,
+            cardUpgrades: activeCardUpgrades,
+            cardRemovals: activeCardRemovals,
+            depthsMap: activeDepthsMap,
+            currentNodeId: activeNodeId,
+            visitedNodeIds: activeVisitedNodeIds,
             completedEncounters: completedEncounterCount,
             finalNodeType: completedNode?.type || "elite",
             finalNodeLabel:
@@ -12383,17 +12396,17 @@ export default function DepthsPage(props) {
           updateDepthsRun({
             status: "completed",
             clientRewardEligible: true,
-            room,
-            artifacts: runArtifacts,
-            cards: runCards,
-            cardUpgrades: runCardUpgrades,
-            cardRemovals: runCardRemovals,
+            room: activeRoom,
+            artifacts: activeArtifacts,
+            cards: activeCards,
+            cardUpgrades: activeCardUpgrades,
+            cardRemovals: activeCardRemovals,
             championSnapshot: battleChampion?.charObj || null,
             championBattleSnapshot: result?.battle?.fighters?.A || null,
             lastBattleId: result?.battle?.id || null,
-            depthsMap,
-            currentNodeId,
-            visitedNodeIds,
+            depthsMap: activeDepthsMap,
+            currentNodeId: activeNodeId,
+            visitedNodeIds: activeVisitedNodeIds,
             completedAt: true,
           }).then((updateResult) => {
             if (!updateResult) {
@@ -12428,17 +12441,17 @@ export default function DepthsPage(props) {
 
         updateDepthsRun({
           status: "roomCleared",
-          room,
-          artifacts: runArtifacts,
-          cards: runCards,
-          cardUpgrades: runCardUpgrades,
-          cardRemovals: runCardRemovals,
+          room: activeRoom,
+          artifacts: activeArtifacts,
+          cards: activeCards,
+          cardUpgrades: activeCardUpgrades,
+          cardRemovals: activeCardRemovals,
           championSnapshot: battleChampion?.charObj || null,
           championBattleSnapshot: result?.battle?.fighters?.A || null,
           lastBattleId: result?.battle?.id || null,
-          depthsMap,
-            currentNodeId,
-            visitedNodeIds,
+          depthsMap: activeDepthsMap,
+          currentNodeId: activeNodeId,
+          visitedNodeIds: activeVisitedNodeIds,
         }).then((result) => {
           if (!result) {
             setEntryPaymentError(
@@ -12448,10 +12461,12 @@ export default function DepthsPage(props) {
             );
             return;
           }
-          const clearedNode = getDepthsMapNode(depthsMap, currentNodeId);
-          nextRoom(battleChampion, runArtifacts, runCardUpgrades, runCards, runCardRemovals, {
-            currentNodeId,
-            visitedNodeIds,
+          const clearedNode = getDepthsMapNode(activeDepthsMap, activeNodeId);
+          nextRoom(battleChampion, activeArtifacts, activeCardUpgrades, activeCards, activeCardRemovals, {
+            room: activeRoom,
+            depthsMap: activeDepthsMap,
+            currentNodeId: activeNodeId,
+            visitedNodeIds: activeVisitedNodeIds,
             rewardType: clearedNode?.type === "elite" ? "upgrade" : "card",
           });
         });
@@ -12460,13 +12475,13 @@ export default function DepthsPage(props) {
         setRunChampion(battleChampion);
         const defeatedRunId = runDocRef.current;
         const defeatedRunToken = runTokenRef.current;
-        const defeatedChampionAssetId = selectedChampion?.assetId || battleChampion?.assetId;
-        const defeatedNode = getDepthsMapNode(depthsMap, currentNodeId);
+        const defeatedChampionAssetId = battleChampion?.assetId || selectedChampion?.assetId;
+        const defeatedNode = getDepthsMapNode(activeDepthsMap, activeNodeId);
         const defeatedChampionFighter = result?.battle?.fighters?.A || null;
         const defeatedAtBattleNode = defeatedNode?.type === "basic" || defeatedNode?.type === "elite";
         const completedEncounterCount = Math.max(
           0,
-          getDepthsCompletedBattleNodeCount(depthsMap, visitedNodeIds) - (defeatedAtBattleNode ? 1 : 0)
+          getDepthsCompletedBattleNodeCount(activeDepthsMap, activeVisitedNodeIds) - (defeatedAtBattleNode ? 1 : 0)
         );
 
         setCurrentMonsters([]);
@@ -12485,16 +12500,16 @@ export default function DepthsPage(props) {
           detail: "Run ended",
           defeated: true,
           ended: true,
-          room,
+          room: activeRoom,
           champion: battleChampion,
           championAssetId: defeatedChampionAssetId,
-          artifacts: runArtifacts,
-          cards: runCards,
-          cardUpgrades: runCardUpgrades,
-          cardRemovals: runCardRemovals,
-          depthsMap,
-          currentNodeId,
-          visitedNodeIds,
+          artifacts: activeArtifacts,
+          cards: activeCards,
+          cardUpgrades: activeCardUpgrades,
+          cardRemovals: activeCardRemovals,
+          depthsMap: activeDepthsMap,
+          currentNodeId: activeNodeId,
+          visitedNodeIds: activeVisitedNodeIds,
           completedEncounters: completedEncounterCount,
           finalNodeType: defeatedNode?.type || "basic",
           finalNodeLabel:
@@ -12507,17 +12522,17 @@ export default function DepthsPage(props) {
 
         updateDepthsRun({
           status: "defeated",
-          room,
-          artifacts: runArtifacts,
-          cards: runCards,
-          cardUpgrades: runCardUpgrades,
-          cardRemovals: runCardRemovals,
+          room: activeRoom,
+          artifacts: activeArtifacts,
+          cards: activeCards,
+          cardUpgrades: activeCardUpgrades,
+          cardRemovals: activeCardRemovals,
           championSnapshot: battleChampion?.charObj || null,
           championBattleSnapshot: result?.battle?.fighters?.A || null,
           lastBattleId: result?.battle?.id || null,
-          depthsMap,
-          currentNodeId,
-          visitedNodeIds,
+          depthsMap: activeDepthsMap,
+          currentNodeId: activeNodeId,
+          visitedNodeIds: activeVisitedNodeIds,
           endedAt: true,
         }).then((updateResult) => {
           if (!updateResult) {

@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from "react"
 
-import { Grid, Typography, Button, TextField } from "@mui/material"
+import { TextField } from "@mui/material"
 
 import { useWallet } from "@txnlab/use-wallet-react"
 
 import DisplayAsset from "../../components/contracts/Market/displayAsset"
+import {
+    MarketEmptyState,
+    MarketPageShell,
+    MarketPager,
+    MarketToolbar,
+    marketTextFieldSx,
+} from "../../components/contracts/Market/MarketPageShell"
 
 import algosdk from "algosdk"
-
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useRouter } from "next/router"
+import { listingPath, parseUnits, unitScale } from "../../functions/market/model"
+import { marketAlgod, buildListing, sendMarketGroup, announceMarketTransaction } from "../../lib/marketTransactions"
 
 const longToByteArray = (long) => {
     // we want to represent the input as a 8-bytes array
@@ -27,6 +34,10 @@ const longToByteArray = (long) => {
 
 
 export default function List(props){
+    const router = useRouter()
+    const [busy, setBusy] = useState(false)
+    const [notice, setNotice] = useState("")
+    const showMessage = (message) => { setNotice(message); props.setMessage(message) }
 
     const {
         wallets,
@@ -103,254 +114,81 @@ export default function List(props){
 
     }
 
-    const list = async (listAsset, listAmount, costId, costAmount) => {
-
-        console.log(listAsset, listAmount, costId, costAmount)
-
-        const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
-                    
-        let listNft = await indexerClient.searchForAssets().index(listAsset).do();
-
-        console.log(listNft)
-
-        let listAtomicAmount = listAmount * (10 ** listNft.assets[0].params.decimals)
-
-        let costNft = await indexerClient.searchForAssets().index(costId).do();
-
-        console.log(costNft)
-
-        let costAtomicAmount 
-        
-        if (costId == 0) {
-            costAtomicAmount = costAmount * (10 ** 6)
+    const list = async (assetId, displayAmount, currencyId, displayPrice) => {
+        if (!activeAddress || busy) return
+        setBusy(true)
+        try {
+            const client = marketAlgod()
+            const indexer = new algosdk.Indexer("", "https://mainnet-idx.algonode.cloud", 443)
+            const { asset } = await indexer.lookupAssetByID(assetId).do()
+            const currency = currencyId === 0 ? { params: { decimals: 6 } } : (await indexer.lookupAssetByID(currencyId).do()).asset
+            const amount = parseUnits(displayAmount, asset.params.decimals)
+            const pricePerUnit = parseUnits(displayPrice, currency.params.decimals)
+            const scale = unitScale(asset.params.decimals)
+            if (pricePerUnit % scale !== 0n) throw new Error("This contract requires a price that can be divided exactly across the asset's smallest units. Increase the price or choose a payment asset with more decimals.")
+            const price = pricePerUnit / scale
+            const listing = { assetId, amount: String(amount), costId: currencyId, costAmount: String(price), seller: activeAddress }
+            const txns = await buildListing({ client, listing })
+            const txId = await sendMarketGroup({ client, txns, signTransactions, setMessage: showMessage, actionLabel: "LIST" })
+            showMessage("Asset listed. Your listing now has its own shareable link.")
+            await announceMarketTransaction(txId)
+            await router.push(listingPath(txId))
+        } catch (error) {
+            showMessage(error.message || "Unable to list this asset.")
+        } finally {
+            setBusy(false)
         }
-        else {
-            costAtomicAmount = costAmount * (10 ** costNft.assets[0].params.decimals)
-        }
-
-        const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
-                
-        let params = await client.getTransactionParams().do();
-
-        const ftxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-            sender: activeAddress,
-            receiver: "HZ2SGTDNOACVJXJ5HP3BM7O3HVEQDH4HYRRWW6ZM5GYOCLIXNMDPN74FAY",
-            amount: 100000,
-            suggestedParams: params,
-            // note: `closeRemainderTo`, `rekeyTo`, and `note` are optional and omitted here
-        });
-
-        console.log(listAsset)
-
-        const ltxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-            sender: activeAddress,
-            receiver: "HZ2SGTDNOACVJXJ5HP3BM7O3HVEQDH4HYRRWW6ZM5GYOCLIXNMDPN74FAY",
-            amount: listAtomicAmount,
-            assetIndex: listAsset,
-            suggestedParams: params,
-            // optional fields omitted: note, closeRemainderTo, revocationTarget, rekeyTo
-        });
-
-
-        let appArgs = []
-        appArgs.push(
-            new Uint8Array(Buffer.from("listAsset")),
-            algosdk.encodeUint64(costId),
-            algosdk.encodeUint64(costAtomicAmount)
-        )
-
-        let accounts = []
-        let foreignApps = []
-            
-        let foreignAssets = [listAsset]
-
-        let listingAddress = algosdk.decodeAddress(activeAddress).publicKey
-
-        let listBox = new Uint8Array([...longToByteArray(listAsset), ...longToByteArray(listAtomicAmount), ...longToByteArray(costId), ...longToByteArray(costAtomicAmount), ...listingAddress])
-
-        console.log(listBox)
-
-        let boxes = [{appIndex: 0, name: listBox}]
-        
-        const atxn = algosdk.makeApplicationNoOpTxnFromObject({
-            sender: activeAddress,
-            suggestedParams: params,
-            appIndex: props.contracts.market,
-
-            appArgs,
-            accounts,
-            foreignApps,
-            foreignAssets,
-            boxes,
-
-            // These were `undefined` in your positional version:
-            // note: undefined,
-            // lease: undefined,
-            // rekeyTo: undefined,
-        });
-        
-        let txns = [ftxn, ltxn, atxn]
-
-        let opted = await indexerClient.lookupAssetBalances(listAsset).do();
-
-        let optedin = false
-        
-        opted.balances.forEach((account) => {
-            if(account.address == "HZ2SGTDNOACVJXJ5HP3BM7O3HVEQDH4HYRRWW6ZM5GYOCLIXNMDPN74FAY") {
-            optedin = true
-            }
-        })
-
-        if (!optedin) {
-
-            
-
-            let appArgs = []
-            appArgs.push(
-                new Uint8Array(Buffer.from("optin"))
-            )
-
-            let accounts = []
-            let foreignApps = []
-                
-            let foreignAssets = [listAsset]
-
-            let boxes = []
-            
-            const otxn = algosdk.makeApplicationNoOpTxnFromObject({
-                sender: activeAddress,
-                suggestedParams: params,
-                appIndex: props.contracts.market,
-
-                appArgs,
-                accounts,
-                foreignApps,
-                foreignAssets,
-                boxes,
-
-                // note: undefined,
-                // lease: undefined,
-                // rekeyTo: undefined,
-            });
-
-            txns.unshift(otxn)
-            
-        }
-
-        let txgroup = algosdk.assignGroupID(txns)
-
-        let encodedTxns= []
-
-        txns.forEach((txn) => {
-            let encoded = algosdk.encodeUnsignedTransaction(txn)
-            encodedTxns.push(encoded)
-    
-        })
-
-        console.log(txns)
-
-        props.setMessage("Sign transaction...")
-    
-        const signedTransactions = await signTransactions(encodedTxns)
-
-        props.setMessage("Sending transaction...")
-
-        const { txid } = await client.sendRawTransaction(signedTransactions).do()
-
-        let confirmedTxn = await algosdk.waitForConfirmation(client, txid, 4);
-
-        props.setMessage("Asset listed")
-
-        setListAsset(null)
-        fetchData()
-
     }
     
         return (
-            <div>
-               
-                <Grid container>
-                    <Grid item xs={12}>
-                        <TextField
-                            color="primary"
-                            variant="outlined"
-                            value={search}
-                            type="text"
-                            label={"Search"}
-                            name="search"
-                            onChange={handleChange}
-                            sx={{
-                                width: '90%',
-                                display: 'flex',
-                                margin: 'auto',
-                                input: { color: 'white' },                    
-                                label: { 
-                                color: 'white',                              
-                                '&.Mui-focused': {
-                                    color: 'white'                          
-                                }
-                                },
-                                '.MuiOutlinedInput-root': {
-                                '& fieldset': {
-                                    borderColor: 'white',
-                                },
-                                '&:hover fieldset': {
-                                    borderColor: 'white',
-                                },
-                                '&.Mui-focused fieldset': {
-                                    borderColor: 'white',
-                                },
-                                }
-                            }}
-                        />
-                    </Grid>
-                </Grid>
-                <Grid container align="center">
-                    <Grid item xs={4}>
-                        <Button style={{}} onClick={() => listNum - 50 >= 0 ? setListNum(prevState => prevState - 50) : null}>
-                            <ArrowBackIcon style={{color: "#FFFFFF"}} />
-                        </Button>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Typography variant="h6" color="secondary"> Showing assets {listNum + 1} - {listNum + 50 > allAssets.length ? allAssets.length : listNum + 51} ({allAssets.length}) </Typography>
-                    </Grid>
-                    <Grid item xs={4}>
-                        <Button style={{}} onClick={() => listNum + 50 < allAssets.length ? setListNum(prevState => prevState + 50) : null}>
-                            <ArrowForwardIcon style={{color: "#FFFFFF"}} />
-                        </Button>
-                    </Grid>
-                </Grid>
-                    
-                
-                
+            <MarketPageShell
+                title="LIST"
+                subtitle="Choose an NFT from your connected wallet, set the amount and price, and list it in the market contract."
+            >
+                <MarketToolbar
+                    onBack={listAsset ? () => setListAsset(null) : null}
+                    backLabel="Back to wallet assets"
+                >
+                    <TextField
+                        color="primary"
+                        variant="outlined"
+                        value={search}
+                        type="text"
+                        label={"Search wallet"}
+                        name="search"
+                        onChange={handleChange}
+                        fullWidth
+                        sx={marketTextFieldSx}
+                    />
+
+                    <MarketPager
+                        listNum={listNum}
+                        total={allAssets.length}
+                        onPrev={() => setListNum(prevState => prevState - 50)}
+                        onNext={() => setListNum(prevState => prevState + 50)}
+                    />
+                </MarketToolbar>
+
+                {notice ? <p className="marketNotice" role="status">{notice}</p> : null}
                 {listAsset ? 
-                    <DisplayAsset nftId={listAsset.id} amount={listAsset.amount} setListAsset={setListAsset} list={list} listAsset={true} />
+                    <DisplayAsset nftId={listAsset.id} amount={listAsset.amount} setListAsset={setListAsset} list={list} listAsset={true} busy={busy} />
                 :
-                    <Grid container>
-                        {assets.length > 0 ? 
-                            assets.map((asset, index) => {
+                    assets.length > 0 ? 
+                        <div className="marketGrid">
+                            {assets.map((asset) => {
                                 console.log(asset)
                                 return (
-                                    <Grid id={asset.assetId} item xs={4} sm={3} md={2} lg={1}>
-                                        <DisplayAsset nftId={asset.assetId} amount={asset.amount} setListAsset={setListAsset} search={search}/>
-                                    </Grid>
+                                    <DisplayAsset key={asset.assetId} nftId={asset.assetId} amount={asset.amount} setListAsset={setListAsset} search={search}/>
                                 )
-                            })
-                        :
-                            null
-                        }
-                        
-                    </Grid>
+                            })}
+                        </div>
+                    :
+                        <MarketEmptyState
+                            title={activeAddress ? "No wallet assets found" : "Wallet not connected"}
+                            text={activeAddress ? "There are no assets available to list in this page range." : "Connect a wallet to choose NFTs for sale."}
+                        />
                 }
-                
-                
-
-                
-
-             
-                
-                
-            </div>
+            </MarketPageShell>
         )
     
     

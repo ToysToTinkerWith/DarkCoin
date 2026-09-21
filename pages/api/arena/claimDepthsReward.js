@@ -23,6 +23,10 @@ const DARK_COIN_REWARD_TIERS = [
   { id: "royal-cache", label: "Royal Cache", basisPoints: 1000, weight: 180 },
   { id: "abyss-jackpot", label: "Abyss Jackpot", basisPoints: 2500, weight: 20 },
 ];
+const DARK_COIN_REWARD_TOTAL_WEIGHT = DARK_COIN_REWARD_TIERS.reduce(
+  (total, tier) => total + Number(tier.weight || 0),
+  0
+);
 
 function sendJson(res, status, payload) {
   const body = JSON.stringify(payload, (_key, value) =>
@@ -272,10 +276,56 @@ function formatAtomicAmount(value, decimals = DARK_COIN_DECIMALS) {
 
 function formatBasisPoints(basisPoints) {
   const percent = Number(basisPoints || 0) / 100;
-  return `${percent.toLocaleString("en-US", {
-    minimumFractionDigits: percent < 1 ? 2 : 0,
+  return formatPercent(percent);
+}
+
+function formatPercent(percent) {
+  const value = Number(percent || 0);
+  return `${value.toLocaleString("en-US", {
+    minimumFractionDigits: value > 0 && value < 1 ? 2 : 0,
     maximumFractionDigits: 2,
   })}%`;
+}
+
+function getRewardTierById(tierId) {
+  const normalized = String(tierId || "").trim();
+  if (!normalized) return null;
+  return DARK_COIN_REWARD_TIERS.find((tier) => tier.id === normalized) || null;
+}
+
+function getRewardTierByStoredReward(reward = {}) {
+  return (
+    getRewardTierById(reward.tierId || reward.darkCoinRewardTierId) ||
+    DARK_COIN_REWARD_TIERS.find((tier) => tier.label === (reward.label || reward.darkCoinRewardLabel)) ||
+    DARK_COIN_REWARD_TIERS.find(
+      (tier) => Number(tier.basisPoints) === Number(reward.basisPoints ?? reward.darkCoinRewardBasisPoints)
+    ) ||
+    null
+  );
+}
+
+function getRewardTierChance(tier = {}) {
+  const weight = Number(tier.weight || 0);
+  return DARK_COIN_REWARD_TOTAL_WEIGHT > 0 ? (weight / DARK_COIN_REWARD_TOTAL_WEIGHT) * 100 : 0;
+}
+
+function getRewardTierChanceFields(tier = {}) {
+  if (!tier || !Number(tier.weight || 0)) {
+    return {
+      weight: 0,
+      totalWeight: DARK_COIN_REWARD_TOTAL_WEIGHT,
+      chance: null,
+      chanceDisplay: "",
+    };
+  }
+
+  const chance = getRewardTierChance(tier);
+  return {
+    weight: Number(tier.weight || 0),
+    totalWeight: DARK_COIN_REWARD_TOTAL_WEIGHT,
+    chance,
+    chanceDisplay: formatPercent(chance),
+  };
 }
 
 function rollDarkCoinReward(contractBalanceAtomic, decimals) {
@@ -295,6 +345,7 @@ function rollDarkCoinReward(contractBalanceAtomic, decimals) {
     label: tier.label,
     basisPoints: tier.basisPoints,
     percentDisplay: formatBasisPoints(tier.basisPoints),
+    ...getRewardTierChanceFields(tier),
     amountAtomic: amountAtomic.toString(),
     amountDisplay: formatAtomicAmount(amountAtomic, decimals),
     contractBalanceAtomic: contractBalanceAtomic.toString(),
@@ -306,7 +357,6 @@ async function getDepthsRewardOdds() {
   const assetId = getDarkCoinAssetId();
   const decimals = getDarkCoinDecimals();
   const contractBalanceAtomic = await getAppAssetBalance(appId, assetId);
-  const totalWeight = DARK_COIN_REWARD_TIERS.reduce((total, tier) => total + Number(tier.weight || 0), 0);
 
   return {
     status: "ok",
@@ -319,19 +369,17 @@ async function getDepthsRewardOdds() {
       let amountAtomic = (contractBalanceAtomic * BigInt(tier.basisPoints)) / 10000n;
       if (contractBalanceAtomic > 0n && amountAtomic <= 0n) amountAtomic = 1n;
       if (amountAtomic > contractBalanceAtomic) amountAtomic = contractBalanceAtomic;
-      const chance = totalWeight > 0 ? (Number(tier.weight || 0) / totalWeight) * 100 : 0;
+      const chanceFields = getRewardTierChanceFields(tier);
 
       return {
         id: tier.id,
         label: tier.label,
         basisPoints: tier.basisPoints,
         percentDisplay: formatBasisPoints(tier.basisPoints),
-        weight: tier.weight,
-        chance,
-        chanceDisplay: `${chance.toLocaleString("en-US", {
-          minimumFractionDigits: chance < 1 ? 2 : 1,
-          maximumFractionDigits: 2,
-        })}%`,
+        weight: chanceFields.weight,
+        totalWeight: chanceFields.totalWeight,
+        chance: chanceFields.chance,
+        chanceDisplay: chanceFields.chanceDisplay,
         amountAtomic: amountAtomic.toString(),
         amountDisplay: formatAtomicAmount(amountAtomic, decimals),
       };
@@ -542,6 +590,8 @@ function getDragonshordeSigner() {
 function getExistingDarkCoinReward(run, { appId, assetId, decimals, walletAddress }) {
   const amountAtomic = run?.darkCoinRewardAmountAtomic;
   if (!amountAtomic) return null;
+  const tier = getRewardTierByStoredReward(run) || {};
+  const chanceFields = getRewardTierChanceFields(tier);
 
   return {
     status: run.darkCoinRewardStatus || "granted",
@@ -555,6 +605,10 @@ function getExistingDarkCoinReward(run, { appId, assetId, decimals, walletAddres
     label: run.darkCoinRewardLabel || "Depths Reward",
     basisPoints: Number(run.darkCoinRewardBasisPoints || 0),
     percentDisplay: run.darkCoinRewardPercentDisplay || formatBasisPoints(run.darkCoinRewardBasisPoints || 0),
+    weight: Number(run.darkCoinRewardWeight || chanceFields.weight || 0),
+    totalWeight: Number(run.darkCoinRewardTotalWeight || chanceFields.totalWeight || 0),
+    chance: Number(run.darkCoinRewardChance ?? chanceFields.chance ?? 0),
+    chanceDisplay: run.darkCoinRewardChanceDisplay || chanceFields.chanceDisplay || "",
     contractBalanceAtomic: String(run.darkCoinRewardContractBalanceAtomic || "0"),
     grantTxId: run.darkCoinRewardGrantTxId || null,
     claimTxId: run.darkCoinClaimTxId || null,
@@ -678,6 +732,10 @@ async function lockDarkCoinGrant({
         label: existingReward.label,
         basisPoints: existingReward.basisPoints,
         percentDisplay: existingReward.percentDisplay,
+        weight: existingReward.weight,
+        totalWeight: existingReward.totalWeight,
+        chance: existingReward.chance,
+        chanceDisplay: existingReward.chanceDisplay,
         amountAtomic: existingReward.amountAtomic,
         amountDisplay: existingReward.amountDisplay,
         contractBalanceAtomic: existingReward.contractBalanceAtomic,
@@ -695,6 +753,10 @@ async function lockDarkCoinGrant({
       darkCoinRewardLabel: grantRoll.label,
       darkCoinRewardBasisPoints: grantRoll.basisPoints,
       darkCoinRewardPercentDisplay: grantRoll.percentDisplay,
+      darkCoinRewardWeight: grantRoll.weight,
+      darkCoinRewardTotalWeight: grantRoll.totalWeight,
+      darkCoinRewardChance: grantRoll.chance,
+      darkCoinRewardChanceDisplay: grantRoll.chanceDisplay,
       darkCoinRewardAmountAtomic: grantRoll.amountAtomic,
       darkCoinRewardAmountDisplay: grantRoll.amountDisplay,
       darkCoinRewardContractBalanceAtomic: grantRoll.contractBalanceAtomic,
@@ -1237,6 +1299,10 @@ async function grantDarkCoinReward(body) {
         label: existingReward.label,
         basisPoints: existingReward.basisPoints,
         percentDisplay: existingReward.percentDisplay,
+        weight: existingReward.weight,
+        totalWeight: existingReward.totalWeight,
+        chance: existingReward.chance,
+        chanceDisplay: existingReward.chanceDisplay,
         amountAtomic: existingReward.amountAtomic,
         amountDisplay: existingReward.amountDisplay,
         contractBalanceAtomic: existingReward.contractBalanceAtomic,

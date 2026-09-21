@@ -1,4 +1,12 @@
 module.exports = {
+    distDir: process.env.NEXT_PUBLIC_ARENA_DEV === 'true' ? '.next-arena-dev' : '.next',
+    // Keep shuffle source available while excluding it from this release.
+    async redirects() {
+        return [{ source: "/market/shuffle/:path*", destination: "/market", permanent: false }];
+    },
+    experimental: {
+        cpus: 1,
+    },
     env: {
         indexerKey: process.env.INDEXER_KEY || process.env.indexerKey || "",
         publicPinata: process.env.PINATA_PUBLIC || process.env.publicPinata || "",

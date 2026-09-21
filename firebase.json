@@ -7,6 +7,7 @@
       "**/node_modules/**"
     ],
     "rewrites": [
+      {"source":"/api/arena/combat","function":{"functionId":"arenaCombat","region":"us-central1"}},
       {
         "source": "/_next/**",
         "function": "nextServer"
@@ -18,7 +19,8 @@
     ]
   },
   "firestore": {
-    "rules": "firestore.rules"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "functions": [
     {

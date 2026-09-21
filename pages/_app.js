@@ -5,6 +5,8 @@ import { ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import theme from "../theme"
 import "../style.css"
+import "../components/arena/playground/playground.css"
+import "../components/arena/playground/champion-preview.css"
 
 import { Button, Typography, CircularProgress } from "@mui/material"
 import CancelIcon from "@mui/icons-material/Cancel"
@@ -18,6 +20,7 @@ import {
 
 import Nav from "../components/connect/nav"
 import Connect from "../components/connect/connect"
+import MarketSocialHead from "../components/contracts/Market/MarketSocialHead"
 import { trackPageView, trackVisitorLocationContext } from "../Firebase/analytics"
 
 const DEPTHS_APP_ID = 3658640544
@@ -41,7 +44,7 @@ export default function MyApp(props) {
   const contracts = {
     council: 1239236238,
     oldArena: 1053328572,
-    market: 3069960875,
+    market: 3690496091,
     airdrop: 1174019649,
     ASAblasters: 1434284594,
     swapper: 1632253886,
@@ -121,7 +124,7 @@ export default function MyApp(props) {
     if (typeof window === "undefined") return
 
     const m = new WalletManager({
-      wallets: [WalletId.PERA, WalletId.DEFLY, WalletId.LUTE],
+      wallets: [WalletId.PERA, WalletId.DEFLY, { id: WalletId.LUTE, options: { siteName: "Dark Coin" } }],
       defaultNetwork: NetworkId.MAINNET,
     })
 
@@ -156,10 +159,11 @@ export default function MyApp(props) {
     }
   }, [display, router])
 
-  if (!manager) return null
+  if (!manager) return <MarketSocialHead seo={pageProps.marketSeo} />
 
   return (
     <React.Fragment>
+      <MarketSocialHead seo={pageProps.marketSeo} />
       {/* {message ? (
         <div
           style={{

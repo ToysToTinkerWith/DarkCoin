@@ -1,0 +1,31 @@
+const http=require('http'),fs=require('fs'),path=require('path'),assert=require('node:assert/strict');
+const root=path.resolve(__dirname,'..'),esbuild=require('../tmp/champion-model-tools/node_modules/esbuild'),{chromium}=require('../tmp/playground-qa/node_modules/playwright');
+esbuild.buildSync({stdin:{contents:`
+import React from 'react';import{createRoot}from'react-dom/client';import * as T from 'three';
+import{makeArena}from'./components/arena/playground/world';import{makeTrainingDummy}from'./components/arena/playground/training-dummy';
+import{CombatEffects}from'./components/arena/playground/combat-effects';import StatusEffects from'./components/arena/playground/StatusEffects';
+import{STATUS_EFFECTS}from'./components/contracts/Arena/arenaBalanceV1';
+import{createRoom,addPlayer,applyStatus,realtimeSnapshot,advance}from'./lib/arena/simulation';
+const scene=new T.Scene(),camera=new T.PerspectiveCamera(40,innerWidth/innerHeight,.1,100),renderer=new T.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);document.body.appendChild(renderer.domElement);makeArena(scene);const dummy=makeTrainingDummy(scene),fx=new CombatEffects(scene);
+const room=createRoom(100,1),player=addPlayer(room,'a',{id:1,name:'Test',loadout:{skin:'Undead',weapon:'scythe'}});
+const actor=new T.Group();actor.position.set(2,0,0);scene.add(actor);const entities=new Map([['a',{actor}]]);
+camera.position.set(3,3.4,5);camera.lookAt(0,1.5,0);
+const hud=document.createElement('div');hud.style.cssText='position:absolute;left:24px;top:24px;padding:18px;background:#15121c;color:white;font-family:system-ui;max-width:800px';document.body.appendChild(hud);const react=createRoot(hud);
+window.apply=()=>{applyStatus(room,player,room.dummy,'bleed',1.15);applyStatus(room,player,player,'bleed',1.15);};
+window.advanceTime=dt=>{player.lastSeen=room.time+dt;advance(room,room.time+dt);};
+window.statusState=()=>({dummy:realtimeSnapshot(room).dummy.statuses,player:realtimeSnapshot(room).players.a.statuses,rows:[...fx.statusRows.values()].map(r=>r.root.children.map(o=>o.userData))});
+function frame(){const state=realtimeSnapshot(room);dummy.update(state.dummy,room.time,.016);fx.update(state,room.time,.016,entities);
+react.render(<><h2 style={{marginTop:0}}>Effect icons · stack count</h2><StatusEffects statuses={Object.keys(STATUS_EFFECTS).map((id,i)=>({id,stacks:i+1}))}/><h3>Live champion effects</h3><StatusEffects statuses={state.players.a.statuses}/></>);
+renderer.render(scene,camera);requestAnimationFrame(frame);}frame();
+`,loader:'jsx',resolveDir:root},loader:{'.js':'jsx'},bundle:true,platform:'browser',outfile:path.join(root,'tmp/status-icons-qa.js'),logLevel:'silent'});
+(async()=>{const css=fs.readFileSync(path.join(root,'components/arena/playground/playground.css'),'utf8');const server=http.createServer((req,res)=>{res.setHeader('Content-Type',req.url==='/qa.js'?'application/javascript':'text/html');res.end(req.url==='/qa.js'?fs.readFileSync(path.join(root,'tmp/status-icons-qa.js')):'<html><head><style>'+css+'</style></head><body style="margin:0"><script src="/qa.js"></script></body></html>');});await new Promise(r=>server.listen(8832,'127.0.0.1',r));
+const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});try{
+const page=await browser.newPage({viewport:{width:1200,height:900}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:8832');await page.waitForFunction(()=>window.apply);
+await page.evaluate(()=>apply());await page.waitForFunction(()=>statusState().rows[0]?.[0]?.stacks===1);
+const first=await page.evaluate(()=>statusState());assert.equal(first.dummy[0].stacks,1);await page.evaluate(()=>{advanceTime(.75);apply()});await page.waitForFunction(()=>statusState().rows[0]?.[0]?.stacks===2);
+const second=await page.evaluate(()=>statusState());assert.equal(second.dummy[0].stacks,2);assert.equal(second.dummy[0].potency,2.3);assert(second.dummy[0].until>first.dummy[0].until);assert.equal(await page.getByRole('img',{name:'Bleed: 2 stacks',exact:true}).count(),2);
+assert.equal(await page.locator('.playgroundStatusBadge svg').count(),10);await page.screenshot({path:path.join(root,'output/playground/status-icons-stacks.png')});
+await page.evaluate(()=>advanceTime(10));await page.waitForFunction(()=>statusState().rows[0]?.length===0);await page.waitForFunction(()=>document.querySelectorAll('.playgroundStatusBadge').length===9);assert.deepEqual(errors,[]);
+console.log('PASS all 9 icons, player HUD, champion and dummy stack badges, potency doubling, refresh and expiry; no browser errors.');
+}finally{await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1});

@@ -92,6 +92,12 @@ export default async function getNft(req, res) {
 
     const charStats = lastNoteB64 ? decodeNoteBase64(lastNoteB64) : ""
 
+    // The armoury only needs NFT metadata and equipped traits. Existing arena
+    // character records are independent of a regular on-chain trait swap.
+    if (req.body?.includeArenaCharacter === false) {
+      return res.json(sanitizeForJson({ nft, charStats, charObject: "none", action: null }))
+    }
+
     // --- get charObject from Firestore ---
     let charObject = "none"
     try {

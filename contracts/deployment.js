@@ -15,8 +15,8 @@ import algosdk from "algosdk"
   const creatorMnemonic = process.env.CREATOR_MNEMONIC || ""
 
   // get accounts from mnemonic
-  const originalMnemonic = process.env.ORIGINAL_MNEMONIC || process.env.CREATOR_MNEMONIC || ""
-  const userMnemonic = process.env.USER_MNEMONIC || process.env.DC_WALLET || ""
+  const originalMnemonic = process.env.LEGACY_DEPLOYER_MNEMONIC
+  const userMnemonic = process.env.LEGACY_USER_MNEMONIC
   if (!originalMnemonic || !userMnemonic) {
     throw new Error("Set ORIGINAL_MNEMONIC/CREATOR_MNEMONIC and USER_MNEMONIC/DC_WALLET before running deployment.js")
   }
@@ -43,6 +43,21 @@ import algosdk from "algosdk"
   //console.log(process.env) 
   const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
   const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
+  const CONFIRMATION_WAIT_ROUNDS = 30
+
+  const normalizeTxId = (value) => {
+    if (!value) return ""
+    return typeof value === "string" ? value : value.toString()
+  }
+
+  const getSendResultTxId = (sendResult, fallbackTxId = "") =>
+    normalizeTxId(sendResult?.txid || sendResult?.txId || sendResult?.txID || sendResult?.id || fallbackTxId)
+
+  const getConfirmedRound = (pendingInfo) =>
+    pendingInfo?.confirmedRound ?? pendingInfo?.["confirmed-round"] ?? 0
+
+  const getPoolError = (pendingInfo) =>
+    pendingInfo?.poolError || pendingInfo?.["pool-error"] || ""
 
 
   // Read Teal File
@@ -97,9 +112,14 @@ const intToBytes = (integer) => {
 // create unsigned transaction
 const createApp = async (sender, 
   approvalProgram, clearProgram, 
-  localInts, localBytes, globalInts, globalBytes, app_args) => {
+  localInts, localBytes, globalInts, globalBytes, app_args, extraPages = 0) => {
     try{
       const onComplete = algosdk.OnApplicationComplete.NoOpOC;
+      const extraPageCount = Number(extraPages);
+
+      if (!Number.isInteger(extraPageCount) || extraPageCount < 0 || extraPageCount > 3) {
+        throw new Error("extraPages must be an integer between 0 and 3");
+      }
 
       let params = await client.getTransactionParams().do()
       params.fee = 1000;
@@ -118,6 +138,7 @@ const createApp = async (sender,
           numGlobalInts: globalInts,
           numGlobalByteSlices: globalBytes,
           appArgs: app_args,
+          extraPages: extraPageCount,
         });
         let txId = txn.txID().toString();
         // Sign the transaction
@@ -125,17 +146,19 @@ const createApp = async (sender,
         console.log("Signed transaction with txID: %s", txId);
         
         // Submit the transaction
-        await client.sendRawTransaction(signedTxn).do()                           
+        const sendResult = await client.sendRawTransaction(signedTxn).do()
+        txId = getSendResultTxId(sendResult, txId)
             // Wait for transaction to be confirmed
-           let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
+           let confirmedTxn = await algosdk.waitForConfirmation(client, txId, CONFIRMATION_WAIT_ROUNDS);
             console.log("confirmed" + confirmedTxn)
 
             //Get the completed Transaction
-            console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+            console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
             // display results
             let transactionResponse = await client.pendingTransactionInformation(txId).do()
             let appId = transactionResponse['application-index'];
             console.log("Created new app-id: ",appId);
+            return appId;
       }catch(err){
       console.log("error: " + err)
     }
@@ -167,7 +190,7 @@ const Optin = async (sender, index) => {
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
         // display results
     // display results
     let transactionResponse = await client.pendingTransactionInformation(txId).do();
@@ -238,13 +261,14 @@ const update = async (sender, index, approvalProgram, clearProgram) => {
   console.log("Signed transaction with txID: %s", txId);
 
   // Submit the transaction
-  await client.sendRawTransaction(signedTxn).do()                           
+  const sendResult = await client.sendRawTransaction(signedTxn).do()
+  txId = getSendResultTxId(sendResult, txId)
       // Wait for transaction to be confirmed
-     const confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
+     const confirmedTxn = await algosdk.waitForConfirmation(client, txId, CONFIRMATION_WAIT_ROUNDS);
       console.log("confirmed" + confirmedTxn)
 
       //Get the completed Transaction
-      console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+      console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   // display results
   let transactionResponse = await client.pendingTransactionInformation(txId).do();
@@ -281,7 +305,7 @@ const  closeOut = async (sender, index) => {
           console.log("confirmed" + confirmedTxn)
 
           //Get the completed Transaction
-          console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+          console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
       // display results
       let transactionResponse = await client.pendingTransactionInformation(txId).do();
@@ -317,7 +341,7 @@ const deleteApp = async (sender, index) => {
           console.log("confirmed" + confirmedTxn)
 
           //Get the completed Transaction
-          console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+          console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
     // display results
     let transactionResponse = await client.pendingTransactionInformation(txId).do();
@@ -353,7 +377,7 @@ const clearState = async (sender, index) => {
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
   // display results
   let transactionResponse = await client.pendingTransactionInformation(txId).do();
   let appId = transactionResponse['txn']['txn'].apid;
@@ -418,7 +442,7 @@ const noopDC = async (address, amount)  => {
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   }catch(err){
     console.log(err)
@@ -468,13 +492,14 @@ const opt = async (asset)  => {
 
 
     // Submit the transaction
-    let { txId } = await client.sendRawTransaction(signed).do()                           
+    let sendResult = await client.sendRawTransaction(signed).do()
+    let txId = getSendResultTxId(sendResult, txn.txID().toString())
         // Wait for transaction to be confirmed
        const confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   }catch(err){
     console.log(err)
@@ -527,7 +552,7 @@ const globaldel = async (address)  => {
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   }catch(err){
     console.log(err)
@@ -579,7 +604,7 @@ const optin = async (sender, index, assetID)  => {
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   }catch(err){
     console.log(err)
@@ -641,7 +666,7 @@ const delbox = async (address)  => {
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   }catch(err){
     console.log(err)
@@ -691,7 +716,7 @@ const noop = async (sender, index)  => {
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   }catch(err){
     console.log(err)
@@ -735,13 +760,14 @@ const pull = async (sender, index, assetIDs)  => {
     console.log("Signed transaction with txID: %s", txId);
 
     // Submit the transaction
-    await client.sendRawTransaction(signedTxn).do()                           
+    const sendResult = await client.sendRawTransaction(signedTxn).do()
+    txId = getSendResultTxId(sendResult, txId)
         // Wait for transaction to be confirmed
        const confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
         console.log("confirmed" + confirmedTxn)
 
         //Get the completed Transaction
-        console.log("Transaction " + txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+        console.log("Transaction " + txId + " confirmed in round " + getConfirmedRound(confirmedTxn));
 
   }catch(err){
     console.log(err)
@@ -822,7 +848,8 @@ const massOpt = async () => {
     signedTxn = txn.signTxn(creatorSecret);
     signedTxns.push(signedTxn)
   })
-  const { txId } = await client.sendRawTransaction(signedTxns).do()
+  const sendResult = await client.sendRawTransaction(signedTxns).do()
+  const txId = getSendResultTxId(sendResult, txns[0]?.txID().toString())
   
   let confirmedTxn = await algosdk.waitForConfirmation(client, txId, 4);
   
@@ -1563,17 +1590,34 @@ function bytesToUint64BEToNumber(bytes) {
   return num;
 }
 
-async function waitForConfirmation(algod, txId) {
-  let lastRound = (await client.status().do())['last-round'];
-  // Poll until confirmed
-  while (true) {
-    const pending = await client.pendingTransactionInformation(txId).do();
-    if (pending['confirmed-round'] && pending['confirmed-round'] > 0) {
-      return pending;
+async function waitForConfirmation(algod, txId, waitRounds = CONFIRMATION_WAIT_ROUNDS) {
+  let status = await algod.status().do();
+  let lastRound = Number(status.lastRound ?? status["last-round"] ?? 0);
+  let waitedRounds = 0;
+
+  while (waitedRounds < waitRounds) {
+    let poolError = "";
+
+    try {
+      const pending = await algod.pendingTransactionInformation(txId).do();
+      if (getConfirmedRound(pending) > 0) {
+        return pending;
+      }
+
+      poolError = getPoolError(pending);
+      if (poolError) {
+        throw new Error(`Transaction rejected: ${poolError}`);
+      }
+    } catch (err) {
+      if (poolError) throw err;
     }
-    lastRound++;
-    await client.statusAfterBlock(lastRound).do();
+
+    lastRound += 1;
+    waitedRounds += 1;
+    await algod.statusAfterBlock(lastRound).do();
   }
+
+  throw new Error(`Transaction ${txId} not confirmed after ${waitRounds} rounds`);
 }
 
 /* =================== FETCH BOXES =================== */
@@ -1662,7 +1706,8 @@ async function sendDeleteCharacter(assetId, nameBytes8) {
   });
 
   const signedTxn = txn.signTxn(adminAcct.sk);
-  const { txId } = await client.sendRawTransaction(signedTxn).do();
+  const sendResult = await client.sendRawTransaction(signedTxn).do();
+  const txId = getSendResultTxId(sendResult, txn.txID().toString());
 
   console.log(
     `deleteCharacter: asset ${assetId} (box name len 8) -> txId ${txId}`
@@ -1705,7 +1750,8 @@ async function sendDeleteCurrentCharacter(assetId, nameBytes15) {
   });
 
   const signedTxn = txn.signTxn(adminAcct.sk);
-  const { txId } = await client.sendRawTransaction(signedTxn).do();
+  const sendResult = await client.sendRawTransaction(signedTxn).do();
+  const txId = getSendResultTxId(sendResult, txn.txID().toString());
 
   console.log(
     `deleteCurrentCharacter: asset ${assetId} (box name len 15) -> txId ${txId}`
@@ -1854,14 +1900,14 @@ export async function optContractIntoTraitAssets({
 
     const signed = txns.map((txn) => txn.signTxn(creatorAccount.sk));
     const sendResult = await client.sendRawTransaction(signed).do();
-    const txid = sendResult.txid ?? sendResult.txId ?? txns[0].txID();
+    const txid = getSendResultTxId(sendResult, txns[0].txID().toString());
 
     const confirmed = await algosdk.waitForConfirmation(client, txid, 4);
 
     results.push({
       assetIds: ids,
       txid,
-      confirmedRound: confirmed.confirmedRound ?? confirmed["confirmed-round"],
+      confirmedRound: getConfirmedRound(confirmed),
     });
   }
 
@@ -1945,19 +1991,19 @@ export async function optDepthsContractIntoDarkCoin({
 
   const signedTxns = txns.map((txn) => txn.signTxn(signerAccount.sk));
   const sendResult = await client.sendRawTransaction(signedTxns).do();
-  const txid = sendResult.txid ?? sendResult.txId ?? txns[txns.length - 1].txID();
+  const txid = getSendResultTxId(sendResult, txns[txns.length - 1].txID().toString());
   console.log(`Depths Dark Coin opt-in submitted: ${txid}`);
 
   const confirmed = await algosdk.waitForConfirmation(client, txid, 4);
   console.log(
-    `Depths Dark Coin opt-in confirmed in round ${confirmed.confirmedRound ?? confirmed["confirmed-round"]}`
+    `Depths Dark Coin opt-in confirmed in round ${getConfirmedRound(confirmed)}`
   );
 
   return {
     appId,
     assetId,
     txid,
-    confirmedRound: confirmed.confirmedRound ?? confirmed["confirmed-round"],
+    confirmedRound: getConfirmedRound(confirmed),
   };
 }
 
@@ -1965,7 +2011,7 @@ const main = async () => {
 
 
 
-  await optContractIntoTraitAssets({ client, creatorAddress });
+  // await optContractIntoTraitAssets({ client, creatorAddress });
 
 
 //   const wallet = "3SKDMKVJQD7RR62DMOIXVK3CQQWSFXAM2JXMIRDOPLIW4MWWPBWYV3NZ3Y"
@@ -1986,17 +2032,28 @@ const clearProgram = await compileProgram(client, clear_state_program )
 
 // // create list of bytes for app args
 let appArgs = [];
+const marketExtraPages = 3;
 
 
 // // create new application
-//const appId =  await createApp(creatorAddress, approvalPogram, clearProgram , localInts, localBytes, globalInts, globalBytes, appArgs)
-
-// const updateId = await update(
+// const appId = await createApp(
 //   creatorAddress,
-//   Number(process.env.DEPTHS_APP_ID || DEPTHS_APP_ID),
 //   approvalPogram,
-//   clearProgram
+//   clearProgram,
+//   localInts,
+//   localBytes,
+//   globalInts,
+//   globalBytes,
+//   appArgs,
+//   marketExtraPages
 // )
+
+const updateId = await update(
+  creatorAddress,
+  3690496091,
+  approvalPogram,
+  clearProgram
+)
 
 //MNK42KGZKBB3JA6QYCPISL2LVYQNUUAZENFZRJL56FCV5E7Y6ZVIND7HGU
 

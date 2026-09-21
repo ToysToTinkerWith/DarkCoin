@@ -1,0 +1,7 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    {"collectionGroup":"arenaPrivate","fieldPath":"state","indexes":[]},
+    {"collectionGroup":"arenaPrivate","fieldPath":"deleteAt","ttl":true,"indexes":[]}
+  ]
+}

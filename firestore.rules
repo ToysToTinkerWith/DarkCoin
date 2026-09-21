@@ -26,9 +26,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    match /{document=**} {
-      allow read: if true;
+    match /{collection}/{document=**} {
+      // Server-only room state includes RNG and session/ownership proofs.
+      // A broad allow elsewhere would override a narrower deny.
+      allow read: if collection != 'arenaPrivate';
       allow write: if
+        collection != 'arenaPrivate' &&
         request.auth != null &&
         request.auth.token.email == 'abergquist96@gmail.com';
     }

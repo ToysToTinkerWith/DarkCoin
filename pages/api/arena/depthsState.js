@@ -3,6 +3,7 @@ import crypto from "crypto";
 import algosdk from "algosdk";
 import nacl from "tweetnacl";
 import admin from "../../../Firebase/FirebaseAdmin";
+import { getDepthsMoveId, findDepthsReplayMove } from "../../../lib/depthsMoves";
 
 export const config = {
   api: {
@@ -51,6 +52,7 @@ const ENDED_RUN_STATUSES = new Set(["defeated", "abandoned", "completed"]);
 const ACTIVE_RUN_STATUSES = new Set(
   [...RUN_STATUSES].filter((status) => !ENDED_RUN_STATUSES.has(status))
 );
+const TERMINAL_RUN_UPDATE_STATUSES = new Set(["defeated", "abandoned", "completed"]);
 
 const PROTECTED_EXACT_KEYS = new Set([
   "rewardEligible",
@@ -78,6 +80,10 @@ const PROTECTED_EXACT_KEYS = new Set([
   "darkCoinRewardLabel",
   "darkCoinRewardBasisPoints",
   "darkCoinRewardPercentDisplay",
+  "darkCoinRewardWeight",
+  "darkCoinRewardTotalWeight",
+  "darkCoinRewardChance",
+  "darkCoinRewardChanceDisplay",
   "darkCoinRewardAmountAtomic",
   "darkCoinRewardAmountDisplay",
   "darkCoinRewardContractBalanceAtomic",
@@ -292,6 +298,12 @@ function normalizeAssetId(value) {
   return Number.isSafeInteger(assetId) && assetId > 0 ? assetId : 0;
 }
 
+function getChampionAssetIdQueryValues(championAssetId) {
+  const assetId = normalizeAssetId(championAssetId);
+  if (!assetId) return [];
+  return [...new Set([assetId, String(assetId)])];
+}
+
 function safeNumber(value, fallback = 0) {
   const number = Number(value);
   return Number.isFinite(number) ? number : fallback;
@@ -498,7 +510,7 @@ function compactRunMonsterForStorage(monster = {}) {
       }
       return acc;
     }, {}),
-    moves: asArray(monster?.moves).map(normalizeVerificationMove),
+    moves: asArray(monster?.moves).map((move, index) => normalizeVerificationMove({ ...move, id: getDepthsMoveId(move, index) })),
     _depthsScaling: monster?._depthsScaling || monster?.depthsScaling || null,
     idleFrame:
       asArray(monster?.idleFrames).find(Boolean) ||
@@ -554,7 +566,7 @@ function compactRunChampionSnapshotForStorage(charObj = null) {
     gainedEffectsMeta: charObj.gainedEffectsMeta || {},
     triggerEffects: asArray(charObj.triggerEffects),
     passiveEffects: asArray(charObj.passiveEffects),
-    moves: asArray(charObj.moves).map(normalizeVerificationMove),
+    moves: asArray(charObj.moves).map((move, index) => normalizeVerificationMove({ ...move, id: getDepthsMoveId(move, index) })),
     depthsCurrentHp:
       charObj.depthsCurrentHp === undefined || charObj.depthsCurrentHp === null
         ? null
@@ -696,8 +708,7 @@ function getReplayFighter(snapshot = {}, side = "") {
 }
 
 function findReplayMove(fighter = {}, moveId = "") {
-  const wanted = String(moveId || "");
-  return asArray(fighter?.moves).find((move) => String(move?.id || move?.name || "") === wanted) || null;
+  return findDepthsReplayMove(asArray(fighter?.moves), moveId);
 }
 
 function throwBattleReplayError(message) {
@@ -1256,7 +1267,22 @@ function buildBattleRootCompactionFields(data = {}) {
   return fields;
 }
 
-async function requireServerVerifiedBattleForRunUpdate({ runId, updates = {} }) {
+function getBattleCurrentNodeId(battle = {}) {
+  return String(
+    battle.currentNodeId ||
+      battle.snapshot?.currentNodeId ||
+      battle.resolvedSnapshot?.currentNodeId ||
+      battle.resumeSnapshot?.currentNodeId ||
+      ""
+  );
+}
+
+function getBattleRoomNumber(battle = {}) {
+  const room = Number(battle.room || battle.snapshot?.room || battle.resolvedSnapshot?.room || battle.resumeSnapshot?.room || 0);
+  return Number.isFinite(room) ? room : 0;
+}
+
+async function requireServerVerifiedBattleForRunUpdate({ runId, updates = {}, existingRun = null }) {
   const nextStatus = String(updates.status || "");
   if (!["roomCleared", "completed", "defeated"].includes(nextStatus)) return;
 
@@ -1299,6 +1325,16 @@ async function requireServerVerifiedBattleForRunUpdate({ runId, updates = {} }) 
     error.status = 400;
     throw error;
   }
+
+  const expectedNodeId = String(updates.currentNodeId || existingRun?.currentNodeId || "");
+  const battleNodeId = getBattleCurrentNodeId(battle);
+  if (expectedNodeId && battleNodeId && battleNodeId !== expectedNodeId) {
+    const error = new Error("Depths verified battle does not match the current encounter.");
+    error.status = 409;
+    throw error;
+  }
+
+  return battle;
 }
 
 function getRunArrayLength(run = {}, key) {
@@ -1398,6 +1434,42 @@ function validateRunUpdateProgression(existingRun = {}, updates = {}) {
   validateNonDecreasingArray(existingRun, updates, "cardRemovals", "card removals");
   validateVisitedNodesProgress(existingRun, updates);
   validateMapNodeProgress(existingRun, updates);
+}
+
+function mergeProgressArray(existing = [], incoming = []) {
+  const out = [];
+  const seen = new Set();
+  [...(Array.isArray(existing) ? existing : []), ...(Array.isArray(incoming) ? incoming : [])].forEach((value) => {
+    const key = String(value || "");
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(value);
+  });
+  return out;
+}
+
+function reconcileTerminalRunUpdateWithServerProgress(existingRun = {}, updates = {}) {
+  const nextStatus = String(updates.status || "");
+  if (!TERMINAL_RUN_UPDATE_STATUSES.has(nextStatus)) return updates;
+
+  const data = { ...(updates || {}) };
+  const currentRoom = Number(existingRun.room || 1);
+  const nextRoom = Number(data.room || currentRoom);
+  if (Number.isFinite(currentRoom) && Number.isFinite(nextRoom) && nextRoom < currentRoom) {
+    data.room = currentRoom;
+  }
+
+  if (Array.isArray(data.visitedNodeIds)) {
+    data.visitedNodeIds = mergeProgressArray(existingRun.visitedNodeIds, data.visitedNodeIds);
+  }
+
+  const currentNodeId = String(existingRun.currentNodeId || "");
+  const nextNodeId = String(data.currentNodeId || "");
+  if (currentNodeId && (!nextNodeId || nextNodeId !== currentNodeId)) {
+    data.currentNodeId = currentNodeId;
+  }
+
+  return data;
 }
 
 function getDarkCoinAssetId() {
@@ -1811,6 +1883,34 @@ function redactRunForClient(id, run = {}) {
   };
 }
 
+function redactRunSummaryForClient(id, run = {}) {
+  return cleanClientValue({
+    id,
+    status: run.status || "",
+    room: run.room || 1,
+    championAssetId: run.championAssetId || null,
+    championName: run.championName || run.championSnapshot?.name || "",
+    activeAddress: run.activeAddress || run.walletAddress || "",
+    currentNodeId: run.currentNodeId || "",
+    visitedNodeIds: Array.isArray(run.visitedNodeIds) ? run.visitedNodeIds : [],
+    depthsMap: run.depthsMap || null,
+    currentMonsters: Array.isArray(run.currentMonsters)
+      ? run.currentMonsters.map((monster) => ({
+          id: monster?.id || monster?.monsterId || monster?.docId || "",
+          monsterId: monster?.monsterId || monster?.id || monster?.docId || "",
+          name: monster?.name || monster?.displayName || "",
+          displayName: monster?.displayName || monster?.name || "",
+        }))
+      : [],
+    nodeResult: run.nodeResult || null,
+    artifactChoiceContext: run.artifactChoiceContext || null,
+    entryRunNumber: run.entryRunNumber || null,
+    serverWriteVersion: Number(run.serverWriteVersion || 1),
+    updatedAt: run.updatedAt || null,
+    serverUpdatedAt: run.serverUpdatedAt || null,
+  });
+}
+
 function redactBattleForClient(id, battle = {}) {
   const clean = cleanClientValue(battle) || {};
   return {
@@ -1855,10 +1955,14 @@ async function findActiveDepthsRun({ walletAddress, championAssetId }) {
     if (activeRun) return activeRun;
   }
 
-  const runsSnap = await db
-    .collection(RUN_COLLECTION)
-    .where("activeAddress", "==", walletAddress)
-    .get();
+  const queryValues = getChampionAssetIdQueryValues(championAssetId);
+  if (!queryValues.length) return null;
+
+  const runsQuery =
+    queryValues.length === 1
+      ? db.collection(RUN_COLLECTION).where("championAssetId", "==", queryValues[0])
+      : db.collection(RUN_COLLECTION).where("championAssetId", "in", queryValues);
+  const runsSnap = await runsQuery.get();
 
   const activeRuns = [];
   runsSnap.forEach((docSnap) => {
@@ -1894,6 +1998,45 @@ async function findLatestBattleForRun(runId, status = "") {
 
   battles.sort((a, b) => b.updatedAtMs - a.updatedAtMs);
   return battles[0] || null;
+}
+
+async function findBestResumeBattleForRun(runId, run = {}) {
+  const battlesSnap = await db.collection(BATTLE_COLLECTION).where("runId", "==", String(runId)).get();
+  const battles = [];
+  const currentNodeId = String(run.currentNodeId || "");
+
+  battlesSnap.forEach((docSnap) => {
+    const battle = docSnap.data() || {};
+    const battleNodeId = getBattleCurrentNodeId(battle);
+    const room = getBattleRoomNumber(battle);
+    battles.push({
+      id: docSnap.id,
+      battle,
+      battleNodeId,
+      room,
+      updatedAtMs: Math.max(
+        timestampMillis(battle.serverUpdatedAt),
+        timestampMillis(battle.updatedAt),
+        timestampMillis(battle.completedAt),
+        timestampMillis(battle.startedAt)
+      ),
+    });
+  });
+
+  const sameNodeBattles = currentNodeId
+    ? battles.filter((entry) => !entry.battleNodeId || entry.battleNodeId === currentNodeId)
+    : battles;
+  const pool = sameNodeBattles.length ? sameNodeBattles : battles;
+
+  pool.sort((a, b) => {
+    const aVerifiedComplete = a.battle.status === "complete" && a.battle.serverBattleVerified === true ? 1 : 0;
+    const bVerifiedComplete = b.battle.status === "complete" && b.battle.serverBattleVerified === true ? 1 : 0;
+    if (aVerifiedComplete !== bVerifiedComplete) return bVerifiedComplete - aVerifiedComplete;
+    if (a.room !== b.room) return b.room - a.room;
+    return b.updatedAtMs - a.updatedAtMs;
+  });
+
+  return pool[0] || null;
 }
 
 async function getChampionEntryState(championAssetId) {
@@ -2022,9 +2165,99 @@ async function getDepthsEntryInfo({ activeAddress, championAssetId }) {
     runsToday: dailyEntryState.runCount,
     lifetimeEntryCount: entryState.runCount,
     nextRunNumber: payment.runNumber,
-    activeRun: activeRun ? redactRunForClient(activeRun.id, activeRun.run) : null,
+    activeRun: activeRun ? redactRunSummaryForClient(activeRun.id, activeRun.run) : null,
     payment,
     entryProofKind: null,
+    resumeProofKind: getDepthsResumeProofKind(),
+  };
+}
+
+async function getDepthsEntryInfoBatch({ activeAddress, championAssetIds }) {
+  const walletAddress = validateAddress(activeAddress, "Depths run wallet address");
+  const assetIds = [
+    ...new Set(asArray(championAssetIds).map(normalizeAssetId).filter(Boolean)),
+  ].slice(0, 100);
+  const dailyKey = getDepthsDailyKey();
+
+  if (!assetIds.length) {
+    return {
+      walletAddress,
+      dailyKey,
+      entries: {},
+      resumeProofKind: getDepthsResumeProofKind(),
+    };
+  }
+
+  const entryRefs = assetIds.map((assetId) => db.collection(CHAMPION_ENTRY_COLLECTION).doc(String(assetId)));
+  const dailyRefs = assetIds.map((assetId) => db.collection(DAILY_ENTRY_COLLECTION).doc(`${assetId}_${dailyKey}`));
+  const entrySnaps = await db.getAll(...entryRefs);
+  const dailySnaps = await db.getAll(...dailyRefs);
+  const entryByAssetId = new Map();
+  const dailyByAssetId = new Map();
+
+  entrySnaps.forEach((snap, index) => {
+    entryByAssetId.set(assetIds[index], snap.exists ? snap.data() || {} : {});
+  });
+  dailySnaps.forEach((snap, index) => {
+    dailyByAssetId.set(assetIds[index], snap.exists ? snap.data() || {} : {});
+  });
+
+  const activeRunRefsById = new Map();
+  assetIds.forEach((assetId) => {
+    const entryData = entryByAssetId.get(assetId) || {};
+    const activeRunId = String(entryData.activeRunId || "").trim();
+    const activeRunStatus = String(entryData.activeRunStatus || "");
+    if (activeRunId && (!activeRunStatus || ACTIVE_RUN_STATUSES.has(activeRunStatus))) {
+      activeRunRefsById.set(activeRunId, db.collection(RUN_COLLECTION).doc(activeRunId));
+    }
+  });
+
+  const activeRunsByAssetId = new Map();
+  if (activeRunRefsById.size) {
+    const runSnaps = await db.getAll(...activeRunRefsById.values());
+    runSnaps.forEach((snap) => {
+      const run = snap.exists ? snap.data() || {} : null;
+      const activeRun = buildActiveDepthsRunCandidate(snap, {
+        walletAddress,
+        championAssetId: normalizeAssetId(run?.championAssetId),
+      });
+      if (activeRun) {
+        activeRunsByAssetId.set(normalizeAssetId(activeRun.run.championAssetId), activeRun);
+      }
+    });
+  }
+
+  const entries = {};
+  assetIds.forEach((assetId) => {
+    const entryData = entryByAssetId.get(assetId) || {};
+    const dailyData = dailyByAssetId.get(assetId) || {};
+    const lifetimeEntryCount = Math.max(0, Math.floor(Number(entryData.runCount || 0)));
+    const runsToday = Math.max(0, Math.floor(Number(dailyData.runCount || 0)));
+    const payment = getEntryPaymentPayload({ championAssetId: assetId, entryCount: runsToday });
+    const activeRun = activeRunsByAssetId.get(assetId) || null;
+
+    entries[String(assetId)] = {
+      championAssetId: assetId,
+      walletAddress,
+      dailyKey,
+      freeRunAvailable: false,
+      requiresPayment: true,
+      entryCount: runsToday,
+      runsToday,
+      lifetimeEntryCount,
+      nextRunNumber: payment.runNumber,
+      activeRun: activeRun ? redactRunSummaryForClient(activeRun.id, activeRun.run) : null,
+      payment,
+      entryProofKind: null,
+      resumeProofKind: getDepthsResumeProofKind(),
+      ownershipVerified: false,
+    };
+  });
+
+  return {
+    walletAddress,
+    dailyKey,
+    entries,
     resumeProofKind: getDepthsResumeProofKind(),
   };
 }
@@ -2285,7 +2518,7 @@ async function resumeDepthsRun({ activeAddress, championAssetId, walletProof }) 
     };
   });
 
-  const latestBattle = await findLatestBattleForRun(activeRun.id);
+  const latestBattle = await findBestResumeBattleForRun(activeRun.id, resumedRun || activeRun.run);
 
   return {
     id: activeRun.id,
@@ -2378,6 +2611,14 @@ async function depthsState(req, res) {
       return sendJson(res, 200, entryInfo);
     }
 
+    if (action === "getEntryInfoBatch") {
+      const entryInfoBatch = await getDepthsEntryInfoBatch({
+        activeAddress: body.activeAddress,
+        championAssetIds: body.championAssetIds,
+      });
+      return sendJson(res, 200, entryInfoBatch);
+    }
+
     if (action === "createRun") {
       const data = normalizeRunPayload(body.data || {}, { creating: true });
       const created = await authorizeDepthsRunEntry({
@@ -2403,8 +2644,9 @@ async function depthsState(req, res) {
         body.expectedServerWriteVersion ?? body.updates?.expectedServerWriteVersion ?? 0
       );
       const { runRef, run } = await requireRunWriteToken(runId, body.runToken);
-      const data = normalizeRunPayload(body.updates || {});
-      await requireServerVerifiedBattleForRunUpdate({ runId, updates: data });
+      const normalizedData = normalizeRunPayload(body.updates || {});
+      const data = reconcileTerminalRunUpdateWithServerProgress(run, normalizedData);
+      await requireServerVerifiedBattleForRunUpdate({ runId, updates: data, existingRun: run });
       validateRunUpdateProgression(run, data);
 
       let serverWriteVersion = 0;
@@ -2432,19 +2674,20 @@ async function depthsState(req, res) {
           throw error;
         }
 
-        validateRunUpdateProgression(freshRun, data);
+        const transactionData = reconcileTerminalRunUpdateWithServerProgress(freshRun, normalizedData);
+        validateRunUpdateProgression(freshRun, transactionData);
         serverWriteVersion = currentVersion + 1;
         transaction.set(
           runRef,
           {
-            ...data,
+            ...transactionData,
             serverWriteVersion,
           },
           { merge: true }
         );
 
-        const nextStatus = String(data.status || freshRun.status || "");
-        const championAssetId = normalizeAssetId(freshRun.championAssetId || data.championAssetId);
+        const nextStatus = String(transactionData.status || freshRun.status || "");
+        const championAssetId = normalizeAssetId(freshRun.championAssetId || transactionData.championAssetId);
         if (championAssetId && nextStatus) {
           const entryRef = db.collection(CHAMPION_ENTRY_COLLECTION).doc(String(championAssetId));
           const entryUpdate = {

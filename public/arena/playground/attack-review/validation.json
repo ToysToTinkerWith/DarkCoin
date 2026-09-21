@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "id": "scythe",
+      "maxSocketErrorM": 0.0005857681598482812,
+      "active": 1,
+      "videoBytes": 713801
+    },
+    {
+      "id": "dragon_longsword",
+      "maxSocketErrorM": 0.0006582014451646451,
+      "active": 1,
+      "videoBytes": 540704
+    },
+    {
+      "id": "dark_sword",
+      "maxSocketErrorM": 0.000629843115482118,
+      "active": 1,
+      "videoBytes": 492739
+    },
+    {
+      "id": "dual_katana",
+      "maxSocketErrorM": 0.001371310384482941,
+      "active": 1,
+      "videoBytes": 492306
+    },
+    {
+      "id": "arctic_dual_katana",
+      "maxSocketErrorM": 0.0014380567774233061,
+      "active": 1,
+      "videoBytes": 479514
+    },
+    {
+      "id": "sketonian_sword",
+      "maxSocketErrorM": 0.0006793032558392132,
+      "active": 1,
+      "videoBytes": 519396
+    },
+    {
+      "id": "rusty_sword",
+      "maxSocketErrorM": 0.000677699749551004,
+      "active": 1,
+      "videoBytes": 372532
+    },
+    {
+      "id": "hedge_knight_sword",
+      "maxSocketErrorM": 0.0006777743713099499,
+      "active": 1,
+      "videoBytes": 508333
+    }
+  ],
+  "errors": [],
+  "mobileGallery": true
+}

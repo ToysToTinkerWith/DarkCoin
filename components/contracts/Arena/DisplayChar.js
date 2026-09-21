@@ -9,11 +9,10 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DescriptionIcon from '@mui/icons-material/Description';
 
-import { CID } from 'multiformats/cid'
+import NftImage from "../../NftImage"
+import { assetImageUrl } from "../../../lib/ipfsMedia"
 
 
-import * as mfsha2 from 'multiformats/hashes/sha2'
-import * as digest from 'multiformats/hashes/digest'
 import {
     POINTS_BYTE_LENGTH,
     getSkillPointStatAdjustments,
@@ -119,6 +118,10 @@ export default function DisplayChar(props) {
                 });
         
                 let session = await response.json()
+                if (!response.ok || !session?.nft?.assets?.[0]?.params) throw new Error(session.error || "Champion unavailable")
+                const params = session.nft.assets[0].params
+                setNft(params)
+                setNftUrl(assetImageUrl(params))
 
 
                 if (session.charObject != "none") {
@@ -129,23 +132,13 @@ export default function DisplayChar(props) {
                 }
             
                 if (session.nft.assets[0].params.creator == "L6VIKAHGH4D7XNH3CYCWKWWOHYPS3WYQM6HMIPNBVSYZWPNQ6OTS5VERQY") {
-                    const addr = algosdk.decodeAddress(session.nft.assets[0].params.reserve)
-
-                    const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey)
-
-                    const ocid = CID.create(0, 0x70, mhdigest)
-
-                    let char = JSON.parse(session.charStats)
-                    
-                    let properties = JSON.stringify(char.properties)
-                    setNft(session.nft.assets[0].params)
-                    setNftUrl("https://ipfs.dark-coin.io/ipfs/" + ocid.toString())
-                    setCharStats(properties)
+                    try {
+                        const char = JSON.parse(session.charStats)
+                        setCharStats(JSON.stringify(char.properties || {}))
+                    } catch { setCharStats("{}") }
                     
                 }
                 else {
-                    setNft(session.nft.assets[0].params)
-                    setNftUrl("https://ipfs.dark-coin.io/ipfs/" + session.nft.assets[0].params.url.slice(34))
                     setCharStats(session.charStats)
                 }
 
@@ -292,7 +285,7 @@ export default function DisplayChar(props) {
                         <Typography color="secondary" align="center" style={{margin: 20}} variant="h6"> {nft.name} </Typography>
 
                         <Button style={{display: "flex", margin: "auto"}} onClick={() => props.setNft(null)}>
-                        <img src={nftUrl} style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500, borderRadius: 5}} />
+                        <NftImage alt={nft?.name || "Champion"} src={nftUrl} style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500, borderRadius: 5}} />
 
 
                         </Button>
@@ -324,7 +317,7 @@ export default function DisplayChar(props) {
                                 :
                                 <Typography color="secondary" align="center" variant="subtitle1"> {nft.name} </Typography>
                             }
-                            <img onClick={() => window.location.href = "/arena/dragonshorde/" + String(props.nftId)} style={{width: "100%", borderRadius: 5}} src={nftUrl} />
+                            <NftImage alt={nft?.name || "Champion"} onClick={() => window.location.href = "/arena/dragonshorde/" + String(props.nftId)} style={{width: "100%", borderRadius: 5}} src={nftUrl} />
                             {charObject ? 
                                 
                                     
@@ -364,7 +357,7 @@ export default function DisplayChar(props) {
                                 :
                                 <Typography color="secondary" align="center" variant="subtitle1"> {nft.name} </Typography>
                             }
-                            <img style={{width: "50%", borderRadius: 5, display: "flex", margin: "auto"}} src={nftUrl} />
+                            <NftImage alt={nft?.name || "Champion"} style={{width: "50%", borderRadius: 5, display: "flex", margin: "auto"}} src={nftUrl} />
                             <Typography color="secondary" align="center" variant="subtitle1" style={{display: "inline-flex", marginLeft: "30%"}}> {(props.wager / 1000000).toLocaleString()} </Typography>
                             <img src="/invDC.svg" style={{display: "inline-flex", margin: "auto", width: 40, padding: 10}} />
                         </div>
@@ -380,7 +373,7 @@ export default function DisplayChar(props) {
                                 :
                                 <Typography color="secondary" align="center" variant="subtitle1"> {nft.name} </Typography>
                             }
-                            <img style={{width: "100%", borderRadius: 5}} src={nftUrl} />
+                            <NftImage alt={nft?.name || "Champion"} style={{width: "100%", borderRadius: 5}} src={nftUrl} />
                             {charObject ? 
                                 <Grid container>
                                     <Grid item xs={6}>
@@ -421,7 +414,7 @@ export default function DisplayChar(props) {
                                 :
                                 <Typography color="secondary" align="center" variant="subtitle1"> {nft.name} </Typography>
                             }
-                            <img style={{width: "100%", borderRadius: 5}} src={nftUrl} />
+                            <NftImage alt={nft?.name || "Champion"} style={{width: "100%", borderRadius: 5}} src={nftUrl} />
                             {charObject ? 
                                 <Grid container>
                                     <Grid item xs={6}>
@@ -587,7 +580,7 @@ export default function DisplayChar(props) {
                                 </Button>
                                 <Typography color="secondary" align="center" variant="subtitle1" style={{margin: 20}}> {charObject.name} </Typography>
 
-                                <img style={{width: "100%", borderRadius: 5}} src={nftUrl} />
+                                <NftImage alt={nft?.name || "Champion"} style={{width: "100%", borderRadius: 5}} src={nftUrl} />
                                 <br />
                                 <div style={{}}>
                                     <BorderLinearProgress variant="determinate" style={{marginRight: 10, marginLeft: 10}} value={((xp - prevLvl) / (nextLvl - prevLvl)) * 100} />
@@ -1217,7 +1210,7 @@ export default function DisplayChar(props) {
                             : 
                             <div onMouseOver={() => setHover(true)} onMouseLeave={() => setHover(false)}  style={{zIndex: 1}}>
                                 {/* <Typography color="secondary" align="center" variant="subtitle1"> {charObject ? charObject["name"] : nft.name.substring(18)} </Typography> */}
-                                <img style={{width: props.dcChars.includes(props.nftId) ? String((150 / (props.length + 3))) + "vw" : String((100 / (props.length + 3))) + "vw", borderRadius: 5, border: props.dcChars.includes(props.nftId) ? "1px solid white" : null}} src={nftUrl} />
+                                <NftImage alt={nft?.name || "Champion"} style={{width: props.dcChars.includes(props.nftId) ? String((150 / (props.length + 3))) + "vw" : String((100 / (props.length + 3))) + "vw", borderRadius: 5, border: props.dcChars.includes(props.nftId) ? "1px solid white" : null}} src={nftUrl} />
                                 <ProgressHealth variant="determinate" style={{color: "white", width: props.dcChars.includes(props.nftId) ? String((150 / (props.length + 3))) + "vw" : String((100 / (props.length + 3))) + "vw"}} value={charObject.currentHealth / charObject.health * 100} />
 
                             </div>
@@ -1234,7 +1227,7 @@ export default function DisplayChar(props) {
                         <Typography color="secondary" align="center" style={{margin: 20}} variant="h6"> {nft.name} </Typography>
 
                         <Button style={{display: "flex", margin: "auto"}} onClick={() => props.setNft(null)}>
-                        <img src={nftUrl} style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500, borderRadius: 5}} />
+                        <NftImage alt={nft?.name || "Champion"} src={nftUrl} style={{display: "flex", margin: "auto", width: "70%", maxWidth: 500, borderRadius: 5}} />
 
 
                         </Button>
@@ -1298,7 +1291,7 @@ export default function DisplayChar(props) {
             }
             else if (props.leaderboard) {
                 return (
-                <img style={{width: 200, borderRadius: 5}} src={nftUrl} />
+                <NftImage alt={nft?.name || "Champion"} style={{width: 200, borderRadius: 5}} src={nftUrl} />
                 )
 
             }
@@ -1341,7 +1334,7 @@ export default function DisplayChar(props) {
             else {
                 return (
                     <div style={{display: "block"}} >
-                        <img style={{width: "100%", borderRadius: 5}} src={nftUrl} />
+                        <NftImage alt={nft?.name || "Champion"} style={{width: "100%", borderRadius: 5}} src={nftUrl} />
                     </div>
         
                 )

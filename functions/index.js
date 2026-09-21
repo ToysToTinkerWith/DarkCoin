@@ -13,6 +13,8 @@
 module.exports = {
   ...require("./server"),
   ...require("./fightJobs"),
+  ...require("./marketAnnouncements"),
+  ...require("./arenaCombat"),
 };
 
 

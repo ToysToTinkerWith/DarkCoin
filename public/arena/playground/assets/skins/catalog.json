@@ -1,0 +1,151 @@
+[
+  {
+    "id": "dark_skin",
+    "name": "Dark Skin",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FDark%20Skin.png?alt=media&token=ab116dc7-33f6-4edf-ab2f-b3710a9989b9",
+    "parts": 111,
+    "vertices": 242519,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [],
+    "tail": false,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "tribal_dark_skin",
+    "name": "Tribal Dark Skin",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FTribal%20Dark%20Skin.png?alt=media&token=75aac210-2fd9-4cb4-973f-a752b31edbc8",
+    "parts": 159,
+    "vertices": 288825,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [],
+    "tail": false,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "tribal_light_skin",
+    "name": "Tribal Light Skin",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FTribal%20Light%20Skin.png?alt=media&token=5e3e3675-c65a-4db6-afd8-1452beb98740",
+    "parts": 159,
+    "vertices": 288825,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [],
+    "tail": false,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "fire_dragon",
+    "name": "Fire Dragon",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FFire%20Dragon.png?alt=media&token=c1963287-afcf-4f20-b918-009aab7c82b5",
+    "parts": 232,
+    "vertices": 311689,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [
+      "skin_tail_01",
+      "skin_tail_02",
+      "skin_tail_03",
+      "skin_tail_04",
+      "skin_tail_05",
+      "skin_tail_06",
+      "skin_tail_07"
+    ],
+    "tail": true,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "undead",
+    "name": "Undead",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FUndead.png?alt=media&token=26371fb9-050f-443e-8eee-751e00e34492",
+    "parts": 131,
+    "vertices": 244791,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [],
+    "tail": false,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "chameleon",
+    "name": "Chameleon",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FChameleon.png?alt=media&token=8872e1a0-c085-4b70-ac9e-c48c6999d216",
+    "parts": 232,
+    "vertices": 311689,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [
+      "skin_tail_01",
+      "skin_tail_02",
+      "skin_tail_03",
+      "skin_tail_04",
+      "skin_tail_05",
+      "skin_tail_06",
+      "skin_tail_07"
+    ],
+    "tail": true,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "light_skin",
+    "name": "Light Skin",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FLight%20Skin.png?alt=media&token=3bb71ab8-5c80-4578-9bc3-65ec2adce349",
+    "parts": 111,
+    "vertices": 242519,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [],
+    "tail": false,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "elder_dragon",
+    "name": "Elder Dragon",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FElder%20Dragon.png?alt=media&token=0ca6e3e8-a196-4309-ad2a-8b4429ccb7c4",
+    "parts": 232,
+    "vertices": 311689,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [
+      "skin_tail_01",
+      "skin_tail_02",
+      "skin_tail_03",
+      "skin_tail_04",
+      "skin_tail_05",
+      "skin_tail_06",
+      "skin_tail_07"
+    ],
+    "tail": true,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  },
+  {
+    "id": "snake",
+    "name": "Snake",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FSkin%2FSnake.png?alt=media&token=ac342d25-a472-4970-bbe6-b0d532056337",
+    "parts": 232,
+    "vertices": 311689,
+    "body_geometry_sha256": "72006f0f314d9a1be191e35c93933bf5bb94906951a6ec747b2ea01c263d6831",
+    "body_vertex_count": 114420,
+    "tail_bones": [
+      "skin_tail_01",
+      "skin_tail_02",
+      "skin_tail_03",
+      "skin_tail_04",
+      "skin_tail_05",
+      "skin_tail_06",
+      "skin_tail_07"
+    ],
+    "tail": true,
+    "fit_standard": "champion-C5-athletic-1.2",
+    "surface_relief_max_m": 0.00068
+  }
+]

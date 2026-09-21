@@ -1,0 +1,187 @@
+[
+  {
+    "id": "crescent_moon_earring",
+    "name": "Crescent Moon Earring",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FCrescent%20Moon%20Earring.png?alt=media&token=892e98e2-ec94-4828-892c-55d96e7ef9e2",
+    "parts": 16,
+    "vertices": 14148,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "dragon_fangs_earring",
+    "name": "Dragon Fangs Earring",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FDragon%20Fangs%20Earring.png?alt=media&token=32fb88ed-7bd3-4c69-b4b4-d8e36a051832",
+    "parts": 22,
+    "vertices": 19952,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "fusion_pearl_earring",
+    "name": "Fusion Pearl Earring",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FFusion%20Pearl%20Earring.png?alt=media&token=ea16cf53-26b8-4df9-ac1c-7995d59e9408",
+    "parts": 14,
+    "vertices": 16448,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "tentacle_earring",
+    "name": "Tentacle Earring",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FTentacle%20Earring.png?alt=media&token=86de73dd-8059-4156-b2f9-7fbda1fbc07c",
+    "parts": 30,
+    "vertices": 29436,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "hoop_earring",
+    "name": "Hoop Earring",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FHoop%20Earring.png?alt=media&token=23c5f036-f6c7-4e89-ac0c-777e4e49349e",
+    "parts": 2,
+    "vertices": 2240,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "golden_feathers",
+    "name": "Golden Feathers",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FGolden%20Feathers.png?alt=media&token=b265185f-dc83-418b-bad2-91155b7cbc9a",
+    "parts": 2,
+    "vertices": 28056,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "battle_wound",
+    "name": "Battle Wound",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FBattle%20Wound.png?alt=media&token=ace4a455-4cf8-4557-9cf7-a023a9236514",
+    "parts": 1,
+    "vertices": 16583,
+    "attachment": "neck_skin",
+    "ear_socket_blender_m": [
+      -0.08937631547451019,
+      -0.007442106492817402,
+      1.6362056732177734
+    ],
+    "maximum_surface_offset_m": 0.0009245118075236678
+  },
+  {
+    "id": "crescent_birthmark",
+    "name": "Crescent-Birthmark",
+    "url": "https://firebasestorage.googleapis.com/v0/b/dark-coin-dc4a3.appspot.com/o/warriors%2FExtra%2FCrescent-Birthmark.png?alt=media&token=213f3421-f1ab-4616-988f-6f49f3fa4b19",
+    "parts": 1,
+    "vertices": 32184,
+    "attachment": "neck_skin",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0.000349498472486157,
+    "source_scale": 4
+  }
+]

@@ -1,0 +1,161 @@
+{
+  "passed": true,
+  "base": "https://dark-coin.com",
+  "clips": [
+    {
+      "url": "dragon_longsword.mp4",
+      "duration": 3.247033,
+      "width": 1100,
+      "height": 850,
+      "frames": 6
+    },
+    {
+      "url": "dragon_staff.mp4",
+      "duration": 4.699433,
+      "width": 1100,
+      "height": 850,
+      "frames": 7
+    },
+    {
+      "url": "dual_katana.mp4",
+      "duration": 2.846533,
+      "width": 1100,
+      "height": 850,
+      "frames": 8
+    },
+    {
+      "url": "executioner_axe.mp4",
+      "duration": 3.665967,
+      "width": 1100,
+      "height": 850,
+      "frames": 8
+    },
+    {
+      "url": "scythe.mp4",
+      "duration": 3.482233,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "shield.mp4",
+      "duration": 2.930667,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "sickle.mp4",
+      "duration": 2.613467,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "spear.mp4",
+      "duration": 2.9948,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "trident.mp4",
+      "duration": 3.179767,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "dark_sword.mp4",
+      "duration": 2.9995,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "elf_bow.mp4",
+      "duration": 3.848833,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "wooden_club.mp4",
+      "duration": 3.565367,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "snake_wings.mp4",
+      "duration": 2.616833,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "sketonian_sword.mp4",
+      "duration": 3.081867,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "fire_wings.mp4",
+      "duration": 2.697933,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "elder_wings.mp4",
+      "duration": 2.713433,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "chameleon_wings.mp4",
+      "duration": 2.6142,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "arctic_dual_katana.mp4",
+      "duration": 2.847367,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "rusty_sword.mp4",
+      "duration": 2.714167,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "lightning_staff.mp4",
+      "duration": 3.8496,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "hedge_knight_sword.mp4",
+      "duration": 3.014233,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    },
+    {
+      "url": "unarmed.mp4",
+      "duration": 2.614433,
+      "width": 1100,
+      "height": 850,
+      "frames": 4
+    }
+  ],
+  "errors": []
+}

@@ -7,12 +7,20 @@
     "dev": "next dev",
     "build": "next build",
     "copy-next": "node scripts/copy-next-to-functions.js",
+    "build:arena-server": "node scripts/build-arena-server.cjs",
+    "build:arena-realtime": "node scripts/build-arena-realtime.cjs",
+    "test:arena-realtime": "node --test tests/arena-realtime.test.cjs",
+    "test:arena-network": "node scripts/build-arena-realtime.cjs && node scripts/test-arena-realtime-browser.cjs",
+    "test:arena": "node --test tests/arena-combat.test.cjs tests/playground.test.cjs tests/arena-preview.test.cjs",
     "deploy:firebase": "firebase deploy --only functions,hosting,firestore:rules",
     "deploy:fight-jobs": "powershell -ExecutionPolicy Bypass -File scripts/deploy-fight-cloud-run-jobs.ps1",
     "grant:fight-jobs": "powershell -ExecutionPolicy Bypass -File scripts/grant-fight-job-scheduler-iam.ps1",
     "start": "next start",
     "out": "next build && next export",
-    "deploy": "npm run build && npm run copy-next && npm run deploy:firebase"
+    "deploy": "npm run build:arena-server && npm run build && npm run copy-next && npm run deploy:firebase",
+    "deploy:arena-dev": "pwsh -NoProfile -File scripts/deploy-arena-dev.ps1",
+    "test:arena-dev-entry": "node scripts/test-arena-dev-entry.cjs",
+    "test:arena-dev-cloud": "node scripts/test-arena-realtime-cloud.cjs --dev --soak"
   },
   "dependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
@@ -50,7 +58,8 @@
     "react-csv": "^2.2.2",
     "react-dom": "^18.2.0",
     "recharts": "^2.7.2",
-    "stream": "^0.0.2"
+    "stream": "^0.0.2",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",

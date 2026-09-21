@@ -12,6 +12,11 @@
       "sha256": "1073ebd617d24f1a67806960b19d09c27c6e00bdcad149f1d7074f229f0d8fb4"
     },
     {
+      "path": ".gitattributes",
+      "size": 76,
+      "sha256": "2a9f01e5591afbcecc1809f6cec8f05b9394bd4b5ea8b54449b01443959207a0"
+    },
+    {
       "path": ".gitignore",
       "size": 2133,
       "sha256": "dbbacb5bae319e39d8a02dbcf4f987f49d8127858c6d18bb27d38bc08a3bd327"
@@ -5133,8 +5138,8 @@
     },
     {
       "path": "scripts/backup_playground_assets.py",
-      "size": 4900,
-      "sha256": "b46a45dab91bc057c5852dde0263322b5f7685b104fdda46d40675173f9b3cfc"
+      "size": 5022,
+      "sha256": "1918e1696d2aeed516099cecaeeb683dd806419d486140ddaf27e0338e1b5dd6"
     },
     {
       "path": "scripts/bake-arena-collision.cjs",
@@ -5592,5 +5597,5 @@
       "sha256": "6bb011c942772016b18bde93dc9613af52beb590a679ca50de5de83b2989329c"
     }
   ],
-  "notes": "Environment files, credentials and caches excluded. Legacy embedded credentials replaced in backup copies."
+  "notes": "Secrets excluded; legacy scripts sanitized in backup copies. Exact byte preservation via .gitattributes."
 }

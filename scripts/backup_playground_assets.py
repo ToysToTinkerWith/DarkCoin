@@ -15,6 +15,8 @@ def main():
  sources=[]
  for parent,prefix in [(ROOT/'output','champion'),(ROOT/'tmp','champion')]:
   for folder in sorted(parent.glob(prefix+'*')):
+   if folder.is_file():
+    sources.append(folder);continue
    if not folder.is_dir():continue
    for d,dirs,files in os.walk(folder):
     dirs[:]=[x for x in dirs if x not in SKIP_DIRS]

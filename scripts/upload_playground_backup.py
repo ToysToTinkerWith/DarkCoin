@@ -79,12 +79,16 @@ def main():
       if archive:archive.close()
      if h.hexdigest()!=sha:raise ValueError('Source changed after inventory: '+src['source'])
   print(f'Uploading {name}: {p.stat().st_size/1024**2:.1f} MiB',flush=True);asset,sha=upload_file(release,p)
-  record={'name':name,'size':p.stat().st_size,'sha256':sha,'assetId':asset['id'],'url':asset['browser_download_url'],'objects':group,'verifiedGithubDigest':asset['digest']}
+  # Draft release download URLs use a temporary untagged name. Record the final
+  # tag URL so the recovery index remains valid after publication.
+  record={'name':name,'size':p.stat().st_size,'sha256':sha,'assetId':asset['id'],'url':'https://github.com/'+REPO+'/releases/download/'+TAG+'/'+name,'objects':group,'verifiedGithubDigest':asset['digest']}
   with LOCK:
    index['parts'].append(record);index['parts'].sort(key=lambda r:r['name']);temp=OUT/'backup-index.pending.json';temp.write_text(json.dumps(index,indent=2),encoding='utf-8');os.replace(temp,index_path)
   # Only the newly created verified archive is removed; original project assets remain.
   p.unlink();print(f'Verified {name} on GitHub ({len(index["parts"])} verified parts)',flush=True)
  with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:list(pool.map(worker,enumerate(groups,1)))
+ for part in index['parts']:part['url']='https://github.com/'+REPO+'/releases/download/'+TAG+'/'+part['name']
+ index_path.write_text(json.dumps(index,indent=2),encoding='utf-8')
  for name in ['manifest.json','backup-index.json']:
   asset,sha=upload_file(release,OUT/name);print('Verified '+name+': '+sha,flush=True)
  print(json.dumps({'complete':True,'parts':len(index['parts']),'compressedGiB':round(sum(p['size'] for p in index['parts'])/1024**3,2),'files':len(manifest['files']),'releaseId':release['id']}),flush=True)

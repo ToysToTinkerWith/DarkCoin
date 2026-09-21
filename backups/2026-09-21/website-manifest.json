@@ -5508,8 +5508,8 @@
     },
     {
       "path": "scripts/upload_playground_backup.py",
-      "size": 6713,
-      "sha256": "8e21d11c99e5d8eec33ef00a6405166b486310b4155fafa4a52a97c0212d00ef"
+      "size": 7067,
+      "sha256": "2327e4dae78f9816e247e17f3b7513d4fb04c7b7708db1b7340c9d56161db30a"
     },
     {
       "path": "scripts/verify-hitbox-gallery.cjs",

@@ -16,6 +16,7 @@ Older ZIP bundles are inspected rather than stored again in full. Their member l
 git clone --branch backup/website-and-playground-2026-09-21 https://github.com/ToysToTinkerWith/DarkCoin.git
 cd DarkCoin
 npm ci
+python scripts/verify_website_backup.py
 ```
 
 Use Node.js 24, matching the production server runtime. Copy `.env.example` to `.env` and `functions/.env.example` to `functions/.env`, then fill the required configuration from your secure records. Some features also require Firebase Secret Manager secrets and access to the existing Firebase/Google Cloud project.
@@ -36,7 +37,7 @@ From the restored checkout, run:
 python scripts/restore_playground_backup.py --manifest manifest.json --index backup-index.json --destination .
 ```
 
-The tool downloads one archive at a time, checks its SHA-256, checks each restored file, and writes the original relative paths. It refuses to overwrite a different existing file. Use an empty destination for a full recovery, or point it at the fresh website checkout; matching files are accepted.
+The release uses ZIP and solid-compressed TAR/XZ archives, both supported by the restore tool. The tool downloads one archive at a time, checks its SHA-256, checks each restored file, and writes the original relative paths. It refuses to overwrite a different existing file. Use an empty destination for a full recovery, or point it at the fresh website checkout; matching files are accepted.
 
 To verify downloaded content without retaining restored files:
 
@@ -50,9 +51,9 @@ To restore only the latest head work, for example:
 python scripts/restore_playground_backup.py --manifest manifest.json --index backup-index.json --destination . --include output/champion-heads-v57/
 ```
 
-The current source sets include heads v57, armour v54, magic v58, extras v59, skins v60, and the shared body/weapon/animation sources referenced by `scripts/prepare-playground-assets.py`. Earlier versions are preserved too. Blender 5.2 was installed on the original machine. Open the `.blend` sources to edit models. Review individual asset READMEs and script imports before regenerating: some older scripts contain original Windows paths that must be adjusted. The exported GLB assets are directly usable without rebuilding.
+The current source sets include heads v57, armour v54, magic v58, extras v59, skins v60, and the shared body/weapon/animation sources referenced by `scripts/prepare-playground-assets.py`. Earlier versions are preserved too. Blender 5.2.1 LTS was installed on the original machine; exact tool versions are recorded in `backups/2026-09-21/toolchain.json`. Open the `.blend` sources to edit models. Review individual asset READMEs and script imports before regenerating: some older scripts contain original Windows paths that must be adjusted. The exported GLB assets are directly usable without rebuilding.
 
-Allow ample disk space for recovery: duplicate files expand back into their original version folders. The backup index reports the total restored size. Temporary space is also needed for one archive and its largest extracted object.
+The snapshot contains 15,184 asset/source files, including 2,482 model files, representing approximately 47.71 GiB when restored. Allow at least 60 GiB of free disk space for a full recovery: duplicate files expand back into their original version folders. The backup index reports the total restored size. Temporary space is also needed for one archive and its largest extracted object.
 
 ## Credentials and live data
 
@@ -63,3 +64,7 @@ This is a code and local-asset backup, not an export of Firestore, Firebase Stor
 ## Integrity and scope
 
 `manifest.json` maps file paths to sizes and SHA-256 hashes. `backup-index.json` maps unique objects to downloadable archives and records each archive checksum. The restore tool validates both layers. The website snapshot has its own `backups/2026-09-21/website-manifest.json` for file verification. Keep the release tag intact and make another dated snapshot after future changes; this backup is not an automatic recurring service.
+
+## Backup tooling
+
+`backup_playground_assets.py` inventories local assets, `upload_playground_backup.py` packages and uploads them, and `restore_playground_backup.py` restores them. The uploader additionally needs Python `requests` and an authenticated Git credential helper. Dates, branch names, and release tags in the creation tools are deliberately fixed for this snapshot; choose new values when preparing a future backup. Restoration needs neither GitHub credentials nor extra Python packages once the release is published.

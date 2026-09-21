@@ -688,8 +688,8 @@
     },
     {
       "path": "docs/website-and-playground-recovery.md",
-      "size": 5389,
-      "sha256": "67ec4bf766fe0c0ed00586087f15a903cdbce305688eb65cb94dff71838d16b3"
+      "size": 6358,
+      "sha256": "e98d47835b659e088e507c3c16455cd559b875b5104f57f17354d4139e13ff1e"
     },
     {
       "path": "Firebase/analytics.js",
@@ -5353,8 +5353,8 @@
     },
     {
       "path": "scripts/restore_playground_backup.py",
-      "size": 3598,
-      "sha256": "2d2241305c0e9bed8f0a5fff293fa75b825c63e06d9350d02e8331d2c04b7106"
+      "size": 4352,
+      "sha256": "10c7555c0637006a34bd1aae893d67b64a5bd7db0f6c54725c770f2ea41a8d37"
     },
     {
       "path": "scripts/smoke-arena-worker.cjs",
@@ -5507,6 +5507,11 @@
       "sha256": "53c543ed3d3b6f911e119a40c7ca1c0959f9fbca7bd2c8c534d01d148fce7c32"
     },
     {
+      "path": "scripts/upload_playground_backup.py",
+      "size": 6713,
+      "sha256": "8e21d11c99e5d8eec33ef00a6405166b486310b4155fafa4a52a97c0212d00ef"
+    },
+    {
       "path": "scripts/verify-hitbox-gallery.cjs",
       "size": 3271,
       "sha256": "3c65fcaabc797de4d5a8ec52e25754711a955eb3bd507957c35b8fd15a0c262e"
@@ -5515,6 +5520,11 @@
       "path": "scripts/verify-inline-attack-production.cjs",
       "size": 4835,
       "sha256": "1c705ca41544cb716e4db1c18b2944a2ee58e77613181334a068af3130bfb63c"
+    },
+    {
+      "path": "scripts/verify_website_backup.py",
+      "size": 1002,
+      "sha256": "b3f218217778fbf1ca8acae531128417e3f3cb284c073853bfde5e15a02c360d"
     },
     {
       "path": "scripts/write-arena-trait-reference.cjs",
@@ -5597,5 +5607,5 @@
       "sha256": "6bb011c942772016b18bde93dc9613af52beb590a679ca50de5de83b2989329c"
     }
   ],
-  "notes": "Secrets excluded; legacy scripts sanitized in backup copies. Exact byte preservation via .gitattributes."
+  "notes": "Secrets excluded; legacy scripts sanitized in backup copies; exact bytes preserved."
 }

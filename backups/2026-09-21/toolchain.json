@@ -1,0 +1,16 @@
+{
+  "python": "3.12.1",
+  "node": "v24.12.0",
+  "blender": "5.2.1 LTS",
+  "pythonPackages": {
+    "numpy": "2.5.2",
+    "pillow": "12.2.0",
+    "requests": "2.34.2",
+    "scipy": "1.18.0"
+  },
+  "modelToolPackages": {
+    "three": "0.180.0",
+    "esbuild": "0.25.10",
+    "playwright": "1.63.0"
+  }
+}

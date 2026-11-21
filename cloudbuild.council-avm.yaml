@@ -1,0 +1,20 @@
+steps:
+  - name: python:3.12-slim
+    entrypoint: bash
+    env:
+      - COUNCIL_AVM_FOCUS=${_COUNCIL_AVM_FOCUS}
+    args:
+      - -ceu
+      - |
+        pip install --disable-pip-version-check -q -r tests/requirements-council-avm.txt
+        python contracts/CouncilDAO.py
+        if [ -n "$$COUNCIL_AVM_FOCUS" ]; then
+          PYTHONPATH=tests python -m unittest -v "$$COUNCIL_AVM_FOCUS"
+        else
+          python -m unittest discover -s tests -p council_avm.py -v
+        fi
+substitutions:
+  _COUNCIL_AVM_FOCUS: ''
+timeout: 600s
+options:
+  logging: CLOUD_LOGGING_ONLY

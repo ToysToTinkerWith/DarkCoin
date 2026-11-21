@@ -244,7 +244,7 @@ const houseAccount = algosdk.mnemonicToSecretKey(HOUSE_MNEMONIC)
 
 // Firebase public config (to fetch creds/creds.GOOGLE_REFRESH_TOKEN and chars)
 const firebaseConfig = {
-  apiKey: "AIzaSyDqIv-4wBs-ublbAx0I_0PXTT1WmMqSRLY",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: "dark-coin-dc4a3.firebaseapp.com",
   projectId: "dark-coin-dc4a3",
   storageBucket: "dark-coin-dc4a3.appspot.com",
@@ -256,19 +256,15 @@ const firebase_app =
   getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
 const db = getFirestore(firebase_app)
 const auth = getAuth(firebase_app)
-const FIREBASE_AUTH_EMAIL = process.env.FIREBASE_AUTH_EMAIL || 'abergquist96@gmail.com'
+const FIREBASE_AUTH_EMAIL = process.env.FIREBASE_AUTH_EMAIL?.trim()
 let _firebaseWriteAuthPromise = null
 
 async function ensureFirebaseWriteAuth() {
   if (_firebaseWriteAuthPromise) return _firebaseWriteAuthPromise
 
   const password = process.env.FIREBASE_AUTH_PASSWORD || process.env.EMAILPASS
-  if (!password) {
-    console.warn(
-      'Firebase write auth password not found; attempting active champion reservation writes without signing in.'
-    )
-    _firebaseWriteAuthPromise = Promise.resolve(null)
-    return _firebaseWriteAuthPromise
+  if (!FIREBASE_AUTH_EMAIL || !password) {
+    throw new Error('Firebase write auth requires FIREBASE_AUTH_EMAIL and FIREBASE_AUTH_PASSWORD or EMAILPASS')
   }
 
   _firebaseWriteAuthPromise = signInWithEmailAndPassword(
@@ -2822,11 +2818,12 @@ async function buildEquippedTraitsFromMeta(algodClient, metaDoc) {
   return built.filter(Boolean)
 }
 
-async function loadEquippedItemEffectsForAsset(assetId) {
+async function loadEquippedItemEffectsForAsset(assetId, charObj) {
   const metaRef = doc(db, 'chars', String(assetId) + 'meta')
   const metaSnap = await getDoc(metaRef)
 
-  if (!metaSnap.exists()) {
+  const generatedProperties=charObj?.generationSchemaVersion===2?charObj.generationEquippedProperties:null
+  if (!generatedProperties && !metaSnap.exists()) {
     return {
       equippedMetaDoc: null,
       equippedTraits: [],
@@ -2837,7 +2834,7 @@ async function loadEquippedItemEffectsForAsset(assetId) {
     }
   }
 
-  const equippedMetaDoc = metaSnap.data() || null
+  const equippedMetaDoc = generatedProperties?{properties:generatedProperties}:metaSnap.data() || null
   const equippedTraits = await buildEquippedTraitsFromMeta(client, equippedMetaDoc)
   const gainedEffects = buildGainedEffectsFromEquippedTraits(equippedTraits)
   const itemEffectLines = formatEquippedItemEffectLines(equippedTraits, null)
@@ -9714,7 +9711,7 @@ async function prepareArenaCharacter(arenaRecord, indexLabel) {
   const charObj = JSON.parse(JSON.stringify(arenaRecord.char.charObj))
   ensureRuntimeEffectFields(charObj)
 
-  const equippedItemRuntime = await loadEquippedItemEffectsForAsset(arenaRecord.assetId)
+  const equippedItemRuntime = await loadEquippedItemEffectsForAsset(arenaRecord.assetId, charObj)
   mergeGainedEffectsIntoRuntimeCharacter(charObj, equippedItemRuntime.gainedEffects)
   equippedItemRuntime.itemEffectLines = formatEquippedItemEffectLines(
     equippedItemRuntime.equippedTraits,

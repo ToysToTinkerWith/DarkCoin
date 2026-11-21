@@ -26,3 +26,5 @@
   
 
   
+::highlight(darkcoin-effects){color:#e9ca87;background-color:rgba(203,163,82,.15);text-decoration:underline dotted #d0aa66}
+.effectKeyword{color:#e9ca87;text-decoration:underline dotted #d0aa66;text-underline-offset:3px;cursor:help;border-radius:2px}.effectKeyword:focus-visible{outline:2px solid #f0d5a0;outline-offset:3px}.effectTooltip{position:fixed;z-index:2147483000;box-sizing:border-box;background:#141819;border:1px solid #b99756;border-radius:8px;color:#efeee8;padding:13px 16px;box-shadow:0 10px 36px #0009;pointer-events:none;font:14px/1.5 system-ui;text-align:left}.effectTooltip strong{color:#efd69c;text-transform:capitalize}.effectTooltip p{margin:5px 0 0;color:#e3e1dc}

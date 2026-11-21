@@ -14,10 +14,6 @@ async function getBattleNfts(req, res) {
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
     });
 
-    const token = {
-    'X-API-Key': process.env.indexerKey
-    }
-    
     const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
     let nftId

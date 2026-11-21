@@ -1,0 +1,1 @@
+const path=require('path');require('esbuild').buildSync({entryPoints:[path.resolve('components/arena/playground/beast-preview.js')],bundle:true,platform:'browser',minify:true,outfile:path.resolve('public/arena/playground/beast-preview.js'),legalComments:'none'});console.log('Built beast preview.');

@@ -60,10 +60,6 @@ export default function BuyNft(props) {
 
         try {
           
-        const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-
         const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
        
       

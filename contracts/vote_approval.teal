@@ -1,329 +1,1717 @@
-#pragma version 8
+#pragma version 10
 txn ApplicationID
 int 0
 ==
-bnz main_l43
+bnz main_l205
 txn OnCompletion
 int OptIn
 ==
-bnz main_l42
+bnz main_l204
 txn OnCompletion
 int CloseOut
 ==
-bnz main_l41
+bnz main_l203
 txn OnCompletion
 int UpdateApplication
 ==
-bnz main_l40
+bnz main_l202
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l39
+bnz main_l201
 txna ApplicationArgs 0
 byte "optin"
 ==
-bnz main_l38
+bnz main_l200
 txna ApplicationArgs 0
-byte "loadReward"
+byte "listAsset"
 ==
-bnz main_l28
+bnz main_l199
 txna ApplicationArgs 0
-byte "rewardWallet"
+byte "buyAsset"
 ==
-bnz main_l16
+bnz main_l193
 txna ApplicationArgs 0
-byte "grantDarkCoin"
+byte "removeListing"
 ==
-bnz main_l12
+bnz main_l192
 txna ApplicationArgs 0
-byte "claimReward"
+byte "createShuffle"
 ==
-bnz main_l11
+bnz main_l177
+txna ApplicationArgs 0
+byte "addShuffleAssets"
+==
+bnz main_l117
+txna ApplicationArgs 0
+byte "rollShuffle"
+==
+bnz main_l86
+txna ApplicationArgs 0
+byte "claimShuffleAsset"
+==
+bnz main_l59
+txna ApplicationArgs 0
+byte "removeShuffleAssets"
+==
+bnz main_l40
+txna ApplicationArgs 0
+byte "upgradeShuffleRolls"
+==
+bnz main_l22
+txna ApplicationArgs 0
+byte "activateShuffle"
+==
+bnz main_l21
+txna ApplicationArgs 0
+byte "deactivateShuffle"
+==
+bnz main_l20
+txna ApplicationArgs 0
+byte "resourceReferences"
+==
+bnz main_l19
 err
-main_l11:
-txn NumAppArgs
+main_l19:
 int 1
->=
+return
+main_l20:
+txna ApplicationArgs 1
+len
+int 8
+==
 assert
-txn NumAssets
-int 1
+byte "S"
+txna ApplicationArgs 1
+concat
+box_get
+store 111
+store 110
+load 111
+assert
+load 110
+len
+int 88
 >=
 assert
 txn Sender
-box_get
-store 21
-store 20
-load 21
-assert
-load 20
-len
-int 16
+load 110
+extract 0 32
 ==
 assert
-load 20
+byte "S"
+txna ApplicationArgs 1
+concat
+int 80
 int 0
-callsub entryamount_1
-store 22
-load 20
-int 0
-callsub entryassetid_2
-store 23
-load 22
+itob
+box_replace
+int 1
+return
+main_l21:
+txna ApplicationArgs 1
+len
+int 8
+==
+assert
+byte "S"
+txna ApplicationArgs 1
+concat
+box_get
+store 107
+store 106
+byte "T"
+txna ApplicationArgs 1
+concat
+box_get
+store 109
+store 108
+load 107
+assert
+load 109
+assert
+load 106
+len
+int 88
+>=
+assert
+txn Sender
+load 106
+extract 0 32
+==
+assert
+byte "S"
+txna ApplicationArgs 1
+concat
+int 80
+int 1
+itob
+box_replace
+int 1
+return
+main_l22:
+txna ApplicationArgs 1
+len
+int 8
+==
+assert
+txn GroupIndex
 int 0
 >
 assert
-load 23
-txna Assets 0
+byte "S"
+txna ApplicationArgs 1
+concat
+box_get
+store 97
+store 96
+byte "I"
+txna ApplicationArgs 1
+concat
+box_get
+store 99
+store 98
+byte "T"
+txna ApplicationArgs 1
+concat
+box_get
+store 101
+store 100
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 103
+store 102
+load 97
+assert
+load 99
+assert
+load 101
+!
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 103
+store 102
+load 103
+assert
+txn Sender
+load 96
+extract 0 32
 ==
+assert
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int pay
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+int 850000
+>=
+assert
+load 96
+extract 56 8
+btoi
+store 6
+load 96
+extract 64 8
+btoi
+store 7
+load 102
+int 24
+%
+int 0
+==
+load 102
+int 16
+%
+int 0
+==
+||
+assert
+load 102
+int 24
+%
+int 0
+==
+bnz main_l39
+int 16
+store 29
+main_l24:
+load 102
+load 29
+/
+store 11
+load 7
+load 11
+<=
+assert
+load 29
+int 24
+==
+assert
+byte "T"
+txna ApplicationArgs 1
+concat
+int 2048
+box_create
+assert
+int 0
+store 14
+main_l25:
+load 14
+load 7
+<
+bnz main_l27
+byte "T"
+txna ApplicationArgs 1
+concat
+int 8
+int 8
+box_extract
+btoi
+store 33
+load 33
+load 6
+==
+assert
+int 1
+return
+main_l27:
+load 14
+load 29
+*
+store 2
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
+box_extract
+btoi
+store 21
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
++
+int 8
+box_extract
+btoi
+store 22
+load 29
+int 24
+==
+bnz main_l38
+load 21
+asset_params_get AssetDecimals
+store 105
+store 104
+load 105
+assert
+int 1
+store 12
+int 0
+store 13
+main_l29:
+load 13
+load 104
+<
+bnz main_l37
+load 12
+store 19
+main_l31:
+load 21
+int 0
+>
+load 22
+int 0
+>
+&&
+load 19
+int 0
+>
+&&
+bnz main_l33
+main_l32:
+load 14
+int 1
++
+store 14
+b main_l25
+main_l33:
+load 22
+load 19
+/
+store 10
+load 10
+int 0
+>
+bz main_l32
+load 14
+int 100
+<
+assert
+load 14
+int 128
++
+store 32
+main_l35:
+load 32
+int 0
+>
+bz main_l32
+load 32
+int 8
+*
+store 34
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+int 8
+box_extract
+btoi
+store 33
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+load 33
+load 10
++
+itob
+box_replace
+load 32
+int 2
+/
+store 32
+b main_l35
+main_l37:
+load 12
+int 10
+*
+store 12
+load 13
+int 1
++
+store 13
+b main_l29
+main_l38:
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 16
++
+int 8
+box_extract
+btoi
+store 19
+b main_l31
+main_l39:
+int 24
+store 29
+b main_l24
+main_l40:
+txna ApplicationArgs 1
+len
+int 8
+==
+assert
+txn NumAppArgs
+int 3
+==
+assert
+txna ApplicationArgs 2
+len
+int 0
+>
+assert
+txna ApplicationArgs 2
+len
+int 24
+%
+int 0
+==
+assert
+txna ApplicationArgs 2
+len
+int 24
+/
+store 28
+load 28
+int 8
+<=
+assert
+byte "S"
+txna ApplicationArgs 1
+concat
+box_get
+store 87
+store 86
+byte "I"
+txna ApplicationArgs 1
+concat
+box_get
+store 89
+store 88
+byte "T"
+txna ApplicationArgs 1
+concat
+box_get
+store 91
+store 90
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 93
+store 92
+load 87
+assert
+load 89
+assert
+load 91
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 93
+store 92
+load 93
+assert
+txn Sender
+load 86
+extract 0 32
+==
+assert
+load 86
+extract 48 8
+btoi
+store 1
+load 86
+extract 56 8
+btoi
+store 6
+load 86
+extract 64 8
+btoi
+store 7
+load 92
+int 24
+%
+int 0
+==
+load 92
+int 16
+%
+int 0
+==
+||
+assert
+load 92
+int 24
+%
+int 0
+==
+bnz main_l58
+int 16
+store 29
+main_l42:
+load 92
+load 29
+/
+store 11
+load 7
+load 11
+<=
+assert
+int 0
+store 0
+main_l43:
+load 0
+load 28
+<
+bnz main_l48
+load 6
+int 0
+==
+bnz main_l47
+byte "S"
+txna ApplicationArgs 1
+concat
+int 48
+load 1
+itob
+box_replace
+byte "S"
+txna ApplicationArgs 1
+concat
+int 56
+load 6
+itob
+box_replace
+main_l46:
+int 1
+return
+main_l47:
+byte "S"
+txna ApplicationArgs 1
+concat
+box_del
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+box_del
+assert
+byte "T"
+txna ApplicationArgs 1
+concat
+box_del
+assert
+b main_l46
+main_l48:
+load 0
+int 24
+*
+store 2
+txna ApplicationArgs 2
+load 2
+int 8
+extract3
+btoi
+store 14
+txna ApplicationArgs 2
+load 2
+int 8
++
+int 8
+extract3
+btoi
+store 17
+txna ApplicationArgs 2
+load 2
+int 16
++
+int 8
+extract3
+btoi
+store 18
+load 14
+load 7
+<
+assert
+load 17
+int 0
+>
+assert
+load 18
+int 0
+>
+assert
+load 14
+load 29
+*
+store 2
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
+box_extract
+btoi
+store 21
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
++
+int 8
+box_extract
+btoi
+store 22
+load 29
+int 24
+==
+bnz main_l57
+load 17
+asset_params_get AssetDecimals
+store 95
+store 94
+load 95
+assert
+int 1
+store 12
+int 0
+store 13
+main_l50:
+load 13
+load 94
+<
+bnz main_l56
+load 12
+store 19
+main_l52:
+load 21
+load 17
+==
+assert
+load 22
+load 18
+>=
+assert
+load 19
+int 0
+>
+assert
+load 18
+load 19
+%
+int 0
+==
+assert
+load 18
+load 19
+/
+store 10
+load 10
+int 0
+>
+assert
+load 1
+load 10
+>=
+assert
+load 6
+load 10
+>=
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
++
+load 22
+load 18
+-
+itob
+box_replace
+load 14
+int 100
+<
+assert
+load 14
+int 128
++
+store 32
+main_l53:
+load 32
+int 0
+>
+bnz main_l55
+load 1
+load 10
+-
+store 1
+load 6
+load 10
+-
+store 6
+itxn_begin
+int axfer
+itxn_field TypeEnum
+load 17
+itxn_field XferAsset
+txn Sender
+itxn_field AssetReceiver
+load 18
+itxn_field AssetAmount
+int 0
+itxn_field Fee
+itxn_submit
+load 0
+int 1
++
+store 0
+b main_l43
+main_l55:
+load 32
+int 8
+*
+store 34
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+int 8
+box_extract
+btoi
+store 33
+load 33
+load 10
+>=
+assert
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+load 33
+load 10
+-
+itob
+box_replace
+load 32
+int 2
+/
+store 32
+b main_l53
+main_l56:
+load 12
+int 10
+*
+store 12
+load 13
+int 1
++
+store 13
+b main_l50
+main_l57:
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 16
++
+int 8
+box_extract
+btoi
+store 19
+b main_l52
+main_l58:
+int 24
+store 29
+b main_l42
+main_l59:
+txn NumAssets
+int 0
+>
+assert
+byte "C"
+txn Sender
+concat
+box_get
+store 79
+store 78
+byte "C"
+txn Sender
+concat
+box_len
+store 81
+store 80
+byte "P"
+txn Sender
+concat
+box_get
+store 83
+store 82
+byte "P"
+txn Sender
+concat
+box_len
+store 85
+store 84
+byte "C"
+txn Sender
+concat
+box_get
+store 79
+store 78
+byte "C"
+txn Sender
+concat
+box_len
+store 81
+store 80
+int 0
+store 23
+byte "P"
+txn Sender
+concat
+box_get
+store 83
+store 82
+byte "P"
+txn Sender
+concat
+box_len
+store 85
+store 84
+load 79
+load 83
+||
+assert
+load 83
+bnz main_l71
+main_l60:
+load 79
+bnz main_l62
+main_l61:
+load 23
+int 0
+>
 assert
 itxn_begin
 int axfer
 itxn_field TypeEnum
-load 23
+txna Assets 0
 itxn_field XferAsset
 txn Sender
 itxn_field AssetReceiver
-load 22
+load 23
 itxn_field AssetAmount
+int 0
+itxn_field Fee
 itxn_submit
-txn Sender
-box_del
-assert
 int 1
 return
-main_l12:
-txn Sender
-global CreatorAddress
-==
+main_l62:
+load 81
 assert
-txn NumAppArgs
-int 2
->=
-assert
-txn NumAccounts
-int 1
->=
-assert
-txn NumAssets
-int 1
->=
-assert
-txna ApplicationArgs 1
-btoi
-store 17
-load 17
-int 0
->
-assert
-txna Accounts 1
-box_get
-store 19
-store 18
-load 19
-bnz main_l15
-txna Accounts 1
-load 17
-txna Assets 0
-callsub rewardentry_0
-box_put
-main_l14:
-int 1
-return
-main_l15:
-load 18
-len
-int 16
-==
-assert
-load 18
-int 0
-callsub entryassetid_2
-txna Assets 0
-==
-assert
-txna Accounts 1
-load 18
-int 0
-callsub entryamount_1
-load 17
-+
-txna Assets 0
-callsub rewardentry_0
-box_put
-b main_l14
-main_l16:
-txn Sender
-global CreatorAddress
-==
-assert
-txn NumAccounts
-int 1
->=
-assert
-byte "rewards"
-box_get
-store 6
-store 5
-load 6
-assert
-load 5
-len
-int 16
->=
-assert
-load 5
-len
+load 80
 int 16
 %
 int 0
 ==
 assert
+load 80
+int 16
+/
+store 11
 int 0
-store 9
+store 24
 int 0
-store 10
-main_l17:
-load 9
-load 5
-len
+store 0
+main_l63:
+load 0
+load 11
 <
-bnz main_l27
-load 10
+bnz main_l66
+load 24
+int 0
+==
+bz main_l61
+byte "C"
+txn Sender
+concat
+box_del
+assert
+b main_l61
+main_l66:
+load 0
+int 16
+*
+store 2
+byte "C"
+txn Sender
+concat
+load 2
+int 8
+box_extract
+btoi
+store 21
+byte "C"
+txn Sender
+concat
+load 2
+int 8
++
+int 8
+box_extract
+btoi
+store 22
+load 21
+txna Assets 0
+==
+load 22
+int 0
+>
+&&
+bnz main_l70
+load 21
+int 0
+>
+load 22
+int 0
+>
+&&
+bnz main_l69
+main_l68:
+load 0
+int 1
++
+store 0
+b main_l63
+main_l69:
+int 1
+store 24
+b main_l68
+main_l70:
+load 23
+load 22
++
+store 23
+byte "C"
+txn Sender
+concat
+load 2
+int 0
+itob
+int 0
+itob
+concat
+box_replace
+b main_l68
+main_l71:
+load 85
+assert
+load 84
+int 1608
+==
+assert
+byte "P"
+txn Sender
+concat
+int 0
+int 8
+box_extract
+btoi
+store 36
+load 36
+int 100
+<=
+assert
+int 0
+store 37
+int 0
+store 0
+main_l72:
+load 0
+load 36
+<
+bnz main_l79
+load 37
+store 0
+main_l74:
+load 0
+load 36
+<
+bnz main_l78
+load 37
+int 0
+==
+bnz main_l77
+byte "P"
+txn Sender
+concat
+int 0
+load 37
+itob
+box_replace
+b main_l60
+main_l77:
+byte "P"
+txn Sender
+concat
+box_del
+assert
+b main_l60
+main_l78:
+int 8
+load 0
+int 16
+*
++
+store 2
+byte "P"
+txn Sender
+concat
+load 2
+int 0
+itob
+int 0
+itob
+concat
+box_replace
+load 0
+int 1
++
+store 0
+b main_l74
+main_l79:
+int 8
+load 0
+int 16
+*
++
+store 2
+byte "P"
+txn Sender
+concat
+load 2
+int 8
+box_extract
+btoi
+store 21
+byte "P"
+txn Sender
+concat
+load 2
+int 8
++
+int 8
+box_extract
+btoi
+store 22
+load 21
+txna Assets 0
+==
+load 22
+int 0
+>
+&&
+bnz main_l85
+load 21
+int 0
+>
+load 22
+int 0
+>
+&&
+bnz main_l82
+main_l81:
+load 0
+int 1
++
+store 0
+b main_l72
+main_l82:
+int 8
+load 37
+int 16
+*
++
+store 20
+load 37
+load 0
+==
+!
+bnz main_l84
+main_l83:
+load 37
+int 1
++
+store 37
+b main_l81
+main_l84:
+byte "P"
+txn Sender
+concat
+load 20
+load 21
+itob
+load 22
+itob
+concat
+box_replace
+b main_l83
+main_l85:
+load 23
+load 22
++
+store 23
+b main_l81
+main_l86:
+txna ApplicationArgs 1
+len
+int 8
+==
+assert
+byte "S"
+txna ApplicationArgs 1
+concat
+box_get
+store 65
+store 64
+byte "I"
+txna ApplicationArgs 1
+concat
+box_get
+store 67
+store 66
+byte "T"
+txna ApplicationArgs 1
+concat
+box_get
+store 69
+store 68
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 71
+store 70
+load 65
+assert
+load 67
+assert
+load 69
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 71
+store 70
+load 71
+assert
+load 64
+extract 32 8
+btoi
+store 4
+load 64
+extract 40 8
+btoi
+store 5
+load 64
+extract 56 8
+btoi
+store 6
+load 64
+extract 64 8
+btoi
+store 7
+load 70
+int 24
+%
+int 0
+==
+load 70
+int 16
+%
+int 0
+==
+||
+assert
+load 70
+int 24
+%
+int 0
+==
+bnz main_l116
+int 16
+store 29
+main_l88:
+load 70
+load 29
+/
+store 11
+load 7
+load 11
+<=
+assert
+load 29
+int 24
+==
+assert
+load 64
+len
+int 88
+>=
+assert
+load 64
+extract 80 8
+btoi
+int 1
+==
+assert
+load 6
 int 0
 >
 assert
+byte "P"
 txn Sender
-txna Accounts 1
 concat
+box_get
+store 73
+store 72
+byte "P"
+txn Sender
+concat
+box_get
+store 73
+store 72
+load 4
+int 0
+==
+bnz main_l112
+load 73
+bnz main_l109
+txn GroupIndex
+int 1
+>
+assert
+load 4
+int 0
+==
+bnz main_l108
+txn GroupIndex
+int 2
+-
+gtxns TypeEnum
+int axfer
+==
+assert
+txn GroupIndex
+int 2
+-
+gtxns XferAsset
+load 4
+==
+assert
+txn GroupIndex
+int 2
+-
+gtxns AssetReceiver
+load 64
+extract 0 32
+==
+assert
+txn GroupIndex
+int 2
+-
+gtxns AssetAmount
+load 5
+==
+assert
+main_l92:
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int pay
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+int 660000
+>=
+assert
+main_l93:
 global Round
 itob
-concat
 global LatestTimestamp
 itob
 concat
-load 5
+txn Sender
+concat
+txna ApplicationArgs 1
+concat
+txn Fee
+itob
 concat
 sha512_256
-store 16
-load 16
 extract 0 8
 btoi
-load 10
+load 6
 %
-store 11
-load 11
-int 16
-*
-store 12
-load 5
-load 12
-callsub entryamount_1
-store 13
-load 5
-load 12
-callsub entryassetid_2
-store 14
-load 13
-int 1
+store 8
+byte "T"
+txna ApplicationArgs 1
+concat
+int 8
+int 8
+box_extract
+btoi
+store 33
+load 33
+load 6
 ==
-bnz main_l24
-byte "rewards"
-load 12
-load 13
+assert
+load 8
+store 9
+int 1
+store 32
+int 0
+store 0
+main_l94:
+load 0
+int 7
+<
+bnz main_l104
+load 32
+int 128
+-
+store 14
+load 14
+load 7
+<
+assert
+load 14
+int 24
+*
+store 20
+byte "I"
+txna ApplicationArgs 1
+concat
+load 20
+int 8
+box_extract
+btoi
+store 17
+byte "I"
+txna ApplicationArgs 1
+concat
+load 20
+int 8
++
+int 8
+box_extract
+btoi
+store 18
+byte "I"
+txna ApplicationArgs 1
+concat
+load 20
+int 16
++
+int 8
+box_extract
+btoi
+store 19
+load 17
+int 0
+>
+assert
+load 18
+load 19
+>=
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+load 20
+int 8
++
+load 18
+load 19
+-
+itob
+box_replace
+load 14
+int 100
+<
+assert
+load 14
+int 128
++
+store 32
+main_l96:
+load 32
+int 0
+>
+bnz main_l103
+byte "S"
+txna ApplicationArgs 1
+concat
+int 56
+load 6
 int 1
 -
 itob
 box_replace
-main_l20:
-txna Accounts 1
+byte "P"
+txn Sender
+concat
 box_get
-store 8
-store 7
-load 8
-bnz main_l23
-txna Accounts 1
+store 75
+store 74
+byte "P"
+txn Sender
+concat
+box_len
+store 77
+store 76
+load 75
+!
+bnz main_l102
+load 77
+assert
+load 76
+int 1608
+==
+assert
+byte "P"
+txn Sender
+concat
+int 0
+int 8
+box_extract
+btoi
+store 36
+main_l99:
+load 36
+int 100
+<
+assert
+int 8
+load 36
+int 16
+*
++
+store 2
+byte "P"
+txn Sender
+concat
+load 2
+load 17
+itob
+load 19
+itob
+concat
+box_replace
+byte "P"
+txn Sender
+concat
+int 0
+load 36
 int 1
-load 14
-callsub rewardentry_0
-box_put
-main_l22:
++
+itob
+box_replace
+load 6
+int 1
+==
+bnz main_l101
+main_l100:
 int 1
 return
-main_l23:
-load 7
-len
-int 16
-==
-assert
-load 7
-int 0
-callsub entryassetid_2
-load 14
-==
-assert
-txna Accounts 1
-load 7
-int 0
-callsub entryamount_1
-int 1
-+
-load 14
-callsub rewardentry_0
-box_put
-b main_l22
-main_l24:
-load 5
-int 0
-load 12
-substring3
-load 5
-load 12
-int 16
-+
-load 5
-len
-substring3
+main_l101:
+byte "S"
+txna ApplicationArgs 1
 concat
-store 15
-load 15
-len
-int 0
-==
-bnz main_l26
-byte "rewards"
-load 15
-box_put
-b main_l20
-main_l26:
-byte "rewards"
 box_del
 assert
-b main_l20
-main_l27:
-load 5
-load 9
-callsub entryamount_1
-int 0
->
+byte "I"
+txna ApplicationArgs 1
+concat
+box_del
 assert
-load 10
-int 1
-+
-store 10
-load 9
-int 16
-+
-store 9
-b main_l17
-main_l28:
+byte "T"
+txna ApplicationArgs 1
+concat
+box_del
+assert
+b main_l100
+main_l102:
+byte "P"
 txn Sender
-global CreatorAddress
-==
+concat
+int 1608
+box_create
 assert
-txn NumAssets
+int 0
+store 36
+b main_l99
+main_l103:
+load 32
+int 8
+*
+store 34
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+int 8
+box_extract
+btoi
+store 33
+load 33
 int 1
 >=
 assert
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+load 33
+int 1
+-
+itob
+box_replace
+load 32
+int 2
+/
+store 32
+b main_l96
+main_l104:
+load 32
+int 2
+*
+int 8
+*
+store 34
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+int 8
+box_extract
+btoi
+store 35
+load 9
+load 35
+<
+bnz main_l107
+load 9
+load 35
+-
+store 9
+load 32
+int 2
+*
+int 1
++
+store 32
+main_l106:
+load 0
+int 1
++
+store 0
+b main_l94
+main_l107:
+load 32
+int 2
+*
+store 32
+b main_l106
+main_l108:
+txn GroupIndex
+int 2
+-
+gtxns TypeEnum
+int pay
+==
+assert
+txn GroupIndex
+int 2
+-
+gtxns Receiver
+load 64
+extract 0 32
+==
+assert
+txn GroupIndex
+int 2
+-
+gtxns Amount
+load 5
+==
+assert
+b main_l92
+main_l109:
+txn GroupIndex
+int 0
+>
+assert
+load 4
+int 0
+==
+bnz main_l111
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int axfer
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns XferAsset
+load 4
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns AssetReceiver
+load 64
+extract 0 32
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns AssetAmount
+load 5
+==
+assert
+b main_l93
+main_l111:
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int pay
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+load 64
+extract 0 32
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+load 5
+==
+assert
+b main_l93
+main_l112:
 txn GroupIndex
 int 0
 >
@@ -332,7 +1720,1362 @@ txn GroupIndex
 int 1
 -
 gtxns TypeEnum
+int pay
+==
+assert
+load 73
+bnz main_l115
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+load 5
+int 660000
++
+>=
+assert
+txn NumAccounts
+int 0
+>
+assert
+txna Accounts 1
+load 64
+extract 0 32
+==
+assert
+load 5
+int 0
+>
+bz main_l93
+itxn_begin
+int pay
+itxn_field TypeEnum
+load 64
+extract 0 32
+itxn_field Receiver
+load 5
+itxn_field Amount
+int 0
+itxn_field Fee
+itxn_submit
+b main_l93
+main_l115:
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+load 64
+extract 0 32
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+load 5
+==
+assert
+b main_l93
+main_l116:
+int 24
+store 29
+b main_l88
+main_l117:
+txna ApplicationArgs 1
+len
+int 8
+==
+assert
+global GroupSize
+txn GroupIndex
+int 1
++
+>
+assert
+global GroupSize
+txn GroupIndex
+int 1
++
+-
+store 26
+load 26
+int 0
+>
+assert
+load 26
+int 8
+<=
+assert
+byte "S"
+txna ApplicationArgs 1
+concat
+box_get
+store 49
+store 48
+byte "I"
+txna ApplicationArgs 1
+concat
+box_get
+store 51
+store 50
+byte "T"
+txna ApplicationArgs 1
+concat
+box_get
+store 53
+store 52
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 55
+store 54
+load 49
+assert
+load 51
+assert
+byte "T"
+txna ApplicationArgs 1
+concat
+box_get
+store 53
+store 52
+byte "I"
+txna ApplicationArgs 1
+concat
+box_len
+store 55
+store 54
+load 55
+assert
+txn Sender
+load 48
+extract 0 32
+==
+assert
+load 48
+extract 48 8
+btoi
+store 1
+load 48
+extract 56 8
+btoi
+store 6
+load 48
+extract 64 8
+btoi
+store 7
+load 54
+int 24
+%
+int 0
+==
+load 54
+int 16
+%
+int 0
+==
+||
+assert
+load 54
+int 24
+%
+int 0
+==
+bnz main_l176
+int 16
+store 29
+main_l119:
+load 54
+load 29
+/
+store 11
+load 7
+load 11
+<=
+assert
+int 0
+store 30
+int 0
+store 31
+load 29
+int 16
+==
+bnz main_l175
+main_l120:
+load 53
+!
+bnz main_l174
+main_l121:
+load 30
+int 0
+>
+load 31
+int 0
+>
+||
+bnz main_l173
+main_l122:
+load 29
+int 16
+==
+bnz main_l166
+main_l123:
+load 53
+!
+bnz main_l152
+main_l124:
+int 0
+store 25
+int 0
+store 0
+main_l125:
+load 0
+load 26
+<
+bnz main_l127
+byte "S"
+txna ApplicationArgs 1
+concat
+int 48
+load 1
+itob
+box_replace
+byte "S"
+txna ApplicationArgs 1
+concat
+int 56
+load 6
+itob
+box_replace
+byte "S"
+txna ApplicationArgs 1
+concat
+int 64
+load 7
+itob
+box_replace
+int 1
+return
+main_l127:
+txn GroupIndex
+load 0
+int 1
++
++
+store 3
+load 3
+gtxns TypeEnum
 int axfer
+==
+assert
+load 3
+gtxns AssetReceiver
+global CurrentApplicationAddress
+==
+assert
+load 3
+gtxns AssetAmount
+int 0
+>
+assert
+int 0
+store 14
+main_l128:
+load 14
+load 0
+<
+bnz main_l151
+load 3
+gtxns XferAsset
+asset_params_get AssetDecimals
+store 61
+store 60
+load 61
+assert
+int 1
+store 12
+int 0
+store 13
+main_l130:
+load 13
+load 60
+<
+bnz main_l150
+load 3
+gtxns AssetAmount
+load 12
+%
+int 0
+==
+assert
+load 3
+gtxns AssetAmount
+load 12
+/
+store 10
+load 10
+int 0
+>
+assert
+int 0
+store 15
+int 0
+store 16
+int 0
+store 14
+main_l132:
+load 14
+load 7
+<
+bnz main_l144
+load 15
+int 0
+==
+bnz main_l138
+main_l134:
+load 16
+int 100
+<
+assert
+load 16
+int 128
++
+store 32
+main_l135:
+load 32
+int 0
+>
+bnz main_l137
+load 1
+load 10
++
+store 1
+load 6
+load 10
++
+store 6
+load 0
+int 1
++
+store 0
+b main_l125
+main_l137:
+load 32
+int 8
+*
+store 34
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+int 8
+box_extract
+btoi
+store 33
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+load 33
+load 10
++
+itob
+box_replace
+load 32
+int 2
+/
+store 32
+b main_l135
+main_l138:
+load 7
+load 11
+<
+assert
+load 25
+int 1
++
+store 25
+txn GroupIndex
+int 0
+>
+assert
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int pay
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+load 30
+load 31
++
+int 1000000
+load 25
+*
++
+>=
+assert
+global CurrentApplicationAddress
+load 3
+gtxns XferAsset
+asset_holding_get AssetBalance
+store 63
+store 62
+load 63
+!
+bnz main_l143
+main_l139:
+load 7
+load 29
+*
+store 2
+load 29
+int 24
+==
+bnz main_l142
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+load 3
+gtxns XferAsset
+itob
+load 3
+gtxns AssetAmount
+itob
+concat
+box_replace
+main_l141:
+load 7
+store 16
+load 7
+int 1
++
+store 7
+b main_l134
+main_l142:
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+load 3
+gtxns XferAsset
+itob
+load 3
+gtxns AssetAmount
+itob
+concat
+load 12
+itob
+concat
+box_replace
+b main_l141
+main_l143:
+itxn_begin
+int axfer
+itxn_field TypeEnum
+load 3
+gtxns XferAsset
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+int 0
+itxn_field Fee
+itxn_submit
+b main_l139
+main_l144:
+load 14
+load 29
+*
+store 2
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
+box_extract
+btoi
+store 21
+load 15
+int 0
+==
+load 21
+load 3
+gtxns XferAsset
+==
+&&
+bnz main_l146
+main_l145:
+load 14
+int 1
++
+store 14
+b main_l132
+main_l146:
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
++
+int 8
+box_extract
+btoi
+store 22
+load 29
+int 24
+==
+bnz main_l149
+load 12
+store 19
+main_l148:
+load 19
+load 12
+==
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
++
+load 22
+load 3
+gtxns AssetAmount
++
+itob
+box_replace
+load 14
+store 16
+int 1
+store 15
+b main_l145
+main_l149:
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 16
++
+int 8
+box_extract
+btoi
+store 19
+b main_l148
+main_l150:
+load 12
+int 10
+*
+store 12
+load 13
+int 1
++
+store 13
+b main_l130
+main_l151:
+txn GroupIndex
+load 14
+int 1
++
++
+store 27
+load 27
+gtxns XferAsset
+load 3
+gtxns XferAsset
+!=
+assert
+load 14
+int 1
++
+store 14
+b main_l128
+main_l152:
+byte "T"
+txna ApplicationArgs 1
+concat
+int 2048
+box_create
+assert
+int 0
+store 14
+main_l153:
+load 14
+load 7
+<
+bz main_l124
+load 14
+load 29
+*
+store 2
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
+box_extract
+btoi
+store 21
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
++
+int 8
+box_extract
+btoi
+store 22
+load 29
+int 24
+==
+bnz main_l165
+load 21
+asset_params_get AssetDecimals
+store 59
+store 58
+load 59
+assert
+int 1
+store 12
+int 0
+store 13
+main_l156:
+load 13
+load 58
+<
+bnz main_l164
+load 12
+store 19
+main_l158:
+load 21
+int 0
+>
+load 22
+int 0
+>
+&&
+load 19
+int 0
+>
+&&
+bnz main_l160
+main_l159:
+load 14
+int 1
++
+store 14
+b main_l153
+main_l160:
+load 22
+load 19
+/
+store 10
+load 10
+int 0
+>
+bz main_l159
+load 14
+int 100
+<
+assert
+load 14
+int 128
++
+store 32
+main_l162:
+load 32
+int 0
+>
+bz main_l159
+load 32
+int 8
+*
+store 34
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+int 8
+box_extract
+btoi
+store 33
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+load 33
+load 10
++
+itob
+box_replace
+load 32
+int 2
+/
+store 32
+b main_l162
+main_l164:
+load 12
+int 10
+*
+store 12
+load 13
+int 1
++
+store 13
+b main_l156
+main_l165:
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 16
++
+int 8
+box_extract
+btoi
+store 19
+b main_l158
+main_l166:
+byte "I"
+txna ApplicationArgs 1
+concat
+int 2400
+box_resize
+load 7
+store 14
+main_l167:
+load 14
+int 0
+>
+bnz main_l169
+int 24
+store 29
+int 100
+store 11
+b main_l123
+main_l169:
+load 14
+int 1
+-
+int 16
+*
+store 2
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
+box_extract
+btoi
+store 21
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+int 8
++
+int 8
+box_extract
+btoi
+store 22
+load 21
+int 0
+>
+assert
+load 21
+asset_params_get AssetDecimals
+store 57
+store 56
+load 57
+assert
+int 1
+store 12
+int 0
+store 13
+main_l170:
+load 13
+load 56
+<
+bnz main_l172
+load 14
+int 1
+-
+int 24
+*
+store 2
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+load 21
+itob
+load 22
+itob
+concat
+load 12
+itob
+concat
+box_replace
+load 14
+int 1
+-
+store 14
+b main_l167
+main_l172:
+load 12
+int 10
+*
+store 12
+load 13
+int 1
++
+store 13
+b main_l170
+main_l173:
+txn GroupIndex
+int 0
+>
+assert
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int pay
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+load 30
+load 31
++
+>=
+assert
+b main_l122
+main_l174:
+int 850000
+store 31
+b main_l121
+main_l175:
+int 1000000
+store 30
+b main_l120
+main_l176:
+int 24
+store 29
+b main_l119
+main_l177:
+txna ApplicationArgs 1
+len
+int 8
+==
+assert
+txna ApplicationArgs 2
+len
+int 8
+==
+assert
+txna ApplicationArgs 3
+len
+int 8
+==
+assert
+txn GroupIndex
+int 0
+>
+assert
+global GroupSize
+txn GroupIndex
+int 1
++
+>
+assert
+global GroupSize
+txn GroupIndex
+int 1
++
+-
+store 26
+load 26
+int 0
+>
+assert
+load 26
+int 8
+<=
+assert
+txn GroupIndex
+int 1
+-
+gtxns TypeEnum
+int pay
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+int 1000000
+int 1000000
+load 26
+*
++
+>=
+assert
+byte "S"
+txna ApplicationArgs 1
+concat
+int 88
+box_create
+assert
+byte "I"
+txna ApplicationArgs 1
+concat
+int 2400
+box_create
+assert
+byte "T"
+txna ApplicationArgs 1
+concat
+int 2048
+box_create
+assert
+int 0
+store 1
+int 0
+store 0
+main_l178:
+load 0
+load 26
+<
+bnz main_l180
+byte "S"
+txna ApplicationArgs 1
+concat
+txn Sender
+txna ApplicationArgs 2
+concat
+txna ApplicationArgs 3
+concat
+load 1
+itob
+concat
+load 1
+itob
+concat
+load 26
+itob
+concat
+global Round
+itob
+concat
+int 0
+itob
+concat
+box_put
+int 1
+return
+main_l180:
+txn GroupIndex
+load 0
+int 1
++
++
+store 3
+load 3
+gtxns TypeEnum
+int axfer
+==
+assert
+load 3
+gtxns AssetReceiver
+global CurrentApplicationAddress
+==
+assert
+load 3
+gtxns AssetAmount
+int 0
+>
+assert
+int 0
+store 14
+main_l181:
+load 14
+load 0
+<
+bnz main_l191
+global CurrentApplicationAddress
+load 3
+gtxns XferAsset
+asset_holding_get AssetBalance
+store 45
+store 44
+load 45
+!
+bnz main_l190
+main_l183:
+load 3
+gtxns XferAsset
+asset_params_get AssetDecimals
+store 47
+store 46
+load 47
+assert
+int 1
+store 12
+int 0
+store 13
+main_l184:
+load 13
+load 46
+<
+bnz main_l189
+load 3
+gtxns AssetAmount
+load 12
+%
+int 0
+==
+assert
+load 3
+gtxns AssetAmount
+load 12
+/
+store 10
+load 10
+int 0
+>
+assert
+load 0
+int 24
+*
+store 2
+byte "I"
+txna ApplicationArgs 1
+concat
+load 2
+load 3
+gtxns XferAsset
+itob
+load 3
+gtxns AssetAmount
+itob
+concat
+load 12
+itob
+concat
+box_replace
+load 0
+int 100
+<
+assert
+load 0
+int 128
++
+store 32
+main_l186:
+load 32
+int 0
+>
+bnz main_l188
+load 1
+load 10
++
+store 1
+load 0
+int 1
++
+store 0
+b main_l178
+main_l188:
+load 32
+int 8
+*
+store 34
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+int 8
+box_extract
+btoi
+store 33
+byte "T"
+txna ApplicationArgs 1
+concat
+load 34
+load 33
+load 10
++
+itob
+box_replace
+load 32
+int 2
+/
+store 32
+b main_l186
+main_l189:
+load 12
+int 10
+*
+store 12
+load 13
+int 1
++
+store 13
+b main_l184
+main_l190:
+itxn_begin
+int axfer
+itxn_field TypeEnum
+load 3
+gtxns XferAsset
+itxn_field XferAsset
+global CurrentApplicationAddress
+itxn_field AssetReceiver
+int 0
+itxn_field AssetAmount
+int 0
+itxn_field Fee
+itxn_submit
+b main_l183
+main_l191:
+txn GroupIndex
+load 14
+int 1
++
++
+store 27
+load 27
+gtxns XferAsset
+load 3
+gtxns XferAsset
+!=
+assert
+load 14
+int 1
++
+store 14
+b main_l181
+main_l192:
+txna Assets 0
+itob
+txna ApplicationArgs 1
+concat
+txna ApplicationArgs 2
+concat
+txna ApplicationArgs 3
+concat
+txn Sender
+concat
+box_get
+store 43
+store 42
+load 43
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field AssetReceiver
+txna ApplicationArgs 1
+btoi
+itxn_field AssetAmount
+itxn_submit
+txna Assets 0
+itob
+txna ApplicationArgs 1
+concat
+txna ApplicationArgs 2
+concat
+txna ApplicationArgs 3
+concat
+txn Sender
+concat
+box_del
+assert
+int 1
+return
+main_l193:
+txna ApplicationArgs 3
+btoi
+txna ApplicationArgs 1
+btoi
+<=
+assert
+txna Assets 1
+int 0
+==
+bnz main_l198
+txn GroupIndex
+int 1
+-
+gtxns XferAsset
+txna Assets 1
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns AssetReceiver
+txna Accounts 1
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns AssetAmount
+txna ApplicationArgs 2
+btoi
+txna ApplicationArgs 3
+btoi
+*
+==
+assert
+main_l195:
+txna Assets 0
+itob
+txna ApplicationArgs 1
+concat
+txna Assets 1
+itob
+concat
+txna ApplicationArgs 2
+concat
+txna Accounts 1
+concat
+box_get
+store 41
+store 40
+load 41
+assert
+txna Assets 0
+itob
+txna ApplicationArgs 1
+concat
+txna Assets 1
+itob
+concat
+txna ApplicationArgs 2
+concat
+txna Accounts 1
+concat
+box_del
+assert
+itxn_begin
+int axfer
+itxn_field TypeEnum
+txna Assets 0
+itxn_field XferAsset
+txn Sender
+itxn_field AssetReceiver
+txna ApplicationArgs 3
+btoi
+itxn_field AssetAmount
+itxn_submit
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 3
+btoi
+-
+int 0
+>
+bnz main_l197
+main_l196:
+int 1
+return
+main_l197:
+txna Assets 0
+itob
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 3
+btoi
+-
+itob
+concat
+txna Assets 1
+itob
+concat
+txna ApplicationArgs 2
+concat
+txna Accounts 1
+concat
+txna Accounts 1
+box_put
+b main_l196
+main_l198:
+txn GroupIndex
+int 1
+-
+gtxns Receiver
+txna Accounts 1
+==
+assert
+txn GroupIndex
+int 1
+-
+gtxns Amount
+txna ApplicationArgs 2
+btoi
+txna ApplicationArgs 3
+btoi
+*
+==
+assert
+b main_l195
+main_l199:
+txn GroupIndex
+int 2
+-
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+txn GroupIndex
+int 2
+-
+gtxns Amount
+int 100000
 ==
 assert
 txn GroupIndex
@@ -349,101 +3092,58 @@ gtxns AssetReceiver
 global CurrentApplicationAddress
 ==
 assert
+txna Assets 0
+itob
 txn GroupIndex
 int 1
 -
 gtxns AssetAmount
-int 0
->
-assert
-txn GroupIndex
-int 1
--
-gtxns AssetAmount
-store 2
-byte "rewards"
+itob
+concat
+txna ApplicationArgs 1
+concat
+txna ApplicationArgs 2
+concat
+txn Sender
+concat
 box_get
-store 4
-store 3
-load 4
+store 39
+store 38
+load 39
 !
-bnz main_l37
-load 3
-len
-int 16
-%
-int 0
-==
 assert
-int 0
-store 0
-int 0
-store 1
-main_l30:
-load 0
-load 3
-len
-<
-bnz main_l34
-load 1
-int 0
-==
-bnz main_l33
-main_l32:
+txna Assets 0
+itob
+txn GroupIndex
+int 1
+-
+gtxns AssetAmount
+itob
+concat
+txna ApplicationArgs 1
+concat
+txna ApplicationArgs 2
+concat
+txn Sender
+concat
+txn Sender
+box_put
 int 1
 return
-main_l33:
-byte "rewards"
-load 3
-load 2
-txna Assets 0
-callsub rewardentry_0
-concat
-box_put
-b main_l32
-main_l34:
-load 3
-load 0
-callsub entryassetid_2
-txna Assets 0
-==
-bnz main_l36
-load 0
-int 16
-+
-store 0
-b main_l30
-main_l36:
-byte "rewards"
-load 0
-load 3
-load 0
-callsub entryamount_1
-load 2
-+
-itob
-box_replace
+main_l200:
+txn GroupIndex
 int 1
-store 1
-load 3
-len
-store 0
-b main_l30
-main_l37:
-byte "rewards"
-load 2
-txna Assets 0
-callsub rewardentry_0
-box_put
-b main_l32
-main_l38:
-txn Sender
-global CreatorAddress
++
+gtxns Receiver
+global CurrentApplicationAddress
 ==
 assert
-txn NumAssets
+txn GroupIndex
 int 1
->=
++
+gtxns Amount
+int 100000
+==
 assert
 itxn_begin
 int axfer
@@ -457,61 +3157,22 @@ itxn_field AssetAmount
 itxn_submit
 int 1
 return
-main_l39:
+main_l201:
 txn Sender
 global CreatorAddress
 ==
 return
-main_l40:
+main_l202:
 txn Sender
 global CreatorAddress
 ==
 return
-main_l41:
+main_l203:
 int 1
 return
-main_l42:
+main_l204:
 int 1
 return
-main_l43:
+main_l205:
 int 1
 return
-
-// reward_entry
-rewardentry_0:
-store 25
-store 24
-load 24
-itob
-load 25
-itob
-concat
-retsub
-
-// entry_amount
-entryamount_1:
-store 27
-store 26
-load 26
-load 27
-load 27
-int 8
-+
-substring3
-btoi
-retsub
-
-// entry_asset_id
-entryassetid_2:
-store 29
-store 28
-load 28
-load 29
-int 8
-+
-load 29
-int 16
-+
-substring3
-btoi
-retsub

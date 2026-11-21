@@ -254,8 +254,6 @@ export default function Raffle(props) {
 
         foreignAssets.push(Number(ticketAssetId))
 
-        let rewards = []
-
         if(!isNaN(assetId1) && !isNaN(assetAmount1)) {
         
             foreignAssets.push(Number(assetId1))
@@ -279,7 +277,6 @@ export default function Raffle(props) {
 
             txns.push(ftxn)
 
-            rewards.push({assetName: assetInfo.asset.params.name, assetUnit: assetInfo.asset.params["unit-name"], assetAmount: Number(assetAmount1), assetId: Number(assetId1)})
         }
 
         if(!isNaN(assetId2) && !isNaN(assetAmount2)) {
@@ -305,7 +302,6 @@ export default function Raffle(props) {
 
             txns.push(ftxn)
 
-            rewards.push({assetName: assetInfo.asset.params.name, assetUnit: assetInfo.asset.params["unit-name"], assetAmount: Number(assetAmount2), assetId: Number(assetId2)})
 
         }
 
@@ -332,7 +328,6 @@ export default function Raffle(props) {
 
             txns.push(ftxn)
 
-            rewards.push({assetName: assetInfo.asset.params.name, assetUnit: assetInfo.asset.params["unit-name"], assetAmount: Number(assetAmount3), assetId: Number(assetId3)})
 
         }
 
@@ -359,7 +354,6 @@ export default function Raffle(props) {
 
             txns.push(ftxn)
 
-            rewards.push({assetName: assetInfo.asset.params.name, assetUnit: assetInfo.asset.params["unit-name"], assetAmount: Number(assetAmount4), assetId: Number(assetId4)})
 
         }
 
@@ -369,10 +363,6 @@ export default function Raffle(props) {
         appArgs.push(algosdk.encodeUint64(Number(ticketAssetAmount)))
         appArgs.push(algosdk.encodeUint64(Number(((raffleLength) / blockTime * 60 * 60 * 24).toFixed(0))))
 
-        let assetInfo = await indexerClient.lookupAssetByID(Number(ticketAssetId)).do();
-
-        let ticket = {assetName: assetInfo.asset.params.name, assetUnit: assetInfo.asset.params["unit-name"], assetAmount: Number(ticketAssetAmount), assetId: Number(ticketAssetId)}
-        
         let atxn = algosdk.makeApplicationNoOpTxn(activeAccount.address, params, props.contracts.raffle, appArgs, accounts, foreignApps, foreignAssets, undefined, undefined, undefined, boxes);
         
         txns.unshift(atxn)
@@ -443,64 +433,9 @@ export default function Raffle(props) {
         props.setMessage("Raffle created.")
         props.setProgress(0)
 
-        updateDiscord(rewards, ticket, raffleLength)
 
         
         }
-
-        const updateDiscord = async (rewards, ticket, length) => {
-
-            let embeds = []
-      
-            embeds.push({
-                "title": "A new raffle has been made!",
-                "url": "https://dark-coin.com/tools/raffle/" + String(activeAccount.address),
-                "color": 0
-            })
-
-            embeds.push({
-                "title": "Rewards",
-                "color": 0
-            })
-            
-            rewards.forEach((reward) => {
-                embeds.push({
-                    "description": reward.assetAmount + " " + reward.assetName + "\n" + "(" + reward.assetId + ")",
-                    "color": 16777215
-                })
-            })
-      
-            embeds.push({
-                "title": "Ticket Cost",
-                "description": ticket.assetAmount + " " + ticket.assetName + "\n" + "(" + ticket.assetId + ")",
-                "color": 0
-            })
-
-            embeds.push({
-                "title": "Raffle Length",
-                "description": length + " days",
-                "color": 0
-            })
-      
-      
-            const response = await fetch(process.env.newRaffleWebhook, {
-                method: "POST",
-                body: JSON.stringify({
-                    username: "Raffle Create",
-                    embeds: embeds
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-      
-      
-      
-            
-        }
-
-       
-
 
     return (
         <div>

@@ -17,10 +17,6 @@ async function getDaoAssets(req, res) {
     let allDaoNfts = []
     let heldDao = []
 
-    const token = {
-        'X-API-Key': process.env.indexerKey
-    }
-
     const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
 

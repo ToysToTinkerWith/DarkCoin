@@ -1,0 +1,27 @@
+import * as T from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import {loadDragon} from './dragon';
+import {DRAGON,dragonSockets} from '../../../lib/arena/dragon';
+const scene=new T.Scene();scene.background=new T.Color('#151e26');scene.fog=new T.Fog('#151e26',22,48);
+const camera=new T.PerspectiveCamera(38,innerWidth/innerHeight,.1,100);camera.position.set(8,5.2,9.4);
+const renderer=new T.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;document.querySelector('#stage').appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,1.2,-.7);controls.enableDamping=true;controls.minDistance=4;controls.maxDistance=22;controls.maxPolarAngle=Math.PI*.49;controls.update();
+scene.add(new T.HemisphereLight('#ccdce9','#35242a',2.7));const key=new T.DirectionalLight('#ffe1b2',4);key.position.set(-5,8,6);key.castShadow=true;key.shadow.mapSize.set(2048,2048);key.shadow.camera.left=-7;key.shadow.camera.right=7;key.shadow.camera.top=7;key.shadow.camera.bottom=-7;key.shadow.normalBias=.025;scene.add(key);const rim=new T.DirectionalLight('#699cb8',3);rim.position.set(5,4,-4);scene.add(rim);
+const ground=new T.Mesh(new T.CylinderGeometry(5.1,5.2,.16,96),new T.MeshStandardMaterial({color:'#30363c',roughness:.97}));ground.position.y=-.10;ground.receiveShadow=true;scene.add(ground);
+for(const radius of [4.85,5.02]){const ring=new T.Mesh(new T.TorusGeometry(radius,.009,6,128),new T.MeshStandardMaterial({color:'#92714b',roughness:.8}));ring.rotation.x=Math.PI/2;ring.position.y=-.013;scene.add(ring);}
+const rows=[['Health',DRAGON.maxHealth],['Stamina',DRAGON.maxStamina],['Walk / run','1.15 / 2.65 m/s'],['Stamina recovery','18 / sec'],['Fire resistance','55 rating'],['Frost / water','0 rating']];document.querySelector('#stats').innerHTML=rows.map(([k,v])=>'<dt>'+k+'</dt><dd>'+v+'</dd>').join('');
+let dragon,rig,phase=0,last=0,playing=true,speed=1,clip='Idle';
+function select(name,t=0,play=true){const changed=clip!==name;clip=name;phase=t;playing=play;if(changed)view(document.querySelector('#view').value);document.querySelector('#pause').textContent=play?'Pause':'Play';document.querySelectorAll('[data-clip]').forEach(b=>b.classList.toggle('active',b.dataset.clip===name));
+ const attack=Object.values(DRAGON.attacks).find(a=>a.clip===name),detail=document.querySelector('#attackDetail');
+ detail.innerHTML=attack?'<small>'+attack.damageType+' attack</small><h3>'+attack.name+'</h3><p>'+attack.description+'</p><p><b>'+attack.damageRoll+(attack.ticks?' × '+attack.ticks+' pulses':'')+'</b><br>'+attack.stamina+' stamina · '+attack.cycle+'s cycle'+(attack.cooldown?' · '+attack.cooldown+'s cooldown':'')+'<br>'+attack.onHit.map(e=>Math.round(e.chance*100)+'% '+e.id+' · '+e.potency+' potency').join('<br>')+'</p>':'<small>Creature study</small><h3>Armored, grounded, deliberate.</h3><p>Inspect the four-legged gait, hinged jaw, articulated tail and ribbed wings. Choose an attack below to see its windup, contact and recovery.</p>';
+}
+document.querySelectorAll('[data-clip]').forEach(b=>b.onclick=()=>select(b.dataset.clip));
+document.querySelector('#pause').onclick=()=>{if(clip==='Death'&&phase>=1){phase=0;playing=true;}else playing=!playing;document.querySelector('#pause').textContent=playing?'Pause':'Play';};
+document.querySelector('#speed').onclick=()=>{speed=speed===1?.5:1;document.querySelector('#speed').textContent=speed===1?'½ speed':'Full speed';};
+document.querySelector('#joints').onclick=()=>{if(rig){rig.visible=!rig.visible;document.querySelector('#joints').classList.toggle('active',rig.visible);}};
+document.querySelector('#scrub').oninput=e=>select(clip,Number(e.target.value)/1000,false);
+const views={quarter:[8,5.2,9.4],side:[13,4.3,0],front:[0,3.7,13],back:[0,4.8,-14],top:[0,15,.1]};
+function view(name){camera.position.set(...views[name]);controls.target.set(0,1.2,-.7);if(clip==='FlameBreath'){camera.position.multiplyScalar(1.18);controls.target.z=1;}controls.update();}document.querySelector('#view').onchange=e=>view(e.target.value);
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+loadDragon(scene).then(d=>{dragon=d;rig=new T.SkeletonHelper(d.model);rig.material.depthTest=false;rig.visible=false;scene.add(rig);document.querySelector('#loading').remove();window.dragonPreview={dragon,camera,controls,select,view,sockets:dragonSockets};const requested=new URLSearchParams(location.search).get('clip');select(Object.hasOwn(DRAGON.clips,requested)?requested:'Idle');}).catch(e=>document.querySelector('#loading').textContent=e.message);
+function frame(time){const dt=Math.min(.05,(time-(last||time))/1000);last=time;if(playing){phase+=dt*speed/DRAGON.clips[clip];if(clip==='Death'){if(phase>=1){phase=1;playing=false;document.querySelector('#pause').textContent='Replay';}}else phase%=1;}dragon?.sample(clip,phase);document.querySelector('#scrub').value=Math.round(phase*1000);document.querySelector('#phaseLabel').textContent=clip;document.querySelector('#timeLabel').textContent=(phase*DRAGON.clips[clip]).toFixed(2)+'s';controls.update();renderer.render(scene,camera);requestAnimationFrame(frame);}requestAnimationFrame(frame);

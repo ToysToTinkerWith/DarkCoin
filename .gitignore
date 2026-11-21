@@ -1,4 +1,5 @@
 # Logs
+.council-local/
 logs
 *.log
 npm-debug.log*
@@ -62,22 +63,35 @@ node_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variables file
-.env
-.env.local
-.env.*.local
-functions/.env
+# Local configuration and credentials. Only blank templates belong in Git.
+.env*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.local.*
 
 # Build output
-.next/
+.next*/
 out/
+/output/
+/arena-server/server.cjs
+/functions/arenaCombat.bundle.cjs
+/functions/arenaRewards.bundle.cjs
 
 # Local credentials / generated service files
 service.json
 permissions.json
 
+# Private compensation signing setup and durable transaction journal
+scripts/send-chronicles-compensation.local.cjs
+.compensation-state/
+
 # Local workspace caches
 venv/
+.venv/
+.tmp*/
 .mypy_cache/
 tmp/
 .agents/
@@ -96,3 +110,12 @@ contracts/updated_assets_info.csv
 
 # dataconnect generated files
 .dataconnect
+
+# Legacy copies are kept outside the public source tree.
+/old/
+/contracts/dragon.js
+/contracts/council.js
+/contracts/functions.js
+/contracts/leaderboard.js
+/contracts/leaderboard2.js
+/contracts/library.js

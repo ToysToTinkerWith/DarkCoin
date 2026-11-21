@@ -12,16 +12,19 @@ const app = next({
 const handle = app.getRequestHandler();
 
 // Prepare ONCE per warm instance
-const prepared = app.prepare();
+let prepared;
 
 exports.nextServer = onRequest(
   {
     region: "us-central1",
     memory: "1GiB",
+    timeoutSeconds: 300,
     maxInstances: 10,
+    secrets: ["ARENA_TICKET_SECRET", "DEPTHS_DISCORD_WEBHOOK", "COUNCIL_QUOTE_SEED"],
   },
   async (req, res) => {
     try {
+      if (!prepared) prepared = app.prepare();
       await prepared;
       return handle(req, res);
     } catch (err) {

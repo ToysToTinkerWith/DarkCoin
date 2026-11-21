@@ -1,0 +1,11 @@
+.notice{display:flex;gap:16px;align-items:flex-start;background:linear-gradient(115deg,#28181b,#161418);border:1px solid #a8584d88;border-left:3px solid #de9778;border-radius:8px;padding:20px 22px;margin:0 0 24px;color:#eedbd2}
+.icon{width:28px;height:28px;flex-shrink:0;color:#e6ad8c;margin-top:3px}
+.label{font-size:10px;line-height:1.5;font-weight:700;letter-spacing:1.4px;color:#e5ae91;margin-bottom:6px}
+.notice .title{font-family:inherit;font-weight:600;font-size:18px;line-height:1.35;margin:0 0 7px;color:#f5e6dd}
+.notice .description{font-size:13px;line-height:1.6;margin:0;color:#c8b7b6}
+.compact{padding:12px 14px;margin-bottom:14px;gap:12px}
+.compact .title{font-size:14px;margin-bottom:4px}
+.compact .description{font-size:12px}
+.compact .label{font-size:9px;margin-bottom:4px}
+.compact .icon{width:22px;height:22px}
+@media(max-width:640px){.notice{padding:15px;gap:12px}.notice .title{font-size:16px}.compact{padding:10px;gap:9px}.compact .title{font-size:13px}.compact .description{font-size:11px}.compact .label{font-size:8px;letter-spacing:.8px}}

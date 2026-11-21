@@ -1,16 +1,24 @@
 module.exports = {
+    distDir: process.env.COUNCIL_DIST_DIR === '.next-council-preview' ? '.next-council-preview' : process.env.NEXT_PUBLIC_ARENA_DEV === 'true' ? '.next-arena-dev' : '.next',
+    // Keep shuffle source available while excluding it from this release.
+    async redirects() {
+        return [
+            // Enable on the verified Council release or an isolated preview.
+            ...(process.env.COUNCIL_ENABLED === 'true' ? [] : [
+                { source: "/council/:path*", destination: "/", permanent: false },
+            ]),
+            // Exact page redirect only: existing 3D asset URLs stay valid.
+            { source: "/arena/playground", destination: "/arena/playtest", permanent: false },
+            { source: "/arena/depths", destination: "/arena", permanent: false },
+            { source: "/arena/fight", destination: "/arena", permanent: false },
+            { source: "/market/shuffle/:path*", destination: "/market", permanent: false },
+        ];
+    },
+    experimental: {
+        cpus: 1,
+    },
     env: {
-        indexerKey: process.env.INDEXER_KEY || process.env.indexerKey || "",
-        publicPinata: process.env.PINATA_PUBLIC || process.env.publicPinata || "",
-        privatePinata: process.env.PINATA_SECRET || process.env.privatePinata || "",
-        discordWebhook: process.env.DISCORD_WEBHOOK || process.env.discordWebhook || "",
-        discordCouncilWebhook: process.env.DISCORD_COUNCIL_WEBHOOK || process.env.discordCouncilWebhook || "",
-        discordErrorWebhook: process.env.DISCORD_ERROR_WEBHOOK || process.env.discordErrorWebhook || "",
-        rewardWebhook: process.env.REWARD_WEBHOOK || process.env.rewardWebhook || "",
-        testDiscordWebhook: process.env.TEST_DISCORD_WEBHOOK || process.env.testDiscordWebhook || "",
-        newRaffleWebhook: process.env.NEW_RAFFLE_WEBHOOK || process.env.newRaffleWebhook || "",
-        raffleWinnersWebhook: process.env.RAFFLE_WINNERS_WEBHOOK || process.env.raffleWinnersWebhook || ""
-
-      },
-
+        NEXT_PUBLIC_COUNCIL_ENABLED: process.env.COUNCIL_ENABLED === 'true' ? 'true' : 'false',
+        NEXT_PUBLIC_WALLET_NETWORK: process.env.NEXT_PUBLIC_WALLET_NETWORK === 'testnet' ? 'testnet' : 'mainnet',
+    },
 }

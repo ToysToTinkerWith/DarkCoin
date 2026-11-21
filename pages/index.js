@@ -10,17 +10,8 @@ const REALM_CARDS = [
     href: "/arena",
     image: "/home/arena.png",
     icon: "/home/arenaLogo.png",
-    text: "Enter the arena and test your might. Rise through the ranks and earn glory in battle.",
+    text: "Explore real-time 3D combat and customize your champion in the Armory.",
     button: "ENTER ARENA",
-  },
-  {
-    key: "council",
-    title: "COUNCIL",
-    href: "/council",
-    image: "/home/council.png",
-    icon: "/home/councilLogo.png",
-    text: "Join the council to debate, plan, and vote on the future of our kingdom.",
-    button: "ENTER COUNCIL",
   },
   {
     key: "market",
@@ -37,8 +28,8 @@ export default function DarkCoinHome() {
   return (
     <>
       <Head>
-        <title>Dark Coin</title>
-        <meta name="description" content="Dark Coin kingdom home page" />
+        <title>DarkCoin | A community on Algorand</title>
+        <meta name="description" content="DarkCoin is a crypto community on Algorand. Use tokens and NFTs in your wallet to play in the 3D Arena, customize champions, and trade in the marketplace." />
       </Head>
 
       <main className="dcPage">
@@ -52,7 +43,7 @@ export default function DarkCoinHome() {
                 initial={{ opacity: 0, y: 42, scale: 0.76 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{
-                  duration: 4.8,
+                  duration: 1.2,
                   ease: [0.16, 1, 0.3, 1],
                   delay: 0.2,
                 }}
@@ -65,9 +56,9 @@ export default function DarkCoinHome() {
               </motion.div>
 
               <div className="heroTextSide">
-                <p className="welcome">WELCOME TO</p>
-                <h1>DARK COIN</h1>
-                <p className="subtitle">A REALM OF HONOR, POWER, AND GREED.</p>
+                <p className="welcome">COMMUNITY ON ALGORAND</p>
+                <h1>DarkCoin</h1>
+                <p className="subtitle">DarkCoin is a crypto community built on the Algorand blockchain. Connect your wallet to use your tokens and NFTs in the Arena, customize your champion in the Armory, and trade in the marketplace.</p>
               </div>
             </div>
           </div>
@@ -114,11 +105,11 @@ export default function DarkCoinHome() {
         </section>
 
         <footer className="footerLinks">
-          <a href="https://discord.com" target="_blank" rel="noreferrer">
+          <a href="https://discord.gg/F6xEUfZGT" target="_blank" rel="noopener noreferrer">
             DISCORD
           </a>
-          <a href="/dark-paper">DARK PAPER</a>
-          <a href="https://github.com" target="_blank" rel="noreferrer">
+          <a href="https://dark-coin.io" target="_blank" rel="noopener noreferrer">DARK PAPER</a>
+          <a href="https://github.com/ToysToTinkerWith/" target="_blank" rel="noopener noreferrer">
             GITHUB
           </a>
         </footer>
@@ -136,7 +127,7 @@ export default function DarkCoinHome() {
 
         .hero {
           position: relative;
-          min-height: 520px;
+          min-height: 460px;
           background-image: url("/home/background.png");
           background-size: cover;
           background-position: center top;
@@ -167,7 +158,7 @@ export default function DarkCoinHome() {
           z-index: 2;
           max-width: 1380px;
           margin: 0 auto;
-          padding: 70px 40px 40px;
+          padding: 58px 40px 46px;
         }
 
         .heroInner {
@@ -175,11 +166,11 @@ export default function DarkCoinHome() {
           align-items: center;
           justify-content: center;
           gap: 48px;
-          min-height: 360px;
+          min-height: 300px;
         }
 
-        .heroLogoSide {
-          flex: 0 0 300px;
+        :global(.heroLogoSide) {
+          flex: 0 0 230px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -187,7 +178,7 @@ export default function DarkCoinHome() {
         }
 
         .mainLogo {
-          width: 240px;
+          width: 190px;
           max-width: 100%;
           height: auto;
           filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.22));
@@ -197,30 +188,32 @@ export default function DarkCoinHome() {
           flex: 1 1 auto;
           min-width: 0;
           text-align: left;
-          max-width: 780px;
+          max-width: 670px;
         }
 
         .welcome {
           margin: 0 0 8px;
-          font-size: clamp(18px, 2vw, 34px);
-          letter-spacing: 0.32em;
+          font-size: 13px;
+          letter-spacing: 0.2em;
           color: rgba(255, 255, 255, 0.95);
         }
 
         h1 {
           margin: 0;
-          font-size: clamp(42px, 7vw, 108px);
+          font-size: clamp(46px, 6.5vw, 86px);
           line-height: 0.95;
           font-weight: 400;
-          letter-spacing: 0.14em;
+          letter-spacing: 0.035em;
           text-shadow: 0 0 24px rgba(255, 255, 255, 0.18);
           white-space: nowrap;
         }
 
         .subtitle {
           margin: 12px 0 0;
-          font-size: clamp(11px, 1.1vw, 20px);
-          letter-spacing: 0.34em;
+          max-width: 640px;
+          font-size: clamp(16px, 1.45vw, 19px);
+          line-height: 1.7;
+          letter-spacing: 0.015em;
           color: rgba(255, 255, 255, 0.78);
         }
 
@@ -232,10 +225,10 @@ export default function DarkCoinHome() {
         }
 
         .cardsGrid {
-          max-width: 1440px;
+          max-width: 1120px;
           margin: 0 auto;
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 22px;
           align-items: start;
         }
@@ -455,8 +448,8 @@ export default function DarkCoinHome() {
             gap: 24px;
           }
 
-          .heroLogoSide {
-            flex-basis: 220px;
+          :global(.heroLogoSide) {
+            flex-basis: 190px;
           }
 
           .mainLogo {
@@ -464,8 +457,8 @@ export default function DarkCoinHome() {
           }
 
           h1 {
-            font-size: clamp(38px, 6vw, 82px);
-            letter-spacing: 0.1em;
+            font-size: clamp(46px, 6vw, 72px);
+            letter-spacing: 0.035em;
           }
         }
 
@@ -475,7 +468,7 @@ export default function DarkCoinHome() {
           }
 
           .heroContent {
-            padding: 50px 20px 28px;
+            padding: 34px 24px 38px;
           }
 
           .heroInner {
@@ -483,13 +476,15 @@ export default function DarkCoinHome() {
             text-align: center;
           }
 
+          :global(.heroLogoSide) { flex: 0 0 auto; }
+          .mainLogo { width: 108px; }
           .heroTextSide {
             text-align: center;
           }
 
           h1 {
-            font-size: clamp(34px, 10vw, 56px);
-            letter-spacing: 0.08em;
+            font-size: clamp(44px, 11vw, 62px);
+            letter-spacing: 0.035em;
             white-space: nowrap;
           }
 
@@ -498,7 +493,8 @@ export default function DarkCoinHome() {
           }
 
           .subtitle {
-            letter-spacing: 0.16em;
+            letter-spacing: .015em;
+            font-size: 16px;
           }
 
           .cardsSection {

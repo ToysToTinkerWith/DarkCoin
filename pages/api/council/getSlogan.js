@@ -1,43 +1,4 @@
-import NextCors from 'nextjs-cors';
-
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-    apiKey: process.env.DALLE_KEY
-});
-
-async function getSlogan(req, res) {
-
-    // Run the cors middleware
-   // nextjs-cors uses the cors package, so we invite you to check the documentation https://github.com/expressjs/cors
-
-   await NextCors(req, res, {
-    // Options
-    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-    origin: '*',
-    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
- });
-
-    let messages = [
-    {"role": "user", "content": "The Dark Coin DAO is called the Council. Dark Coin is a community that uses the Algorand Blockchain for data storage and finance. This is a proposal submitted to the Council: Proposal = \"" + req.body.proposal},
-    {"role": "user", "content": "\"  Describe this proposal in 5 words or less. Only mention the essence of the proposal."},       
-    ]
-
-    let response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: messages
-    })
-
-    console.log(response.choices[0].message.content)
-
-    let chat = response.choices[0].message.content
-
-
-
-    res.json(chat);
-
-   
-   
+export default function retired(req, res) {
+  res.setHeader('Cache-Control', 'no-store');
+  return res.status(410).json({ error: 'Legacy Council AI drafting and sanitization are retired. Submit the original proposal through /council/ask.' });
 }
-
-export default getSlogan

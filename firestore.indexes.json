@@ -1,0 +1,16 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "nextAttemptAt", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {"collectionGroup":"arenaPrivate","fieldPath":"state","indexes":[]},
+    {"collectionGroup":"arenaPrivate","fieldPath":"deleteAt","ttl":true,"indexes":[]}
+  ]
+}

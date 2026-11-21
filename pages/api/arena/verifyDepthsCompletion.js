@@ -4,7 +4,6 @@ import crypto from "crypto";
 import admin from "../../../Firebase/FirebaseAdmin";
 
 const INDEXER_BASE = "https://mainnet-idx.algonode.cloud";
-const DEFAULT_AUTHORIZED_EMAIL = "abergquist96@gmail.com";
 
 const db = admin.firestore();
 const serverTimestamp = admin.firestore.FieldValue.serverTimestamp;
@@ -38,7 +37,6 @@ function getBearerToken(req) {
 function getAuthorizedFirebaseEmails() {
   return new Set(
     [
-      DEFAULT_AUTHORIZED_EMAIL,
       ...splitEnvList(process.env.DEPTHS_REWARD_AUTHORIZED_EMAILS),
       ...splitEnvList(process.env.AUTHORIZED_FIREBASE_EMAILS),
     ].map((email) => email.toLowerCase())

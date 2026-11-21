@@ -1,0 +1,18 @@
+const fs=require('fs'),path=require('path'),assert=require('assert');const root=path.resolve(__dirname,'..'),out=path.join(root,'output/champion-extras-v59'),assets=path.join(root,'public/arena/playground/assets');
+global.self=global;global.createImageBitmap=async()=>({width:2560,height:1536,close(){}});global.ProgressEvent=class{constructor(t,o){Object.assign(this,o)}};
+(async()=>{const T=await import('three'),validator=require(path.join(root,'tmp/champion-model-tools/node_modules/gltf-validator')),esbuild=require(path.join(root,'tmp/champion-model-tools/node_modules/esbuild')),rows=JSON.parse(fs.readFileSync(path.join(out,'extra-manifest.json'))),reports=[];
+ const bundle=path.join(root,'tmp/extra-character-test.cjs');await esbuild.build({entryPoints:[path.join(root,'components/arena/playground/character.js')],bundle:true,platform:'node',format:'cjs',outfile:bundle,external:['three','three/*'],logLevel:'silent'});const originalFetch=global.fetch;global.fetch=async(url)=>{if(!String(url).includes('/assets/'))return originalFetch(url);const b=fs.readFileSync(path.join(assets,String(url).split('/assets/')[1]));return {ok:true,arrayBuffer:async()=>b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),json:async()=>JSON.parse(b)};};const {loadCharacter}=require(bundle);
+ for(const row of rows){for(const suffix of ['','-rigged']){const report=await validator.validateBytes(new Uint8Array(fs.readFileSync(path.join(out,'models',row.id+suffix+'.glb'))),{maxIssues:30});assert.equal(report.issues.numErrors,0,row.id+' '+JSON.stringify(report.issues.messages));}
+  const c=await loadCharacter({skin:'Undead',head:'bone',armour:'leather_garb',weapon:'dragon_longsword',extra:row.id},()=>{},new AbortController().signal);const extras=[];let head;c.model.traverse(o=>{if(o.isMesh&&o.userData.trait==='05_Extra')extras.push(o);if(o.isBone&&o.name==='head')head=o;});assert(extras.length>0);c.update(0,'Idle');
+  const relative=()=>extras.map(o=>{const v=new T.Vector3().fromBufferAttribute(o.geometry.attributes.position,0);o.applyBoneTransform(0,v);o.localToWorld(v);return head.worldToLocal(v);});const baseline=relative();let error=0;
+  if(row.attachment==='both_ears'){
+   let min=Infinity,max=-Infinity,left=0,right=0;
+   for(const o of extras){const p=o.geometry.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i);min=Math.min(min,x);max=Math.max(max,x);if(x<0)left++;else if(x>0)right++;}}
+   assert(left>0&&right>0,row.id+' must cover both ears');assert.equal(left,right,row.id+' mirrored vertex counts');assert(Math.abs(min+max)<1e-6,row.id+' symmetric extent');
+  }
+  if(row.id==='crescent_birthmark')assert.equal(row.source_scale,4);
+
+  for(const o of extras){const w=o.geometry.attributes.skinWeight,idx=o.geometry.attributes.skinIndex;for(let i=0;i<w.count;i++){assert(Math.abs(w.getX(i)+w.getY(i)+w.getZ(i)+w.getW(i)-1)<1e-5);if(row.attachment==='both_ears')assert.equal(o.skeleton.bones[idx.getX(i)].name,'head');}}
+  c.toggle();for(const gait of ['Walk','Run','Walk_Left','Run_Backward']){for(let i=0;i<12;i++){c.update(.1,gait);relative().forEach((v,j)=>{assert(v.toArray().every(Number.isFinite));if(row.attachment==='both_ears')error=Math.max(error,v.distanceTo(baseline[j]));});}c.attack();}assert(error<1e-4);if(row.attachment==='neck_skin')assert(row.maximum_surface_offset_m<.0015);c.dispose();reports.push({id:row.id,glbs:2,earDriftMetres:error,neckSurfaceOffsetMetres:row.maximum_surface_offset_m});console.log('PASS',row.id);}
+ global.fetch=originalFetch;fs.writeFileSync(path.join(out,'validation.json'),JSON.stringify(reports,null,2));
+})().catch(e=>{console.error(e);process.exitCode=1});

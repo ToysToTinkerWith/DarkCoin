@@ -1,0 +1,1 @@
+const path=require('path');require('esbuild').buildSync({entryPoints:[path.resolve('components/arena/playground/dragon-preview.js')],bundle:true,platform:'browser',minify:true,outfile:path.resolve('public/arena/playground/dragon-preview.js'),legalComments:'none'});console.log('Built dragon preview.');

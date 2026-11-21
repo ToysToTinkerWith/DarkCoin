@@ -29,6 +29,7 @@ export default class MyDocument extends Document {
      
           <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
           <meta name="title" content="Dark Coin | Algorand" />
+          <meta name="name" content="Dark Coin" />
           <meta name="description" content="Dark Coin is an innovative community-driven project within the Algorand ecosystem, focused on expanding the possibilities of Algorand Standard Assets (ASAs) in the decentralized finance (DeFi) space. It operates as a decentralized autonomous organization (DAO), giving collective ownership and democratic management power to its members through blockchain-enforced rules." />
             <meta name="keywords" content="Dark Coin, Algorand, Algorand Standard Assets, ASAs, decentralized finance, decentralized autonomous organization, DAO, blockchain" />
 

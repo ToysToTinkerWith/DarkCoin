@@ -1,10 +1,10 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useWallet } from "@txnlab/use-wallet-react";
+import WalletRewards,{useWalletRewards} from './WalletRewards';
 import algosdk from "algosdk";
 
 import { Typography, Grid, Popover, Divider } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 
 import { CID } from "multiformats/cid";
 import * as mfsha2 from "multiformats/hashes/sha2";
@@ -37,48 +37,20 @@ export default function DarkCoinWalletConnect({
   const [assetsAnchorEl, setAssetsAnchorEl] = useState(null);
   const [assetImgById, setAssetImgById] = useState({});
 
-  const [walletImagesReady, setWalletImagesReady] = useState(false);
   const [assetsLoading, setAssetsLoading] = useState(false);
   const [connectingWalletId, setConnectingWalletId] = useState(null);
   const [connectError, setConnectError] = useState("");
-  const [walletCollapsed, setWalletCollapsed] = useState(false);
 
   const fetchedAddressRef = useRef(null);
   const walletButtonRef = useRef(null);
+  useEffect(()=>{const open=()=>{setConnectAnchorEl(activeAddress?null:walletButtonRef.current);setAssetsAnchorEl(activeAddress?walletButtonRef.current:null);};window.addEventListener('darkcoin-connect-wallet',open);return()=>window.removeEventListener('darkcoin-connect-wallet',open);},[activeAddress]);
+  useEffect(()=>{const changed=()=>{if(activeAddress)fetchDcAssets(activeAddress,true);};window.addEventListener('champion-name-changed',changed);return()=>window.removeEventListener('champion-name-changed',changed);},[activeAddress,fetchDcAssets]);
+
 
   const walletAssets = Array.isArray(wallet) ? wallet : [];
   const connectPopoverOpen = Boolean(connectAnchorEl);
   const assetsPopoverOpen = Boolean(assetsAnchorEl);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const urls = [
-      "/home/wallet.png",
-      "/home/walletOpen.png",
-      "/home/walletLogo.png",
-    ];
-
-    Promise.all(
-      urls.map(
-        (url) =>
-          new Promise((resolve) => {
-            const img = new Image();
-            img.onload = resolve;
-            img.onerror = resolve;
-            img.src = url;
-          })
-      )
-    ).then(() => {
-      if (!cancelled) {
-        setWalletImagesReady(true);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const rewards=useWalletRewards(assetsPopoverOpen,fetchDcAssets);
 
   useEffect(() => {
     if (!activeAddress) {
@@ -541,11 +513,6 @@ export default function DarkCoinWalletConnect({
     event.preventDefault();
     event.stopPropagation();
 
-    if (walletCollapsed) {
-      setWalletCollapsed(false);
-      return;
-    }
-
     const anchor = walletButtonRef.current || event.currentTarget;
 
     if (connectPopoverOpen || assetsPopoverOpen) {
@@ -562,20 +529,6 @@ export default function DarkCoinWalletConnect({
 
     setAssetsAnchorEl(null);
     setConnectAnchorEl(anchor);
-  }
-
-  function handleWalletButtonKeyDown(event) {
-    if (event.key === "Enter" || event.key === " ") {
-      handleWalletButtonClick(event);
-    }
-  }
-
-  function handleWalletCollapse(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    setConnectAnchorEl(null);
-    setAssetsAnchorEl(null);
-    setWalletCollapsed(true);
   }
 
   function renderAssetRow(asset, options = {}) {
@@ -633,85 +586,33 @@ export default function DarkCoinWalletConnect({
 
   return (
     <>
-      <div
+      <button
         ref={walletButtonRef}
-        className={`walletFixedShell ${walletImagesReady ? "ready" : ""} ${
-          walletCollapsed ? "collapsed" : ""
-        }`}
+        type="button"
+        className="navWalletButton"
         onClick={handleWalletButtonClick}
-        onKeyDown={handleWalletButtonKeyDown}
-        role="button"
-        tabIndex={0}
-        aria-label={
-          walletCollapsed
-            ? "Show wallet"
-            : activeAddress
-            ? "Open wallet assets"
-            : "Connect wallet"
-        }
+        aria-label={activeAddress ? 'Open wallet assets' : 'Connect Wallet'}
+        aria-haspopup="dialog"
+        aria-expanded={connectPopoverOpen || assetsPopoverOpen}
+        aria-controls={assetsPopoverOpen ? 'wallet-assets-popover' : connectPopoverOpen ? 'wallet-connect-popover' : undefined}
+        title={activeAddress || undefined}
       >
-        <button
-          type="button"
-          className={`walletTab ${activeAddress ? "connected" : ""}`}
-          onClick={handleWalletButtonClick}
-        >
-          <div className="walletCardIcon">
-            {walletImagesReady ? (
-              <img src="/home/walletLogo.png" alt="Wallet icon" />
-            ) : (
-              <div className="walletLogoPlaceholder" />
-            )}
-          </div>
-
-          <div
-            className={`walletImagePlaceholder ${
-              walletImagesReady ? "imageReady" : ""
-            }`}
-          />
-
-          {walletImagesReady ? (
-            <img
-              src={
-                assetsPopoverOpen || connectPopoverOpen
-                  ? "/home/walletOpen.png"
-                  : "/home/wallet.png"
-              }
-              alt="Wallet"
-              className="walletButtonImage"
-            />
-          ) : null}
-
-          <div className="walletButtonFade" />
-
-          <span className="walletMain">
-            {activeAddress ? shortenAddress(activeAddress) : "CONNECT WALLET"}
-          </span>
-        </button>
-
-        {!walletCollapsed ? (
-          <button
-            type="button"
-            className="walletCollapseToggle"
-            aria-label="Hide wallet"
-            title="Hide wallet"
-            onClick={handleWalletCollapse}
-          >
-            <KeyboardArrowRightIcon fontSize="small" />
-          </button>
-        ) : null}
-      </div>
+        <span>{activeAddress ? shortenAddress(activeAddress) : 'Connect Wallet'}</span>
+        {rewards.count>0&&<span className="walletRewardBadge" role="status" aria-label={`${rewards.count} unique reward assets to claim`}>{rewards.count}</span>}
+      </button>
 
       <Popover
+        id="wallet-connect-popover"
         open={connectPopoverOpen}
         anchorEl={connectAnchorEl}
         onClose={() => setConnectAnchorEl(null)}
-        anchorOrigin={{ vertical: "center", horizontal: "left" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         PaperProps={{
           className: "walletConnectPopoverPaper",
         }}
       >
-        <div className="walletConnectPopover">
+        <div className="walletConnectPopover" role="dialog" aria-label="Wallet connection">
           <div className="walletPanelScroll">
             <div className="walletPanelHeader">
               <div>
@@ -852,16 +753,17 @@ export default function DarkCoinWalletConnect({
       </Popover>
 
       <Popover
+        id="wallet-assets-popover"
         open={assetsPopoverOpen}
         anchorEl={assetsAnchorEl}
         onClose={() => setAssetsAnchorEl(null)}
-        anchorOrigin={{ vertical: "center", horizontal: "left" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         PaperProps={{
           className: "assetsPopoverPaper",
         }}
       >
-        <div className="assetsPopover">
+        <div className="assetsPopover" role="dialog" aria-label="Wallet assets">
           <div className="assetsHeader">
             <div>
               <p>WALLET ASSETS</p>
@@ -880,6 +782,7 @@ export default function DarkCoinWalletConnect({
           </div>
 
           <div className="assetsScroll">
+            <WalletRewards rewards={rewards}/>
             {assetsLoading ? (
               <div className="assetsLoadingBox">
                 <div className="assetSkeletonRow" />
@@ -928,288 +831,27 @@ export default function DarkCoinWalletConnect({
       </Popover>
 
       <style jsx>{`
-        .walletFixedShell {
-          --wallet-window-gap: 40px;
-          --wallet-logo-right-edge: 36px;
-          position: fixed;
-          top: 120px;
-          right: var(--wallet-window-gap);
-          width: 130px;
-          height: 88px;
-          z-index: 100000;
-          pointer-events: auto;
-          cursor: pointer;
-          outline: none;
-          opacity: 0;
-          transform: translateX(24px);
-          transition:
-            opacity 420ms ease,
-            transform 420ms ease;
-        }
-
-        .walletFixedShell.ready {
-          opacity: 1;
-          transform: translateX(0);
-        }
-
-        .walletFixedShell.ready.collapsed {
-          opacity: 1;
-          transform: translateX(calc(100% + var(--wallet-window-gap) - var(--wallet-logo-right-edge)));
-        }
-
-        .walletFixedShell.collapsed .walletTab {
-          background: transparent;
-          border-color: transparent;
-          box-shadow: none;
-          filter: none;
-        }
-
-        .walletFixedShell.collapsed .walletMain {
-          opacity: 0;
-        }
-
-        .walletFixedShell.collapsed .walletImagePlaceholder,
-        .walletFixedShell.collapsed .walletButtonImage,
-        .walletFixedShell.collapsed .walletButtonFade {
-          opacity: 0;
-        }
-
-        .walletFixedShell.collapsed .walletTab::before {
-          opacity: 0;
-        }
-
-        .walletTab {
+        .navWalletButton {
           position: relative;
-          width: 130px;
-          height: 88px;
-          padding: 0;
-          display: block;
-          background: #050505;
-          border: 1px solid rgba(255, 255, 255, 0.55);
-          outline: none;
-          border-radius: 5px;
-          box-shadow:
-            inset 0 0 24px rgba(255, 255, 255, 0.055),
-            0 18px 34px rgba(0, 0, 0, 0.86),
-            0 0 18px rgba(255, 255, 255, 0.08);
-          cursor: pointer;
-          overflow: visible;
-          pointer-events: auto;
-          z-index: 100001;
-          transition:
-            transform 180ms ease,
-            filter 180ms ease,
-            border-color 180ms ease,
-            box-shadow 180ms ease;
-        }
-
-        .walletTab::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          margin: 4px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          pointer-events: none;
-          z-index: 4;
-        }
-
-        .walletTab:hover {
-          transform: translateY(3px);
-          filter: brightness(1.08) contrast(1.08);
-          border-color: rgba(255, 255, 255, 0.76);
-          box-shadow:
-            inset 0 0 28px rgba(255, 255, 255, 0.085),
-            0 22px 42px rgba(0, 0, 0, 0.92),
-            0 0 24px rgba(255, 255, 255, 0.14);
-        }
-
-        .walletTab.connected {
-          border-color: rgba(255, 255, 255, 0.68);
-          filter: brightness(1.05) contrast(1.08);
-        }
-
-        .walletImagePlaceholder {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          background:
-            radial-gradient(
-              circle at 24% 18%,
-              rgba(255, 255, 255, 0.16),
-              transparent 34%
-            ),
-            linear-gradient(to bottom, #171717, #050505 72%, #000);
-          border-radius: 5px;
-          opacity: 1;
-          pointer-events: none;
-          transition: opacity 260ms ease;
-        }
-
-        .walletImagePlaceholder.imageReady {
-          opacity: 0;
-        }
-
-        .walletLogoPlaceholder {
-          width: 31px;
-          height: 31px;
-          border-radius: 50%;
-          background:
-            radial-gradient(
-              circle at 35% 25%,
-              rgba(255, 255, 255, 0.22),
-              transparent 42%
-            ),
-            rgba(255, 255, 255, 0.06);
-          animation: softPulse 1s ease-in-out infinite alternate;
-        }
-
-        .walletButtonImage {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-          z-index: 0;
-          pointer-events: none;
-          user-select: none;
-          opacity: 1;
-          filter: grayscale(1) contrast(1.08) brightness(0.72);
-          transform: scale(1.03);
-          transition: opacity 220ms ease;
-          animation: walletImageFadeIn 260ms ease both;
-        }
-
-        @keyframes walletImageFadeIn {
-          from {
-            opacity: 0;
-          }
-
-          to {
-            opacity: 1;
-          }
-        }
-
-        .walletButtonFade {
-          position: absolute;
-          inset: 0;
-          z-index: 2;
-          background:
-            linear-gradient(
-              to bottom,
-              rgba(0, 0, 0, 0.03),
-              rgba(0, 0, 0, 0.16) 32%,
-              rgba(0, 0, 0, 0.78) 78%,
-              rgba(0, 0, 0, 0.94)
-            ),
-            radial-gradient(
-              circle at 20% 18%,
-              rgba(255, 255, 255, 0.12),
-              transparent 34%
-            );
-          pointer-events: none;
-        }
-
-        .walletCardIcon {
-          position: absolute;
-          z-index: 8;
-          left: -10px;
-          top: -12px;
-          width: 46px;
-          height: 46px;
-          border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.58);
-          background: rgba(0, 0, 0, 0.94);
-          display: grid;
-          place-items: center;
-          box-shadow:
-            0 0 0 4px rgba(0, 0, 0, 0.82),
-            inset 0 0 14px rgba(255, 255, 255, 0.12),
-            0 0 16px rgba(255, 255, 255, 0.08);
-          pointer-events: none;
-        }
-
-        .walletCardIcon img {
-          width: 31px;
-          height: 31px;
-          object-fit: contain;
-          filter: brightness(1.25) contrast(1.1);
-          pointer-events: none;
-          user-select: none;
-          animation: walletImageFadeIn 260ms ease both;
-        }
-
-        .walletCollapseToggle {
-          position: absolute;
-          z-index: 100002;
-          right: -15px;
-          bottom: -16px;
-          width: 32px;
-          height: 32px;
-          padding: 0;
-          display: grid;
-          place-items: center;
-          color: rgba(255, 255, 255, 0.94);
-          background:
-            radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.16), transparent 42%),
-            rgba(0, 0, 0, 0.92);
-          border: 1px solid rgba(255, 255, 255, 0.46);
-          border-radius: 50%;
-          box-shadow:
-            0 0 0 3px rgba(0, 0, 0, 0.74),
-            inset 0 0 12px rgba(255, 255, 255, 0.12),
-            0 10px 20px rgba(0, 0, 0, 0.7);
-          cursor: pointer;
-          transition:
-            transform 160ms ease,
-            filter 160ms ease,
-            border-color 160ms ease;
-        }
-
-        .walletCollapseToggle:hover {
-          transform: translateX(2px);
-          filter: brightness(1.16);
-          border-color: rgba(255, 255, 255, 0.75);
-        }
-
-        .walletCollapseToggle :global(svg) {
-          width: 20px;
-          height: 20px;
-          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.86));
-        }
-
-        .walletMain {
-          position: absolute;
-          z-index: 6;
-          left: 6px;
-          right: 6px;
-          bottom: 7px;
-          min-height: 16px;
-          padding: 3px 4px 2px;
-          display: flex;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          color: rgba(255, 255, 255, 0.96);
-          background: rgba(0, 0, 0, 0.62);
-          border: 1px solid rgba(255, 255, 255, 0.28);
-          border-radius: 3px;
-          box-shadow:
-            inset 0 0 10px rgba(255, 255, 255, 0.06),
-            0 0 12px rgba(0, 0, 0, 0.8);
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 7.5px;
-          font-weight: 700;
-          letter-spacing: 0.06em;
-          line-height: 1;
-          text-align: center;
-          text-shadow:
-            0 1px 2px rgba(0, 0, 0, 0.95),
-            0 0 8px rgba(0, 0, 0, 0.9);
-          overflow: hidden;
+          min-height: 44px;
+          padding: 11px 19px;
+          border: 1px solid #f2efe7;
+          border-radius: 4px;
+          background: #f2efe7;
+          color: #171613;
+          font: 700 13px/1.4 Georgia, "Times New Roman", serif;
+          letter-spacing: .035em;
           white-space: nowrap;
-          text-overflow: ellipsis;
-          pointer-events: none;
+          cursor: pointer;
+          transition: background 150ms ease, box-shadow 150ms ease;
         }
+        .navWalletButton:hover { background: #fffdf7; box-shadow: 0 0 18px #f2efe722; }
+        .navWalletButton:focus-visible { outline: 2px solid #f2efe7; outline-offset: 4px; }
+        .walletRewardBadge { position:absolute; top:-8px; right:-8px; min-width:22px; height:22px; padding:2px 5px; border:2px solid #f2efe7; border-radius:20px; background:#24211c; color:#f2efe7; font:bold 11px/14px Arial,sans-serif; }
+        @media(max-width:760px) { .navWalletButton { font-size:12px; padding:10px 12px; } }
 
         .walletPanelScroll {
           max-height: min(680px, calc(100vh - 120px));
@@ -1481,61 +1123,6 @@ export default function DarkCoinWalletConnect({
           }
         }
 
-        @keyframes softPulse {
-          from {
-            opacity: 0.45;
-          }
-
-          to {
-            opacity: 0.9;
-          }
-        }
-
-        @media (max-width: 680px) {
-          .walletFixedShell {
-            --wallet-window-gap: 20px;
-            --wallet-logo-right-edge: 35px;
-            top: 120px;
-            width: 100px;
-            height: 56px;
-            z-index: 100000;
-            pointer-events: auto;
-          }
-
-          .walletTab {
-            width: 100px;
-            height: 56px;
-          }
-
-          .walletCardIcon {
-            left: -9px;
-            top: -31px;
-            width: 44px;
-            height: 44px;
-          }
-
-          .walletCardIcon img {
-            width: 25px;
-            height: 25px;
-          }
-
-          .walletLogoPlaceholder {
-            width: 25px;
-            height: 25px;
-          }
-
-          .walletButtonImage {
-            width: 100%;
-            height: 100%;
-          }
-
-          .walletCollapseToggle {
-            right: -10px;
-            bottom: -14px;
-            width: 30px;
-            height: 30px;
-          }
-        }
       `}</style>
 
       <style jsx global>{`
@@ -1550,7 +1137,7 @@ export default function DarkCoinWalletConnect({
         .walletConnectPopover,
         .assetsPopover {
           width: 460px;
-          max-width: calc(100vw - 160px);
+          max-width: calc(100vw - 32px);
           max-height: min(680px, calc(100vh - 120px));
           overflow: hidden;
           border: 1px solid rgba(255, 255, 255, 0.34);
@@ -1568,6 +1155,8 @@ export default function DarkCoinWalletConnect({
           color: #fff;
           font-family: Georgia, "Times New Roman", serif;
         }
+
+        .assetsPopover { display:flex; flex-direction:column; }
 
         .assetsHeader {
           display: flex;
@@ -1592,6 +1181,8 @@ export default function DarkCoinWalletConnect({
         }
 
         .assetsScroll {
+          min-height:0;
+          flex:1;
           max-height: min(590px, calc(100vh - 210px));
           overflow-y: auto;
           padding: 16px;
@@ -1633,11 +1224,12 @@ export default function DarkCoinWalletConnect({
           flex-shrink: 0;
         }
 
+
+
         .assetImg {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          animation: walletImageFadeIn 260ms ease both;
         }
 
         .assetImgLoading {
@@ -1693,7 +1285,7 @@ export default function DarkCoinWalletConnect({
           .walletConnectPopover,
           .assetsPopover {
             width: 420px;
-            max-width: calc(100vw - 140px);
+            max-width: calc(100vw - 32px);
           }
         }
 
@@ -1705,7 +1297,9 @@ export default function DarkCoinWalletConnect({
             max-height: calc(100vh - 170px);
           }
 
-          .assetsHeader {
+          .assetsPopover { display:flex; flex-direction:column; }
+
+        .assetsHeader {
             align-items: flex-start;
             flex-direction: column;
           }

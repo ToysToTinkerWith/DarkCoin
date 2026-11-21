@@ -1,3 +1,5 @@
+import EffectKeywords, { EffectRulesContext } from '../components/EffectKeywords'
+import { effectRulesetForPath } from '../lib/effect-glossary'
 import React, { useEffect, useState, useCallback, useRef } from "react"
 import PropTypes from "prop-types"
 import { useRouter } from "next/router"
@@ -5,6 +7,10 @@ import { ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import theme from "../theme"
 import "../style.css"
+import "../components/arena/playground/playground.css"
+import "../components/arena/playground/champion-preview.css"
+import "../components/contracts/Arena/armoury-preview.css"
+import "../components/contracts/Arena/armoury-build.css"
 
 import { Button, Typography, CircularProgress } from "@mui/material"
 import CancelIcon from "@mui/icons-material/Cancel"
@@ -18,6 +24,7 @@ import {
 
 import Nav from "../components/connect/nav"
 import Connect from "../components/connect/connect"
+import MarketSocialHead from "../components/contracts/Market/MarketSocialHead"
 import { trackPageView, trackVisitorLocationContext } from "../Firebase/analytics"
 
 const DEPTHS_APP_ID = 3658640544
@@ -41,7 +48,7 @@ export default function MyApp(props) {
   const contracts = {
     council: 1239236238,
     oldArena: 1053328572,
-    market: 3069960875,
+    market: 3690496091,
     airdrop: 1174019649,
     ASAblasters: 1434284594,
     swapper: 1632253886,
@@ -52,10 +59,12 @@ export default function MyApp(props) {
     depths: Number(process.env.NEXT_PUBLIC_DEPTHS_APP_ID || DEPTHS_APP_ID),
   }
 
-  const fetchDcAssets = useCallback(async (activeAddress) => {
+  const fetchDcAssets = useCallback(async (activeAddress, force = false) => {
     if (!activeAddress) return
 
     const normalizedAddress = String(activeAddress)
+
+    if (force) fetchedWalletAssetsRef.current.delete(normalizedAddress)
 
     // Prevent repeated Algorand/API calls for the same wallet during one page load.
     if (fetchedWalletAssetsRef.current.has(normalizedAddress)) {
@@ -92,25 +101,8 @@ export default function MyApp(props) {
     }
   }, [])
 
-  const sendDiscordMessage = useCallback(async (error, location, address) => {
-    try {
-      console.log(error)
-
-      await fetch(process.env.discordErrorWebhook, {
-        method: "POST",
-        body: JSON.stringify({
-          embeds: [
-            {
-              title: String(address) + " " + String(location),
-              description: String(error),
-            },
-          ],
-        }),
-        headers: { "Content-Type": "application/json" },
-      })
-    } catch (e) {
-      console.error("Failed to send Discord error message:", e)
-    }
+  const sendDiscordMessage = useCallback((error, location) => {
+    console.error(location, error)
   }, [])
 
   useEffect(() => {
@@ -121,8 +113,8 @@ export default function MyApp(props) {
     if (typeof window === "undefined") return
 
     const m = new WalletManager({
-      wallets: [WalletId.PERA, WalletId.DEFLY, WalletId.LUTE],
-      defaultNetwork: NetworkId.MAINNET,
+      wallets: [WalletId.PERA, WalletId.DEFLY, { id: WalletId.LUTE, options: { siteName: "Dark Coin" } }],
+      defaultNetwork: process.env.NEXT_PUBLIC_WALLET_NETWORK === 'testnet' ? NetworkId.TESTNET : NetworkId.MAINNET,
     })
 
     setManager(m)
@@ -156,10 +148,11 @@ export default function MyApp(props) {
     }
   }, [display, router])
 
-  if (!manager) return null
+  if (!manager) return <MarketSocialHead seo={pageProps.marketSeo} />
 
   return (
     <React.Fragment>
+      <MarketSocialHead seo={pageProps.marketSeo} />
       {/* {message ? (
         <div
           style={{
@@ -199,9 +192,9 @@ export default function MyApp(props) {
 
           {display ? (
             <div>
-              <Nav />
-
-              <Connect wallet={wallet} fetchDcAssets={fetchDcAssets} />
+              <Nav walletControl={<Connect wallet={wallet} fetchDcAssets={fetchDcAssets} />} />
+              <EffectRulesContext.Provider value={effectRulesetForPath(router.pathname)}>
+              <EffectKeywords/>
 
               <Component
                 {...pageProps}
@@ -211,6 +204,7 @@ export default function MyApp(props) {
                 sendDiscordMessage={sendDiscordMessage}
                 wallet={wallet}
               />
+              </EffectRulesContext.Provider>
             </div>
           ) : null}
         </ThemeProvider>

@@ -1,3 +1,4 @@
+import {applyChampionNames} from '../../lib/champion-names'
 import NextCors from "nextjs-cors"
 import algosdk from "algosdk"
 
@@ -137,7 +138,7 @@ async function getDcAssets(req, res) {
       },
     })
 
-    return sendJson(res, accountDc)
+    return sendJson(res, await applyChampionNames(accountDc))
   } catch (error) {
     console.error(error)
     return sendJson(

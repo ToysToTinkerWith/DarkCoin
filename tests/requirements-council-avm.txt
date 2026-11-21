@@ -1,0 +1,4 @@
+algojig==0.0.2
+pyteal==0.27.0
+PyNaCl==1.6.2
+py-algorand-sdk==2.12.0

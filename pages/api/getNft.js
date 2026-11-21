@@ -1,3 +1,4 @@
+import {applyChampionNames} from '../../lib/champion-names'
 import NextCors from "nextjs-cors"
 import algosdk from "algosdk"
 
@@ -80,6 +81,8 @@ export default async function getNft(req, res) {
     // --- NFT + stats ---
     const nft = await indexerClient.searchForAssets().index(Number(nftId)).do()
 
+    await applyChampionNames((nft.assets||[]).map(asset=>({asset})))
+
     const assetConfig = await indexerClient
       .lookupAssetTransactions(Number(nftId))
       .txType("acfg")
@@ -92,12 +95,19 @@ export default async function getNft(req, res) {
 
     const charStats = lastNoteB64 ? decodeNoteBase64(lastNoteB64) : ""
 
+    // The armoury only needs NFT metadata and equipped traits. Existing arena
+    // character records are independent of a regular on-chain trait swap.
+    if (req.body?.includeArenaCharacter === false) {
+      return res.json(sanitizeForJson({ nft, charStats, charObject: "none", action: null }))
+    }
+
     // --- get charObject from Firestore ---
     let charObject = "none"
     try {
       const charRef = doc(db, "chars", `${nftId}object`)
       const charSnap = await getDoc(charRef)
       charObject = charSnap.exists() ? charSnap.data() : "none"
+
     } catch (err) {
       console.log("Error fetching charObject from Firestore:", err)
       charObject = "none"

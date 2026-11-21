@@ -1,0 +1,16 @@
+{
+  "name": "dark-coin-arena-realtime",
+  "private": true,
+  "version": "1.0.0",
+  "engines": {
+    "node": "24"
+  },
+  "scripts": {
+    "start": "node server.cjs"
+  },
+  "overrides": {"gaxios": {"uuid": "11.1.1"}},
+  "dependencies": {
+    "firebase-admin": "14.4.0",
+    "ws": "8.21.3"
+  }
+}

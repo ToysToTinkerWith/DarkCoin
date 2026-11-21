@@ -1,6 +1,7 @@
 import NextCors from "nextjs-cors";
 import algosdk from "algosdk";
 import crypto from "crypto";
+import {depthsTreasuryConfig, depthsAvailableBalance, depthsPayoutAmount, reserveDepthsReward, depthsRewardView} from "../../../lib/arena/depths-treasury";
 import admin from "../../../Firebase/FirebaseAdmin";
 
 const ALGOD_BASE = "https://mainnet-api.algonode.cloud";
@@ -23,6 +24,10 @@ const DARK_COIN_REWARD_TIERS = [
   { id: "royal-cache", label: "Royal Cache", basisPoints: 1000, weight: 180 },
   { id: "abyss-jackpot", label: "Abyss Jackpot", basisPoints: 2500, weight: 20 },
 ];
+const DARK_COIN_REWARD_TOTAL_WEIGHT = DARK_COIN_REWARD_TIERS.reduce(
+  (total, tier) => total + Number(tier.weight || 0),
+  0
+);
 
 function sendJson(res, status, payload) {
   const body = JSON.stringify(payload, (_key, value) =>
@@ -45,7 +50,7 @@ function normalizeAssetId(value) {
 }
 
 function getDepthsAppId() {
-  return normalizeAssetId(process.env.DEPTHS_APP_ID || process.env.NEXT_PUBLIC_DEPTHS_APP_ID) || DEPTHS_APP_ID;
+  return depthsTreasuryConfig().appId;
 }
 
 function getApplicationAddressString(appId) {
@@ -272,10 +277,56 @@ function formatAtomicAmount(value, decimals = DARK_COIN_DECIMALS) {
 
 function formatBasisPoints(basisPoints) {
   const percent = Number(basisPoints || 0) / 100;
-  return `${percent.toLocaleString("en-US", {
-    minimumFractionDigits: percent < 1 ? 2 : 0,
+  return formatPercent(percent);
+}
+
+function formatPercent(percent) {
+  const value = Number(percent || 0);
+  return `${value.toLocaleString("en-US", {
+    minimumFractionDigits: value > 0 && value < 1 ? 2 : 0,
     maximumFractionDigits: 2,
   })}%`;
+}
+
+function getRewardTierById(tierId) {
+  const normalized = String(tierId || "").trim();
+  if (!normalized) return null;
+  return DARK_COIN_REWARD_TIERS.find((tier) => tier.id === normalized) || null;
+}
+
+function getRewardTierByStoredReward(reward = {}) {
+  return (
+    getRewardTierById(reward.tierId || reward.darkCoinRewardTierId) ||
+    DARK_COIN_REWARD_TIERS.find((tier) => tier.label === (reward.label || reward.darkCoinRewardLabel)) ||
+    DARK_COIN_REWARD_TIERS.find(
+      (tier) => Number(tier.basisPoints) === Number(reward.basisPoints ?? reward.darkCoinRewardBasisPoints)
+    ) ||
+    null
+  );
+}
+
+function getRewardTierChance(tier = {}) {
+  const weight = Number(tier.weight || 0);
+  return DARK_COIN_REWARD_TOTAL_WEIGHT > 0 ? (weight / DARK_COIN_REWARD_TOTAL_WEIGHT) * 100 : 0;
+}
+
+function getRewardTierChanceFields(tier = {}) {
+  if (!tier || !Number(tier.weight || 0)) {
+    return {
+      weight: 0,
+      totalWeight: DARK_COIN_REWARD_TOTAL_WEIGHT,
+      chance: null,
+      chanceDisplay: "",
+    };
+  }
+
+  const chance = getRewardTierChance(tier);
+  return {
+    weight: Number(tier.weight || 0),
+    totalWeight: DARK_COIN_REWARD_TOTAL_WEIGHT,
+    chance,
+    chanceDisplay: formatPercent(chance),
+  };
 }
 
 function rollDarkCoinReward(contractBalanceAtomic, decimals) {
@@ -295,18 +346,27 @@ function rollDarkCoinReward(contractBalanceAtomic, decimals) {
     label: tier.label,
     basisPoints: tier.basisPoints,
     percentDisplay: formatBasisPoints(tier.basisPoints),
+    ...getRewardTierChanceFields(tier),
     amountAtomic: amountAtomic.toString(),
     amountDisplay: formatAtomicAmount(amountAtomic, decimals),
     contractBalanceAtomic: contractBalanceAtomic.toString(),
   };
 }
 
+let rewardOddsCache = null;
 async function getDepthsRewardOdds() {
+  if (rewardOddsCache && rewardOddsCache.until > Date.now()) return rewardOddsCache.result;
+  const entry = {until:Date.now() + 10000, result:readDepthsRewardOdds()};
+  rewardOddsCache = entry;
+  try {return await entry.result;} catch (error) {if (rewardOddsCache === entry) rewardOddsCache = null;throw error;}
+}
+
+async function readDepthsRewardOdds() {
   const appId = getDepthsAppId();
   const assetId = getDarkCoinAssetId();
   const decimals = getDarkCoinDecimals();
-  const contractBalanceAtomic = await getAppAssetBalance(appId, assetId);
-  const totalWeight = DARK_COIN_REWARD_TIERS.reduce((total, tier) => total + Number(tier.weight || 0), 0);
+  const inventory = await depthsAvailableBalance(db, depthsTreasuryConfig(), assetId);
+  const contractBalanceAtomic = BigInt(inventory.available);
 
   return {
     status: "ok",
@@ -316,22 +376,18 @@ async function getDepthsRewardOdds() {
     contractBalanceAtomic: contractBalanceAtomic.toString(),
     contractBalanceDisplay: formatAtomicAmount(contractBalanceAtomic, decimals),
     rewardTiers: DARK_COIN_REWARD_TIERS.map((tier) => {
-      let amountAtomic = (contractBalanceAtomic * BigInt(tier.basisPoints)) / 10000n;
-      if (contractBalanceAtomic > 0n && amountAtomic <= 0n) amountAtomic = 1n;
-      if (amountAtomic > contractBalanceAtomic) amountAtomic = contractBalanceAtomic;
-      const chance = totalWeight > 0 ? (Number(tier.weight || 0) / totalWeight) * 100 : 0;
+      const amountAtomic = depthsPayoutAmount(inventory, tier.basisPoints);
+      const chanceFields = getRewardTierChanceFields(tier);
 
       return {
         id: tier.id,
         label: tier.label,
         basisPoints: tier.basisPoints,
         percentDisplay: formatBasisPoints(tier.basisPoints),
-        weight: tier.weight,
-        chance,
-        chanceDisplay: `${chance.toLocaleString("en-US", {
-          minimumFractionDigits: chance < 1 ? 2 : 1,
-          maximumFractionDigits: 2,
-        })}%`,
+        weight: chanceFields.weight,
+        totalWeight: chanceFields.totalWeight,
+        chance: chanceFields.chance,
+        chanceDisplay: chanceFields.chanceDisplay,
         amountAtomic: amountAtomic.toString(),
         amountDisplay: formatAtomicAmount(amountAtomic, decimals),
       };
@@ -488,40 +544,6 @@ async function simulateSignedTransactionOrThrow(algod, signedTxn, context) {
   }
 }
 
-async function assertDepthsRewardAppSupportsMethods(algod, appId) {
-  try {
-    const app = await algod.getApplicationByID(appId).do();
-    const approvalProgram = app?.params?.approvalProgram || app?.params?.["approval-program"];
-    const approvalBytes =
-      approvalProgram instanceof Uint8Array
-        ? approvalProgram
-        : typeof approvalProgram === "string"
-        ? new Uint8Array(Buffer.from(approvalProgram, "base64"))
-        : null;
-
-    if (!approvalBytes?.length) {
-      throw new Error("approval program was not returned");
-    }
-
-    const disassembled = await algod.disassemble(approvalBytes).do();
-    const teal = String(disassembled?.result || "");
-    if (!teal.includes("grantDarkCoin") || !teal.includes("claimReward")) {
-      const error = new Error(
-        `Configured Depths app ${appId} is not the Depths reward contract. Deploy contracts/depths.py and set DEPTHS_APP_ID / NEXT_PUBLIC_DEPTHS_APP_ID to that app id.`
-      );
-      error.status = 500;
-      throw error;
-    }
-  } catch (error) {
-    if (error?.status) throw error;
-    const wrapped = new Error(
-      `Could not verify Depths reward contract ${appId}: ${error?.message || String(error)}`
-    );
-    wrapped.status = 500;
-    throw wrapped;
-  }
-}
-
 function getDragonshordeSigner() {
   const mnemonic =
     process.env.DRAGONSHORDE_ADMIN_MNEMONIC ||
@@ -542,6 +564,8 @@ function getDragonshordeSigner() {
 function getExistingDarkCoinReward(run, { appId, assetId, decimals, walletAddress }) {
   const amountAtomic = run?.darkCoinRewardAmountAtomic;
   if (!amountAtomic) return null;
+  const tier = getRewardTierByStoredReward(run) || {};
+  const chanceFields = getRewardTierChanceFields(tier);
 
   return {
     status: run.darkCoinRewardStatus || "granted",
@@ -555,6 +579,10 @@ function getExistingDarkCoinReward(run, { appId, assetId, decimals, walletAddres
     label: run.darkCoinRewardLabel || "Depths Reward",
     basisPoints: Number(run.darkCoinRewardBasisPoints || 0),
     percentDisplay: run.darkCoinRewardPercentDisplay || formatBasisPoints(run.darkCoinRewardBasisPoints || 0),
+    weight: Number(run.darkCoinRewardWeight || chanceFields.weight || 0),
+    totalWeight: Number(run.darkCoinRewardTotalWeight || chanceFields.totalWeight || 0),
+    chance: Number(run.darkCoinRewardChance ?? chanceFields.chance ?? 0),
+    chanceDisplay: run.darkCoinRewardChanceDisplay || chanceFields.chanceDisplay || "",
     contractBalanceAtomic: String(run.darkCoinRewardContractBalanceAtomic || "0"),
     grantTxId: run.darkCoinRewardGrantTxId || null,
     claimTxId: run.darkCoinClaimTxId || null,
@@ -626,211 +654,6 @@ async function loadEligibleRun({ runId, runToken, requestedChampionAssetId }) {
   }
 
   return { runRef, run, championAssetId, walletAddress, serverRewardProof };
-}
-
-async function lockDarkCoinGrant({
-  runRef,
-  runId,
-  roll,
-  appId,
-  assetId,
-  decimals,
-  walletAddress,
-  championAssetId,
-  serverRewardProof,
-}) {
-  let existingReward = null;
-  let grantRoll = roll;
-
-  await db.runTransaction(async (transaction) => {
-    const freshSnap = await transaction.get(runRef);
-    if (!freshSnap.exists) {
-      const error = new Error("Depths run was not found during reward lock.");
-      error.status = 404;
-      throw error;
-    }
-
-    const fresh = freshSnap.data() || {};
-    existingReward = getExistingDarkCoinReward(fresh, { appId, assetId, decimals, walletAddress });
-
-    if (fresh.darkCoinRewardStatus === "claimed" || fresh.darkCoinClaimTxId) return;
-    if (fresh.darkCoinRewardStatus === "granted" || fresh.darkCoinRewardGrantTxId) return;
-
-    if (fresh.darkCoinRewardStatus === "granting") {
-      const error = new Error("Depths Dark Coin reward is already being granted.");
-      error.status = 409;
-      throw error;
-    }
-
-    if (
-      fresh.status !== "completed" ||
-      fresh.serverRewardEligible !== true ||
-      fresh.serverRewardProof !== serverRewardProof
-    ) {
-      const error = new Error("Depths run is no longer reward eligible.");
-      error.status = 400;
-      throw error;
-    }
-
-    if (existingReward) {
-      grantRoll = {
-        tierId: existingReward.tierId,
-        label: existingReward.label,
-        basisPoints: existingReward.basisPoints,
-        percentDisplay: existingReward.percentDisplay,
-        amountAtomic: existingReward.amountAtomic,
-        amountDisplay: existingReward.amountDisplay,
-        contractBalanceAtomic: existingReward.contractBalanceAtomic,
-      };
-    } else {
-      existingReward = null;
-    }
-
-    transaction.update(runRef, {
-      darkCoinRewardStatus: "granting",
-      darkCoinRewardAssetId: assetId,
-      darkCoinRewardAppId: appId,
-      darkCoinRewardWalletAddress: walletAddress,
-      darkCoinRewardTierId: grantRoll.tierId,
-      darkCoinRewardLabel: grantRoll.label,
-      darkCoinRewardBasisPoints: grantRoll.basisPoints,
-      darkCoinRewardPercentDisplay: grantRoll.percentDisplay,
-      darkCoinRewardAmountAtomic: grantRoll.amountAtomic,
-      darkCoinRewardAmountDisplay: grantRoll.amountDisplay,
-      darkCoinRewardContractBalanceAtomic: grantRoll.contractBalanceAtomic,
-      darkCoinRewardGrantStartedAt: serverTimestamp(),
-      rewardStatus: "darkcoin_granting",
-      updatedAt: serverTimestamp(),
-    });
-
-    transaction.set(
-      db.collection("depthsRewardClaims").doc(String(runId)),
-      {
-        runId: String(runId),
-        status: "darkcoin_granting",
-        championAssetId,
-        walletAddress,
-        appId,
-        assetId,
-        reward: grantRoll,
-        requestedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
-  });
-
-  return { existingReward, grantRoll };
-}
-
-async function submitGrantDarkCoinCall({ appId, walletAddress, assetId, amountAtomic }) {
-  const amountNumber = Number(amountAtomic);
-  if (!Number.isSafeInteger(amountNumber) || BigInt(amountNumber) !== BigInt(String(amountAtomic))) {
-    const error = new Error("Depths Dark Coin reward amount is too large to encode safely.");
-    error.status = 500;
-    throw error;
-  }
-
-  const algod = new algosdk.Algodv2("", ALGOD_BASE, 443);
-  await assertDepthsRewardAppSupportsMethods(algod, appId);
-
-  const signer = getRewardSigner();
-  const signerAddress = String(signer.addr);
-  const suggestedParams = await algod.getTransactionParams().do();
-  const appArgs = [
-    new Uint8Array(Buffer.from("grantDarkCoin")),
-    algosdk.encodeUint64(amountNumber),
-  ];
-  const walletBoxReference = makeAccountBoxReference(walletAddress);
-
-  const txn = algosdk.makeApplicationNoOpTxnFromObject({
-    sender: signerAddress,
-    appIndex: appId,
-    suggestedParams,
-    appArgs,
-    accounts: [walletAddress],
-    foreignAssets: [assetId],
-    boxes: [walletBoxReference],
-    convertToAccess: false,
-  });
-  assertAppCallHasBoxReference(txn, walletBoxReference, "Depths Dark Coin grant");
-
-  const signedTxn = txn.signTxn(signer.sk);
-  assertSignedTxnHasBoxReference(signedTxn, walletBoxReference, "Depths Dark Coin grant");
-  let txId = null;
-
-  try {
-    await simulateSignedTransactionOrThrow(algod, signedTxn, "Depths Dark Coin grant");
-    const sendResult = await algod.sendRawTransaction(signedTxn).do();
-    txId = sendResult?.txid || sendResult?.txId || txn.txID();
-    const confirmed = await algosdk.waitForConfirmation(algod, txId, 4);
-
-    return {
-      txId,
-      confirmedRound: Number(confirmed?.confirmedRound || confirmed?.["confirmed-round"] || 0) || null,
-      signer: signerAddress,
-    };
-  } catch (error) {
-    error.txId = txId;
-    error.signer = signerAddress;
-    throw error;
-  }
-}
-
-async function recordDarkCoinClaim(body) {
-  const runId = String(body.runId || "").trim();
-  const runToken = String(body.runToken || "").trim();
-  const txId = String(body.txId || body.claimTxId || "").trim();
-
-  if (!runId) {
-    const error = new Error("runId is required.");
-    error.status = 400;
-    throw error;
-  }
-  if (!txId) {
-    const error = new Error("claim txId is required.");
-    error.status = 400;
-    throw error;
-  }
-
-  const runRef = db.collection("depthsRuns").doc(runId);
-  const runSnap = await runRef.get();
-  if (!runSnap.exists) {
-    const error = new Error("Depths run was not found.");
-    error.status = 404;
-    throw error;
-  }
-
-  const run = runSnap.data() || {};
-  requireRunWriteToken(run, runToken);
-
-  const walletAddress = validateAddress(run.activeAddress, "Depths run wallet address");
-
-  await runRef.update({
-    darkCoinRewardStatus: "claimed",
-    darkCoinClaimTxId: txId,
-    darkCoinClaimedAt: serverTimestamp(),
-    rewardStatus: "darkcoin_claimed",
-    rewardTxId: txId,
-    updatedAt: serverTimestamp(),
-  });
-
-  await db.collection("depthsRewardClaims").doc(runId).set(
-    {
-      runId,
-      status: "darkcoin_claimed",
-      walletAddress,
-      claimTxId: txId,
-      claimedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
-
-  return {
-    status: "claimed",
-    runId,
-    walletAddress,
-    claimTxId: txId,
-  };
 }
 
 async function loadRunForXpFinalization({ runId, runToken, requestedChampionAssetId }) {
@@ -1185,176 +1008,18 @@ async function finalizeDepthsRunXp(body) {
 }
 
 async function grantDarkCoinReward(body) {
-  const runId = String(body.runId || "").trim();
-  const runToken = String(body.runToken || "").trim();
-  const appId = getDepthsAppId();
-  const assetId = getDarkCoinAssetId();
-  const decimals = getDarkCoinDecimals();
-
-  if (!runId) {
-    const error = new Error("runId is required.");
-    error.status = 400;
-    throw error;
-  }
-  if (!runToken) {
-    const error = new Error("runToken is required.");
-    error.status = 400;
-    throw error;
-  }
-  if (!appId) {
-    const error = new Error("Server misconfigured: DEPTHS_APP_ID or NEXT_PUBLIC_DEPTHS_APP_ID is required.");
-    error.status = 500;
-    throw error;
-  }
-
-  const { runRef, run, championAssetId, walletAddress, serverRewardProof } = await loadEligibleRun({
-    runId,
-    runToken,
-    requestedChampionAssetId: body.championAssetId,
+  const runId = String(body.runId || "").trim(), runToken = String(body.runToken || "").trim();
+  if (!runId || runId.includes('/') || !runToken) throw Object.assign(new Error("runId and runToken are required."), {status:400});
+  const config = depthsTreasuryConfig();
+  const eligible = await loadEligibleRun({runId, runToken, requestedChampionAssetId:body.championAssetId});
+  const row = await reserveDepthsReward(db, config, eligible, {
+    assetId:getDarkCoinAssetId(), rollReward:rollDarkCoinReward, formatAmount:formatAtomicAmount,
   });
-
-  const existingReward = getExistingDarkCoinReward(run, { appId, assetId, decimals, walletAddress });
-  if (
-    existingReward &&
-    (existingReward.status === "granted" ||
-      existingReward.status === "claimed" ||
-      existingReward.grantTxId ||
-      existingReward.claimTxId)
-  ) {
-    return {
-      status: existingReward.status || "granted",
-      runId,
-      championAssetId,
-      walletAddress,
-      darkCoinReward: existingReward,
-    };
-  }
-
-  const contractBalanceAtomic = await getAppAssetBalance(appId, assetId);
-  const roll = existingReward
-    ? {
-        tierId: existingReward.tierId,
-        label: existingReward.label,
-        basisPoints: existingReward.basisPoints,
-        percentDisplay: existingReward.percentDisplay,
-        amountAtomic: existingReward.amountAtomic,
-        amountDisplay: existingReward.amountDisplay,
-        contractBalanceAtomic: existingReward.contractBalanceAtomic,
-      }
-    : rollDarkCoinReward(contractBalanceAtomic, decimals);
-
-  const locked = await lockDarkCoinGrant({
-    runRef,
-    runId,
-    roll,
-    appId,
-    assetId,
-    decimals,
-    walletAddress,
-    championAssetId,
-    serverRewardProof,
-  });
-
-  if (
-    locked.existingReward &&
-    (locked.existingReward.status === "granted" ||
-      locked.existingReward.status === "claimed" ||
-      locked.existingReward.grantTxId ||
-      locked.existingReward.claimTxId)
-  ) {
-    return {
-      status: locked.existingReward.status || "granted",
-      runId,
-      championAssetId,
-      walletAddress,
-      darkCoinReward: locked.existingReward,
-    };
-  }
-
-  try {
-    const grantTx = await submitGrantDarkCoinCall({
-      appId,
-      walletAddress,
-      assetId,
-      amountAtomic: locked.grantRoll.amountAtomic,
-    });
-
-    const darkCoinReward = {
-      status: "granted",
-      appId,
-      assetId,
-      decimals,
-      walletAddress,
-      ...locked.grantRoll,
-      grantTxId: grantTx.txId,
-      grantConfirmedRound: grantTx.confirmedRound,
-    };
-
-    await runRef.update({
-      darkCoinRewardStatus: "granted",
-      darkCoinRewardGrantTxId: grantTx.txId,
-      darkCoinRewardGrantConfirmedRound: grantTx.confirmedRound,
-      darkCoinRewardSigner: grantTx.signer,
-      darkCoinRewardGrantedAt: serverTimestamp(),
-      rewardStatus: "darkcoin_granted",
-      updatedAt: serverTimestamp(),
-    });
-
-    await db.collection("depthsRewardClaims").doc(String(runId)).set(
-      {
-        runId,
-        status: "darkcoin_granted",
-        championAssetId,
-        walletAddress,
-        appId,
-        assetId,
-        reward: locked.grantRoll,
-        grantTxId: grantTx.txId,
-        grantConfirmedRound: grantTx.confirmedRound,
-        rewardSigner: grantTx.signer,
-        grantedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
-
-    return {
-      status: "granted",
-      runId,
-      championAssetId,
-      walletAddress,
-      darkCoinReward,
-    };
-  } catch (error) {
-    await runRef.update({
-      darkCoinRewardStatus: "grant_failed",
-      darkCoinRewardError: error?.message || "Depths Dark Coin reward grant failed.",
-      darkCoinRewardFailedAt: serverTimestamp(),
-      rewardStatus: "darkcoin_grant_failed",
-      updatedAt: serverTimestamp(),
-    });
-
-    await db.collection("depthsRewardClaims").doc(String(runId)).set(
-      {
-        runId,
-        status: "darkcoin_grant_failed",
-        championAssetId,
-        walletAddress,
-        appId,
-        assetId,
-        reward: locked.grantRoll,
-        grantTxId: error?.txId || null,
-        rewardSigner: error?.signer || null,
-        error: error?.message || "Depths Dark Coin reward grant failed.",
-        failedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
-
-    throw error;
-  }
+  return {status:row.deliveryStatus, runId, championAssetId:eligible.championAssetId, walletAddress:eligible.walletAddress, darkCoinReward:depthsRewardView(row)};
 }
 
 async function claimDepthsReward(req, res) {
+  res.setHeader("Cache-Control", "no-store");
   await NextCors(req, res, {
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
     origin: "*",
@@ -1371,7 +1036,7 @@ async function claimDepthsReward(req, res) {
     const action = String(body.action || "grantDarkCoin").trim();
 
     if (action === "recordDarkCoinClaim") {
-      return sendJson(res, 200, await recordDarkCoinClaim(body));
+      return sendJson(res, 410, {error:"Legacy Depths claims have been replaced by shared Arena Treasury delivery. Use your wallet rewards menu."});
     }
 
     if (action === "finalizeRunXp") {

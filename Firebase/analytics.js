@@ -4,7 +4,7 @@ import firebase_app from "./FirebaseInit"
 let analyticsPromise = null
 
 export async function getFirebaseAnalytics() {
-  if (typeof window === "undefined") return null
+  if (typeof window === "undefined" || process.env.NEXT_PUBLIC_ARENA_DEV === "true") return null
   if (!firebase_app?.options?.measurementId) return null
 
   if (!analyticsPromise) {

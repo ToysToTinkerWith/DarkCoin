@@ -1,0 +1,14 @@
+{
+  "source": "ArenaTreasury.py",
+  "avmVersion": 9,
+  "schema": {
+    "localInts": 0,
+    "localBytes": 0,
+    "globalInts": 2,
+    "globalBytes": 1
+  },
+  "creationArgs": "oracle",
+  "sourceSha256": "070dd215990007fbc4591176203401671d404773899a3b6e50c29211adea858b",
+  "approvalSha256": "08a057436fd2f3a2a5f37c2d937de0b158021490938381e122ba5700ef0fe2b8",
+  "clearSha256": "e8b0fe094c82f39837ff242dc78cdcc3db7240e48f2bb12831423cc3e11752ab"
+}

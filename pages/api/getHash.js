@@ -58,10 +58,14 @@ async function getHash(req, res) {
       optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
    });
 
+    const email = process.env.FIREBASE_AUTH_EMAIL?.trim();
+    const password = process.env.FIREBASE_AUTH_PASSWORD || process.env.EMAILPASS;
+    if (!email || !password) {
+        return res.status(503).json({ error: 'Firebase server login is not configured' });
+    }
+
     return new Promise(async (resolve) => {
 
-            const email    = 'abergquist96@gmail.com';
-            const password = process.env.EMAILPASS
         
             const { user } = await signInWithEmailAndPassword(auth, email, password);
             const idToken  = await user.getIdToken();      // JWT you can send to your API

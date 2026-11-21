@@ -1,13 +1,5 @@
-
-import * as admin from "firebase-admin";
-var serviceAccount = require("../service.json");
-
-if (!admin.apps.length) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-}
-
-console.log("initit")
-
+import * as admin from 'firebase-admin';
+// Production uses its attached service identity. Local development can set
+// GOOGLE_APPLICATION_CREDENTIALS; credentials never enter compiled source.
+if (!admin.apps.some(app => app.name === '[DEFAULT]')) admin.initializeApp();
 export default admin;

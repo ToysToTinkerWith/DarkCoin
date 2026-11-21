@@ -1282,7 +1282,7 @@ function MonsterSheet({ monster, onBack }) {
           Back
         </Button>
         <Button
-          href="/arena/depths"
+          href="/arena"
           startIcon={<ArrowBackIcon />}
           sx={{
             ...buttonStyle,
@@ -1294,7 +1294,7 @@ function MonsterSheet({ monster, onBack }) {
             },
           }}
         >
-          The Depths
+          Arena
         </Button>
       </Box>
 
@@ -1445,8 +1445,8 @@ export default function ArenaMonstersPage() {
               <Typography sx={{ color: DC_THEME.muted, fontSize: 14 }}>
                 {monsters.length ? `${monsters.length} loaded` : ""}
               </Typography>
-              <Button href="/arena/depths" startIcon={<ArrowBackIcon />} sx={{ ...buttonStyle, minHeight: 38, px: 1.6 }}>
-                The Depths
+              <Button href="/arena" startIcon={<ArrowBackIcon />} sx={{ ...buttonStyle, minHeight: 38, px: 1.6 }}>
+                Arena
               </Button>
             </Box>
           </Box>

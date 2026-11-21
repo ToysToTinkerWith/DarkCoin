@@ -20,6 +20,7 @@ import VolumeOffIcon from "@mui/icons-material/VolumeOff";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { buildDepthsArtifactRuntime } from "./depthsArtifacts";
 import { getArenaEffectInfo } from "./effectInfo";
+import { getDepthsMoveId, findDepthsReplayMove, restoreDepthsMoveIds } from "../../../lib/depthsMoves";
 
 const THEME = {
   text: "rgba(255,255,255,0.94)",
@@ -2374,7 +2375,7 @@ function normalizeMove(move, index, sourceCharObj, sourceRole = "") {
 
   return {
     ...src,
-    id: src.id || `${index}-${src.name || "move"}`,
+    id: getDepthsMoveId(src, index),
     name: src.name || `Move ${index + 1}`,
     type: src.type || src.category || "melee damage",
     category: src.category || src.type || "melee damage",
@@ -3066,7 +3067,7 @@ function getWinner(battle) {
   return null;
 }
 
-function mergeFighterSnapshot(fighter = {}, snapshot = {}) {
+function mergeFighterSnapshot(fighter = {}, snapshot = {}, initialFighter = {}) {
   if (!snapshot || typeof snapshot !== "object") return fighter;
   const snapshotMoves = asArray(snapshot.moves);
   const moveMetadataById = snapshotMoves.reduce((acc, move) => {
@@ -3074,7 +3075,8 @@ function mergeFighterSnapshot(fighter = {}, snapshot = {}) {
     if (key) acc[key] = move;
     return acc;
   }, {});
-  const mergedMoves = asArray(fighter.moves).map((move) => {
+  const catalog = asArray(initialFighter.moves).length ? initialFighter.moves : snapshotMoves;
+  const mergedMoves = restoreDepthsMoveIds(asArray(fighter.moves), catalog).map((move) => {
     const saved = moveMetadataById[String(move?.id || move?.name || "")] || null;
     if (!saved) return move;
     return {
@@ -3108,9 +3110,7 @@ function hydrateAnimationMoveFromFighter(next) {
 
   const actorMoves = asArray(next.fighters?.[animation.actorSide]?.moves);
   const moveId = String(animation.move.id || animation.move.moveId || animation.move.cardId || animation.move.name || "");
-  const fullMove = actorMoves.find(
-    (move) => String(move?.id || move?.moveId || move?.cardId || move?.name || "") === moveId
-  );
+  const fullMove = findDepthsReplayMove(actorMoves, moveId);
 
   if (fullMove) {
     next.animation = {
@@ -3157,18 +3157,19 @@ function hydrateBattleFromSnapshot(initialBattle, snapshot = {}, battleId = "", 
     : next.actionLog;
 
   if (next.fighters?.A && snapshot.champion) {
-    next.fighters.A = mergeFighterSnapshot(next.fighters.A, snapshot.champion);
+    next.fighters.A = mergeFighterSnapshot(next.fighters.A, snapshot.champion, savedBattle.serverInitialSnapshot?.champion);
   }
 
   asArray(snapshot.monsters).forEach((monsterSnapshot) => {
     const side = monsterSnapshot?.side;
     if (side && next.fighters?.[side]) {
-      next.fighters[side] = mergeFighterSnapshot(next.fighters[side], monsterSnapshot);
+      const initialFighter = asArray(savedBattle.serverInitialSnapshot?.monsters).find((entry) => entry.side === side);
+      next.fighters[side] = mergeFighterSnapshot(next.fighters[side], monsterSnapshot, initialFighter);
     }
   });
 
   if (!asArray(snapshot.monsters).length && snapshot.monster && next.fighters?.B) {
-    next.fighters.B = mergeFighterSnapshot(next.fighters.B, snapshot.monster);
+    next.fighters.B = mergeFighterSnapshot(next.fighters.B, snapshot.monster, savedBattle.serverInitialSnapshot?.monsters?.[0]);
   }
 
   hydrateAnimationMoveFromFighter(next);

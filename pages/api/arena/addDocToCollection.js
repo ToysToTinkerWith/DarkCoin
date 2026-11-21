@@ -317,8 +317,11 @@ async function addDocToCollection(req, res) {
     }
 
     // Sign in to Firebase so Firestore rules allow reads/writes
-    const email = 'abergquist96@gmail.com'
-    const password = process.env.EMAILPASS
+    const email = process.env.FIREBASE_AUTH_EMAIL?.trim()
+    const password = process.env.FIREBASE_AUTH_PASSWORD || process.env.EMAILPASS
+    if (!email || !password) {
+      return jsonSafeResponse(res, 503, { error: "Firebase server login is not configured" })
+    }
     const { user } = await signInWithEmailAndPassword(auth, email, password)
     await user.getIdToken()
 

@@ -1,0 +1,50 @@
+{
+  "Walk": {
+    "nominal_speed_m_s": 1.309700988757743
+  },
+  "Walk_Backward": {
+    "nominal_speed_m_s": 0.85
+  },
+  "Walk_Left": {
+    "nominal_speed_m_s": 0.44
+  },
+  "Walk_Right": {
+    "nominal_speed_m_s": 0.44
+  },
+  "Walk_Forward_Left": {
+    "nominal_speed_m_s": 0.8
+  },
+  "Walk_Forward_Right": {
+    "nominal_speed_m_s": 0.8
+  },
+  "Walk_Backward_Left": {
+    "nominal_speed_m_s": 0.65
+  },
+  "Walk_Backward_Right": {
+    "nominal_speed_m_s": 0.65
+  },
+  "Run": {
+    "nominal_speed_m_s": 2.5370390438036567
+  },
+  "Run_Backward": {
+    "nominal_speed_m_s": 1.772727272727273
+  },
+  "Run_Left": {
+    "nominal_speed_m_s": 1.0636363636363637
+  },
+  "Run_Right": {
+    "nominal_speed_m_s": 1.0636363636363637
+  },
+  "Run_Forward_Left": {
+    "nominal_speed_m_s": 1.5272727272727276
+  },
+  "Run_Forward_Right": {
+    "nominal_speed_m_s": 1.5272727272727276
+  },
+  "Run_Backward_Left": {
+    "nominal_speed_m_s": 1.2954545454545454
+  },
+  "Run_Backward_Right": {
+    "nominal_speed_m_s": 1.2954545454545454
+  }
+}

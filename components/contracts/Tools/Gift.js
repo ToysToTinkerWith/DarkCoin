@@ -254,7 +254,7 @@ export default function Gift(props) {
           }catch(err){
             console.log(err)
             props.setMessage(err)
-            props.sendDiscordMessage("Rewards/Gift", activeAddress, err)
+            props.sendDiscordMessage(err, "Rewards/Gift")
           }
          
   
@@ -264,41 +264,6 @@ export default function Gift(props) {
       
 
     }
-
-    const updateDiscord = async () => {
-
-      
-
-      let embeds = []
-
-      embeds.push({
-          "title": "A new proposal has been made!",
-          "color": 0
-      })
-      
-
-      embeds.push({
-          "description": this.state.proposal,
-          "color": 16777215
-      })
-
-
-      const response = await fetch(process.env.discordCouncilWebhook, {
-          method: "POST",
-          body: JSON.stringify({
-              username: "Council Propose",
-              embeds: embeds
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-
-
-      
-  }
-      
 
         return (
             <div style={{border: "1px solid white", margin: 20, borderRadius: 15}}>

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Head from "next/head";
 import algosdk from "algosdk";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
@@ -27,9 +28,9 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { CID } from "multiformats/cid";
-import * as mfsha2 from "multiformats/hashes/sha2";
-import * as digest from "multiformats/hashes/digest";
+import { assetImageUrl } from "../../lib/ipfsMedia";
+import { getDepthsMoveId } from "../../lib/depthsMoves";
+import { readEntryPayment, rememberEntryPayment, clearEntryPayment, confirmEntryPayment, submitEntryPayment } from "../../lib/depthsEntryPayments";
 import DepthsBattle from "../../components/contracts/Arena/DepthsBattle";
 import Character from "../../components/contracts/Arena/Character";
 import DisplayChar from "../../components/contracts/Arena/DisplayChar";
@@ -71,6 +72,7 @@ import { getArenaEffectInfo } from "../../components/contracts/Arena/effectInfo"
 import { db } from "../../Firebase/FirebaseInit";
 
 const ALGOD_BASE = "https://mainnet-api.algonode.cloud";
+const INDEXER_BASE = "https://mainnet-idx.algonode.cloud";
 const DARK_COIN_ASSET_ID = 1088771340;
 const DARK_COIN_DECIMALS = 6;
 const DEPTHS_APP_ID = 3658640544;
@@ -219,7 +221,7 @@ function buildDepthsResumeProofNote({ walletAddress, championAssetId }) {
 }
 
 function isDarkCoinRewardGranted(reward) {
-  return reward?.status === "granted" && Boolean(reward?.grantTxId);
+  return reward?.status === "granted" && (reward?.deliveryMode === "direct" || Boolean(reward?.grantTxId));
 }
 
 function getDepthsRewardTierImage(reward = {}) {
@@ -2070,8 +2072,8 @@ function pickNumberMapValues(map = {}) {
     }, {});
 }
 
-function compactDepthsMoveForRun(move = {}) {
-  const moveId = String(move?.id || move?.moveId || move?.cardId || move?.depthsCardId || move?.name || "");
+function compactDepthsMoveForRun(move = {}, index = 0) {
+  const moveId = getDepthsMoveId(move, index);
   return {
     id: moveId,
     name: String(move?.name || moveId || "Move"),
@@ -2479,7 +2481,15 @@ async function postDepthsState(payload) {
     body: JSON.stringify(cleanForFirestore(payload)),
   });
 
-  const body = await response.json().catch(() => ({}));
+  const responseText = await response.text().catch(() => "");
+  let body = {};
+  if (responseText) {
+    try {
+      body = JSON.parse(responseText);
+    } catch {
+      body = { error: responseText };
+    }
+  }
   if (!response.ok) {
     const error = new Error(body?.error || `Depths state API failed with status ${response.status}`);
     error.status = response.status;
@@ -3504,30 +3514,7 @@ function getCharObjectFromGetNftSession(session) {
 }
 
 function getNftImageUrl(session) {
-  const asset = session?.nft?.assets?.[0];
-  const params = asset?.params || {};
-  const name = String(params.name || "");
-
-  try {
-    if (name.substring(0, 18) === "Dark Coin Champion" && params.reserve) {
-      const addr = algosdk.decodeAddress(params.reserve);
-      const mhdigest = digest.create(mfsha2.sha256.code, addr.publicKey);
-      const ocid = CID.create(0, 0x70, mhdigest);
-      return `https://ipfs.dark-coin.io/ipfs/${ocid.toString()}`;
-    }
-  } catch (error) {
-    console.warn("Unable to derive champion image from reserve address:", error);
-  }
-
-  if (params.url && String(params.url).startsWith("ipfs://")) {
-    return `https://ipfs.dark-coin.io/ipfs/${String(params.url).replace("ipfs://", "")}`;
-  }
-
-  if (params.url && String(params.url).includes("/ipfs/")) {
-    return `https://ipfs.dark-coin.io/ipfs/${String(params.url).split("/ipfs/")[1]}`;
-  }
-
-  return null;
+  return assetImageUrl(session?.nft?.assets?.[0]?.params) || null;
 }
 
 function normalizeMonsterDoc(data, docId) {
@@ -4576,7 +4563,7 @@ function HeroPanel({ championCount, monsterCount, cardCount }) {
           }}
         />
         <Typography sx={{ ...medievalText, color: THEME.muted, fontSize: { xs: 12, md: 16 } }}>
-          Dark Coin Arena
+          DarkCoin Chronicles · Classic 2D
         </Typography>
         <Typography
           variant="h1"
@@ -4967,6 +4954,11 @@ function DepthsEntryPaymentPanel({
             ))}
           </Box>
 
+          {prompt?.pendingPayment ? (
+            <Typography sx={{ mt: 2, color: THEME.gold, fontSize: 13 }}>
+              A previous entry payment was found. Continue to check it and enter without sending another payment.
+            </Typography>
+          ) : null}
           {status || error ? (
             <Box
               sx={{
@@ -4993,7 +4985,7 @@ function DepthsEntryPaymentPanel({
               onClick={onConfirm}
               sx={{ ...buttonStyle, minHeight: 44, minWidth: 220 }}
             >
-              {submitting ? "Waiting For Wallet" : "Sign Dark Coin Payment"}
+              {submitting ? "Processing Entry" : prompt?.pendingPayment ? "Check Existing Payment" : "Sign Dark Coin Payment"}
             </Button>
             <Button disabled={submitting} onClick={onCancel} sx={{ ...buttonStyle, minHeight: 44 }}>
               Cancel
@@ -9056,6 +9048,7 @@ function NodeResultPanel({
   depthsXpLoading = false,
   depthsXpError = "",
   onClaimReward = null,
+  onRetryReward = null,
 }) {
   if (!result) return null;
 
@@ -9265,7 +9258,9 @@ function NodeResultPanel({
                       </Box>
                     </Box>
                     <Typography sx={{ color: THEME.muted, fontSize: 13, mt: 0.7 }}>
-                      {darkCoinReward.label || "Depths Reward"} rolled {darkCoinReward.percentDisplay || "a percentage"} of the contract balance.
+                      {darkCoinReward.label || "Depths Reward"} pays {darkCoinReward.percentDisplay || "a percentage"} of the shared treasury’s available
+                      balance (after pending rewards, subject to asset payout limits)
+                      {darkCoinReward.chanceDisplay ? ` and has a ${darkCoinReward.chanceDisplay} roll chance.` : "."}
                     </Typography>
                     {darkCoinReward.grantTxId ? (
                       <Typography sx={{ color: THEME.faint, fontSize: 11, mt: 1 }}>
@@ -9279,19 +9274,20 @@ function NodeResultPanel({
                     ) : null}
                   </>
                 ) : rewardError ? (
-                  <Typography sx={{ color: THEME.bad, fontSize: 13, lineHeight: 1.5 }}>{rewardError}</Typography>
+                  <Box><Typography sx={{ color: THEME.bad, fontSize: 13, lineHeight: 1.5 }}>{rewardError}</Typography><Button onClick={onRetryReward} disabled={rewardLoading || !onRetryReward} sx={buttonStyle}>Retry saved reward</Button></Box>
                 ) : (
                   <Typography sx={{ color: THEME.muted, fontSize: 13 }}>Reward roll is waiting for server confirmation.</Typography>
                 )}
 
+                {darkCoinReward?.deliveryMode === 'direct' && !rewardClaimed ? <Typography sx={{color:THEME.muted,fontSize:13,mt:1}}>{['queued','pending'].includes(darkCoinReward.deliveryStatus)?'Sending your reward from the shared Arena Treasury. You can leave this page; delivery continues automatically.':'Your reward is saved. Claim it here or through the wallet menu after opting into DARK.'}</Typography> : null}
                 {darkCoinReward && rewardGranted && !rewardClaimed ? (
                   <Button
                     startIcon={rewardClaiming ? <CircularProgress size={16} sx={{ color: THEME.text }} /> : <AutoAwesomeIcon />}
-                    disabled={rewardClaiming || !onClaimReward}
+                    disabled={rewardClaiming || !onClaimReward || ["queued","pending"].includes(darkCoinReward?.deliveryStatus)}
                     onClick={onClaimReward}
                     sx={{ ...buttonStyle, mt: 2, minHeight: 42 }}
                   >
-                    {rewardClaiming ? "Claiming Dark Coin..." : "Claim Dark Coin"}
+                    {rewardClaiming ? "Preparing delivery..." : "Claim Dark Coin"}
                   </Button>
                 ) : null}
               </>
@@ -9364,7 +9360,7 @@ function DepthsWalletRewardPanel({
           Claim all Dark Coin rewards currently granted to this wallet.
         </Typography>
         {loading ? (
-          <Typography sx={{ color: THEME.muted, fontSize: 13, mt: 0.75 }}>Checking wallet reward box...</Typography>
+          <Typography sx={{ color: THEME.muted, fontSize: 13, mt: 0.75 }}>Checking saved treasury rewards...</Typography>
         ) : hasReward ? (
           <Typography sx={{ color: THEME.gold, fontSize: 13, mt: 0.75, lineHeight: 1.45 }}>
             {rewardAmount} Dark Coin available to claim.
@@ -9414,7 +9410,7 @@ function DepthsRewardOddsPanel({ odds = null, loading = false, error = "" }) {
             Depths Rewards
           </Typography>
           <Typography sx={{ color: THEME.muted, fontSize: 12, mt: 0.5, lineHeight: 1.45 }}>
-            Rewards are rolled from the current Dark Coin balance held by the Depths contract.
+            Rewards use the shared Arena Treasury’s available DARK, excluding pending rewards from both games. Asset payout limits apply.
           </Typography>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
@@ -9459,7 +9455,7 @@ function DepthsRewardOddsPanel({ odds = null, loading = false, error = "" }) {
                   </Box>
                 </Box>
                 <Typography sx={{ color: THEME.muted, fontSize: 11.5, mt: 1, lineHeight: 1.35 }}>
-                  {tier.percentDisplay} of balance
+                  {tier.percentDisplay} of available balance
                 </Typography>
                 <Typography sx={{ color: THEME.text, fontSize: 13, fontWeight: 900, mt: 0.35 }}>
                   {tier.amountDisplay} Dark Coin
@@ -9572,6 +9568,7 @@ export default function DepthsPage(props) {
   const [entryPaymentError, setEntryPaymentError] = useState("");
   const [entryPaymentPrompt, setEntryPaymentPrompt] = useState(null);
   const [entryPaymentSubmitting, setEntryPaymentSubmitting] = useState(false);
+  const entryPaymentLockRef = useRef(false);
   const [championEntryInfoByAssetId, setChampionEntryInfoByAssetId] = useState({});
   const [championEntryInfoLoading, setChampionEntryInfoLoading] = useState(false);
   const [objectModalRecord, setObjectModalRecord] = useState(null);
@@ -9855,7 +9852,7 @@ export default function DepthsPage(props) {
 
       const reward = body.darkCoinReward || null;
       setDarkCoinReward(reward);
-      if (reward && String(reward.walletAddress || "").trim() === activeAddress) {
+      if (reward?.deliveryStatus === "saved" && String(reward.walletAddress || "").trim() === activeAddress) {
         setWalletDepthsReward(reward);
       }
       return reward;
@@ -9867,6 +9864,12 @@ export default function DepthsPage(props) {
       setDarkCoinRewardLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (darkCoinReward?.deliveryMode !== 'direct' || !['queued','pending'].includes(darkCoinReward?.deliveryStatus)) return;
+    const timer=setInterval(()=>requestDarkCoinRewardGrant(),10000);
+    return ()=>clearInterval(timer);
+  },[darkCoinReward?.deliveryMode,darkCoinReward?.deliveryStatus,activeAddress,runId]);
 
   const postDepthsRunDiscordResult = async ({
     runId: targetRunId = runDocRef.current,
@@ -9946,16 +9949,15 @@ export default function DepthsPage(props) {
       note: textBytes(JSON.stringify(note)),
     });
 
-    const encodedTxn = algosdk.encodeUnsignedTransaction(txn);
-    const signedTransactions = await signTransactions([encodedTxn]);
-
-    setEntryPaymentStatus("Sending Dark Coin payment");
-    const sendResult = await algod.sendRawTransaction(signedTransactions).do();
-    const txId = sendResult?.txid || sendResult?.txId || txn.txID();
-
-    setEntryPaymentStatus("Confirming Dark Coin payment");
-    await algosdk.waitForConfirmation(algod, txId, 4);
-    return txId;
+    return submitEntryPayment({
+      client: algod, indexer: new algosdk.Indexer("", INDEXER_BASE, 443), txn, signTransactions,
+      onStatus: setEntryPaymentStatus,
+      remember: (txId) => {
+        const pendingPayment = { txId, walletAddress: activeAddress, championAssetId: note.championAssetId };
+        rememberEntryPayment(window.localStorage, pendingPayment);
+        setEntryPaymentPrompt((current) => current ? { ...current, pendingPayment } : current);
+      },
+    });
   };
 
   const createDepthsEntryWalletProof = async (record) => {
@@ -10241,6 +10243,17 @@ export default function DepthsPage(props) {
     } else if (status === "active" && latestBattleVerifiedComplete) {
       const completionResult = buildSavedBattleCompletionResult(latestBattle);
       if (completionResult) {
+        completionResult.runState = {
+          room: Number(runData.room || 1),
+          depthsMap: savedMap,
+          currentNodeId: savedNodeId,
+          visitedNodeIds: savedVisited,
+          champion: nextChampion,
+          artifacts,
+          cards: cardsForRun,
+          cardUpgrades,
+          cardRemovals,
+        };
         window.setTimeout(() => {
           handleBattleComplete(completionResult);
         }, 0);
@@ -10269,152 +10282,50 @@ export default function DepthsPage(props) {
     }
   };
 
-  const loadWalletDepthsReward = async ({ quiet = false } = {}) => {
-    if (!activeAddress) {
-      setWalletDepthsReward(null);
-      setWalletDepthsRewardStatus("");
-      if (!quiet) setWalletDepthsRewardError("Connect a wallet to check Depths rewards.");
-      return null;
-    }
-
-    const appId = Number(getDepthsRewardAppId(props.contracts));
-    const assetId = Number(DARK_COIN_ASSET_ID);
-
-    if (!appId) {
-      setWalletDepthsReward(null);
-      if (!quiet) setWalletDepthsRewardError("Depths reward contract id is not configured.");
-      return null;
-    }
-
-    setWalletDepthsRewardLoading(true);
-    if (!quiet) {
-      setWalletDepthsRewardError("");
-      setWalletDepthsRewardStatus("");
-    }
-
-    try {
-      const algod = new algosdk.Algodv2("", ALGOD_BASE, 443);
-      const claimBox = await readDepthsClaimBox(algod, appId, activeAddress);
-
-      if (claimBox.assetId !== assetId) {
-        throw new Error(
-          `Depths reward box is for asset #${claimBox.assetId}, but the UI is configured to claim Dark Coin #${assetId}.`
-        );
-      }
-
-      const amountAtomic = normalizeAtomicAmountString(claimBox.amountAtomic);
-      const reward = {
-        status: "granted",
-        walletAddress: activeAddress,
-        appId,
-        assetId,
-        decimals: DARK_COIN_DECIMALS,
-        amountAtomic,
-        amountDisplay: formatDarkCoinAtomicAmount(amountAtomic, DARK_COIN_DECIMALS),
-      };
-
-      setWalletDepthsReward(reward);
-      if (!quiet) {
-        setWalletDepthsRewardStatus(
-          BigInt(amountAtomic || "0") > 0n ? "Claimable rewards found." : "No claimable Depths rewards found."
-        );
-      }
-      return reward;
-    } catch (error) {
-      if (isMissingAlgorandBoxError(error)) {
-        setWalletDepthsReward(null);
-        if (!quiet) {
-          setWalletDepthsRewardStatus("");
-          setWalletDepthsRewardError("");
-        }
-        return null;
-      }
-      console.warn("Depths wallet reward check failed:", error);
-      setWalletDepthsReward(null);
-      if (!quiet) setWalletDepthsRewardError(error?.message || "Could not check Depths rewards.");
-      return null;
-    } finally {
-      setWalletDepthsRewardLoading(false);
-    }
+  const treasuryRequest = async (payload) => {
+    const response = await fetch('/api/arena/economy', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({...payload,address:activeAddress})});
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not process treasury rewards.');
+    return data;
   };
 
-  const claimDepthsRewardForWallet = async ({ reward = null, recordRunClaim = false } = {}) => {
-    if (!activeAddress) {
-      throw new Error("Connect the wallet that has Depths rewards before claiming.");
-    }
-    if (!signTransactions) {
-      throw new Error("Connect a wallet that can sign transactions before claiming.");
-    }
-
-    const appId = Number(reward?.appId || getDepthsRewardAppId(props.contracts));
-    const assetId = Number(reward?.assetId || DARK_COIN_ASSET_ID);
-    const rewardWallet = String(reward?.walletAddress || activeAddress || "").trim();
-
-    if (!appId) {
-      throw new Error("Depths reward contract id is not configured.");
-    }
-    if (rewardWallet && rewardWallet !== activeAddress) {
-      throw new Error("Connect the wallet that has this Depths reward before claiming.");
-    }
-
-    const algod = new algosdk.Algodv2("", ALGOD_BASE, 443);
-    let claimBox = null;
+  const loadWalletDepthsReward = async ({quiet=false}={}) => {
+    if (!activeAddress) {setWalletDepthsReward(null);return null;}
+    setWalletDepthsRewardLoading(true);
+    if (!quiet) {setWalletDepthsRewardError('');setWalletDepthsRewardStatus('');}
     try {
-      claimBox = await readDepthsClaimBox(algod, appId, activeAddress);
-    } catch (boxError) {
-      if (isMissingAlgorandBoxError(boxError)) {
-        throw new Error("No on-chain Depths reward is available for this wallet yet.");
+      const rewards=[];let cursor=null;
+      do {
+        const page=await treasuryRequest({op:'rewards',cursor});
+        rewards.push(...page.rewards.filter(row=>row.source==='depths'&&!row.claimed&&row.deliveryStatus==='saved'));cursor=page.cursor;
+      } while(cursor);
+      const amountAtomic=rewards.reduce((total,row)=>total+BigInt(row.claim.amount),0n).toString();
+      const reward=rewards.length?{status:'granted',deliveryMode:'direct',walletAddress:activeAddress,assetId:DARK_COIN_ASSET_ID,amountAtomic,amountDisplay:formatDarkCoinAtomicAmount(amountAtomic),rewards}:null;
+      setWalletDepthsReward(reward);
+      if(!quiet)setWalletDepthsRewardStatus(rewards.length?'Saved Depths rewards found.':'No pending Depths rewards.');
+      return reward;
+    } catch(error) {if(!quiet)setWalletDepthsRewardError(error.message);return null;}
+    finally {setWalletDepthsRewardLoading(false);}
+  };
+
+  const claimDepthsRewardForWallet = async ({reward=null}={}) => {
+    if(!activeAddress||reward?.walletAddress!==activeAddress)throw new Error('Connect the wallet that earned this reward.');
+    if(reward.deliveryMode!=='direct')throw new Error('This is a legacy reward. Contact support before claiming.');
+    const targets=reward.rewards||[{hour:reward.hour,claim:{slot:reward.slot||0}}];
+    const algod=new algosdk.Algodv2('',ALGOD_BASE,443);
+    for(const row of targets){
+      const request={hour:row.hour,slot:row.claim.slot};
+      const prepared=await treasuryRequest({...request,op:'claim'});
+      if(prepared.transactions?.length){
+        if(!signTransactions)throw new Error('Connect a wallet to approve the DARK asset opt-in.');
+        const bytes=prepared.transactions.map(value=>Uint8Array.from(atob(value),c=>c.charCodeAt(0)));
+        const signed=await signTransactions(bytes);
+        const result=await algod.sendRawTransaction(signed).do();
+        await algosdk.waitForConfirmation(algod,result.txid||result.txId,4);
       }
-      throw boxError;
+      await treasuryRequest({...request,op:'deliver'});
     }
-
-    if (claimBox.assetId !== assetId) {
-      throw new Error(
-        `Depths reward box is for asset #${claimBox.assetId}, but the UI is configured to claim Dark Coin #${assetId}.`
-      );
-    }
-    if (BigInt(claimBox.amountAtomic || "0") <= 0n) {
-      throw new Error("Depths reward box has no claimable Dark Coin.");
-    }
-
-    const suggestedParams = await algod.getTransactionParams().do();
-    const claimBoxReference = { appIndex: 0, name: algosdk.decodeAddress(activeAddress).publicKey };
-    const txn = algosdk.makeApplicationNoOpTxnFromObject({
-      sender: activeAddress,
-      appIndex: appId,
-      suggestedParams,
-      appArgs: [textBytes("claimReward")],
-      foreignAssets: [assetId],
-      boxes: [claimBoxReference],
-      convertToAccess: false,
-    });
-
-    const encodedTxn = algosdk.encodeUnsignedTransaction(txn);
-    const signedTransactions = await signTransactions([encodedTxn]);
-    const sendResult = await algod.sendRawTransaction(signedTransactions).do();
-    const txId = sendResult?.txid || sendResult?.txId || txn.txID();
-    await algosdk.waitForConfirmation(algod, txId, 4);
-
-    if (recordRunClaim && (runDocRef.current || runId) && (runTokenRef.current || runToken)) {
-      await fetch("/api/arena/claimDepthsReward", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "recordDarkCoinClaim",
-          runId: runDocRef.current || runId,
-          runToken: runTokenRef.current || runToken,
-          txId,
-        }),
-      }).catch(() => null);
-    }
-
-    return {
-      txId,
-      appId,
-      assetId,
-      amountAtomic: normalizeAtomicAmountString(claimBox.amountAtomic),
-      amountDisplay: formatDarkCoinAtomicAmount(claimBox.amountAtomic, DARK_COIN_DECIMALS),
-    };
+    return {queued:true,amountDisplay:reward.amountDisplay};
   };
 
   const claimWalletDepthsRewards = async () => {
@@ -10425,13 +10336,13 @@ export default function DepthsPage(props) {
     try {
       const result = await claimDepthsRewardForWallet({ reward: walletDepthsReward, recordRunClaim: false });
       setWalletDepthsReward(null);
-      setWalletDepthsRewardStatus(`Claimed ${result.amountDisplay} Dark Coin. Transaction: ${result.txId}`);
+      setWalletDepthsRewardStatus(`Delivery queued for ${result.amountDisplay} DARK. The treasury will send it to your wallet once confirmed.`);
       setDarkCoinReward((current) => {
         if (!current || String(current.walletAddress || "").trim() !== activeAddress) return current;
         return {
           ...current,
-          status: "claimed",
-          claimTxId: result.txId,
+          status: "granted",
+          deliveryStatus: "queued",
         };
       });
     } catch (error) {
@@ -10445,7 +10356,7 @@ export default function DepthsPage(props) {
   const claimDarkCoinReward = async () => {
     if (!darkCoinReward || !activeAddress) return;
     if (!isDarkCoinRewardGranted(darkCoinReward)) {
-      setDarkCoinRewardError("Dark Coin cannot be claimed until the reward has been granted on-chain.");
+      setDarkCoinRewardError("The treasury must reserve your reward before it can be claimed.");
       return;
     }
 
@@ -10455,11 +10366,11 @@ export default function DepthsPage(props) {
     try {
       const result = await claimDepthsRewardForWallet({ reward: darkCoinReward, recordRunClaim: true });
       setWalletDepthsReward(null);
-      setWalletDepthsRewardStatus(`Claimed ${result.amountDisplay} Dark Coin. Transaction: ${result.txId}`);
+      setWalletDepthsRewardStatus(`Delivery queued for ${result.amountDisplay} DARK. The treasury will send it to your wallet once confirmed.`);
       setDarkCoinReward((current) => ({
         ...(current || darkCoinReward),
-        status: "claimed",
-        claimTxId: result.txId,
+        status: "granted",
+        deliveryStatus: "queued",
       }));
     } catch (error) {
       console.warn("Depths Dark Coin claim failed:", error);
@@ -10532,6 +10443,7 @@ export default function DepthsPage(props) {
       const entryInfo = await getEntryInfo();
 
       if (entryInfo?.activeRun) {
+        clearEntryPayment(window.localStorage, activeAddress, record.assetId);
         return resumeDepthsRun(record, { activeRunHint: entryInfo.activeRun });
       }
 
@@ -10541,6 +10453,7 @@ export default function DepthsPage(props) {
       setEntryPaymentPrompt({
         record,
         payment,
+        pendingPayment: readEntryPayment(window.localStorage, activeAddress, record.assetId) || entryInfo.recoverablePayment,
         cardOptions: firstCardChoices,
         artifactOptions: firstArtifactChoices,
         nextRunNumber: entryInfo?.nextRunNumber || payment.runNumber || 1,
@@ -10573,7 +10486,8 @@ export default function DepthsPage(props) {
   };
 
   const confirmDepthsEntryPayment = async () => {
-    if (!entryPaymentPrompt || entryPaymentSubmitting) return null;
+    if (!entryPaymentPrompt || entryPaymentSubmitting || entryPaymentLockRef.current) return null;
+    entryPaymentLockRef.current = true;
     const { record, payment, cardOptions, artifactOptions } = entryPaymentPrompt;
 
     try {
@@ -10586,14 +10500,16 @@ export default function DepthsPage(props) {
         championAssetId: record.assetId || null,
       });
       if (latestEntryInfo?.activeRun) {
+        clearEntryPayment(window.localStorage, activeAddress, record.assetId);
         setEntryPaymentPrompt(null);
         setEntryPaymentSubmitting(false);
         return resumeDepthsRun(record, { activeRunHint: latestEntryInfo.activeRun });
       }
       const latestPayment = latestEntryInfo?.payment || payment;
+      const pendingPayment = readEntryPayment(window.localStorage, activeAddress, record.assetId) || latestEntryInfo?.recoverablePayment;
       const latestAmount = normalizeAtomicAmountString(latestPayment?.amountAtomic);
       const promptedAmount = normalizeAtomicAmountString(payment?.amountAtomic);
-      if (latestAmount && promptedAmount && latestAmount !== promptedAmount) {
+      if (!pendingPayment && latestAmount && promptedAmount && latestAmount !== promptedAmount) {
         setEntryPaymentPrompt((current) => ({
           ...(current || entryPaymentPrompt),
           payment: latestPayment,
@@ -10604,14 +10520,26 @@ export default function DepthsPage(props) {
         setEntryPaymentSubmitting(false);
         return null;
       }
-      const txId = await submitDepthsEntryPayment(latestPayment);
+      let txId;
+      if (pendingPayment) {
+        const savedPayment = { ...pendingPayment, walletAddress: activeAddress, championAssetId: record.assetId };
+        rememberEntryPayment(window.localStorage, savedPayment);
+        setEntryPaymentPrompt((current) => current ? { ...current, pendingPayment: savedPayment } : current);
+        setEntryPaymentStatus("Checking your existing Dark Coin payment");
+        txId = await confirmEntryPayment({ client: new algosdk.Algodv2("", ALGOD_BASE, 443),
+          indexer: new algosdk.Indexer("", INDEXER_BASE, 443), txId: savedPayment.txId });
+      } else {
+        txId = await submitDepthsEntryPayment(latestPayment);
+      }
       setEntryPaymentStatus("Authorizing Depths entry");
       const created = await postDepthsState(
         buildDepthsCreatePayload(record, cardOptions || [], artifactOptions || [], txId)
       );
+      clearEntryPayment(window.localStorage, activeAddress, record.assetId);
       return applyCreatedDepthsRun(created);
     } catch (error) {
       if (error?.body?.activeRunExists || error?.body?.activeRun) {
+        clearEntryPayment(window.localStorage, activeAddress, record.assetId);
         setEntryPaymentPrompt(null);
         setEntryPaymentSubmitting(false);
         return resumeDepthsRun(record, { activeRunHint: error.body.activeRun });
@@ -10630,6 +10558,8 @@ export default function DepthsPage(props) {
       setEntryPaymentSubmitting(false);
       console.warn("Depths entry payment failed:", error);
       return null;
+    } finally {
+      entryPaymentLockRef.current = false;
     }
   };
 
@@ -10801,27 +10731,27 @@ export default function DepthsPage(props) {
     async function loadChampionEntryInfo() {
       try {
         setChampionEntryInfoLoading(true);
-        const entries = await Promise.all(
-          playableChampions.map(async (record) => {
-            const assetId = String(record.assetId || "");
-            if (!assetId) return null;
-
-            try {
-              const entryInfo = await postDepthsState({
-                action: "getEntryInfo",
-                activeAddress,
-                championAssetId: record.assetId || null,
-              });
-              return [assetId, entryInfo];
-            } catch (error) {
-              console.warn("Failed to load Depths entry info", record.assetId, error);
-              return [assetId, { error: error?.message || "Could not load Depths run status." }];
-            }
-          })
-        );
+        const result = await postDepthsState({
+          action: "getEntryInfoBatch",
+          activeAddress,
+          championAssetIds: playableChampions.map((record) => record.assetId).filter(Boolean),
+        });
 
         if (!cancelled) {
-          setChampionEntryInfoByAssetId(Object.fromEntries(entries.filter(Boolean)));
+          setChampionEntryInfoByAssetId(result?.entries || {});
+        }
+      } catch (error) {
+        console.warn("Failed to load Depths entry info batch", error);
+        if (!cancelled) {
+          const entries = playableChampions
+            .map((record) => {
+              const assetId = String(record.assetId || "");
+              return assetId
+                ? [assetId, { error: error?.message || "Could not load Depths run status." }]
+                : null;
+            })
+            .filter(Boolean);
+          setChampionEntryInfoByAssetId(Object.fromEntries(entries));
         }
       } finally {
         if (!cancelled) setChampionEntryInfoLoading(false);
@@ -12334,23 +12264,39 @@ export default function DepthsPage(props) {
 
     battleAdvanceTimeoutRef.current = window.setTimeout(() => {
       battleAdvanceTimeoutRef.current = null;
+      const resumeState = result?.runState || {};
+      const activeRoom = Number.isFinite(Number(resumeState.room)) ? Number(resumeState.room) : room;
+      const activeDepthsMap = resumeState.depthsMap || depthsMap;
+      const activeNodeId = resumeState.currentNodeId || currentNodeId;
+      const activeVisitedNodeIds = Array.isArray(resumeState.visitedNodeIds)
+        ? resumeState.visitedNodeIds
+        : visitedNodeIds;
+      const activeBaseChampion = resumeState.champion || runChampion || selectedChampion;
+      const activeArtifacts = Array.isArray(resumeState.artifacts) ? resumeState.artifacts : runArtifacts;
+      const activeCards = Array.isArray(resumeState.cards) ? resumeState.cards : runCards;
+      const activeCardUpgrades = Array.isArray(resumeState.cardUpgrades)
+        ? resumeState.cardUpgrades
+        : runCardUpgrades;
+      const activeCardRemovals = Array.isArray(resumeState.cardRemovals)
+        ? resumeState.cardRemovals
+        : runCardRemovals;
       const battleChampion = result?.battle?.fighters?.A
-        ? setDepthsChampionCurrentHp(runChampion || selectedChampion, result.battle.fighters.A.hp)
-        : runChampion;
+        ? setDepthsChampionCurrentHp(activeBaseChampion, result.battle.fighters.A.hp)
+        : activeBaseChampion;
       if (result?.winner === "champion") {
         setResumedBattle(null);
-        const completedDepths = isDepthsFinalNode(depthsMap, currentNodeId);
+        const completedDepths = isDepthsFinalNode(activeDepthsMap, activeNodeId);
 
         setRunChampion(battleChampion);
 
         if (completedDepths) {
           const completedRunId = runDocRef.current;
           const completedRunToken = runTokenRef.current;
-          const completedChampionAssetId = selectedChampion?.assetId || battleChampion?.assetId;
-          const completedNode = getDepthsMapNode(depthsMap, currentNodeId);
+          const completedChampionAssetId = battleChampion?.assetId || selectedChampion?.assetId;
+          const completedNode = getDepthsMapNode(activeDepthsMap, activeNodeId);
           const finalChampionFighter = result?.battle?.fighters?.A || null;
           const completedEncounterCount =
-            getDepthsCompletedBattleNodeCount(depthsMap, visitedNodeIds) || Math.max(1, room);
+            getDepthsCompletedBattleNodeCount(activeDepthsMap, activeVisitedNodeIds) || Math.max(1, activeRoom);
 
           setCurrentMonsters([]);
           setDarkCoinReward(null);
@@ -12361,16 +12307,16 @@ export default function DepthsPage(props) {
             text: `${battleChampion?.name || selectedChampion?.name || "Your champion"} has cleared the final encounter.`,
             detail: "Rolling reward",
             completed: true,
-            room,
+            room: activeRoom,
             champion: battleChampion,
             championAssetId: completedChampionAssetId,
-            artifacts: runArtifacts,
-            cards: runCards,
-            cardUpgrades: runCardUpgrades,
-            cardRemovals: runCardRemovals,
-            depthsMap,
-            currentNodeId,
-            visitedNodeIds,
+            artifacts: activeArtifacts,
+            cards: activeCards,
+            cardUpgrades: activeCardUpgrades,
+            cardRemovals: activeCardRemovals,
+            depthsMap: activeDepthsMap,
+            currentNodeId: activeNodeId,
+            visitedNodeIds: activeVisitedNodeIds,
             completedEncounters: completedEncounterCount,
             finalNodeType: completedNode?.type || "elite",
             finalNodeLabel:
@@ -12383,17 +12329,17 @@ export default function DepthsPage(props) {
           updateDepthsRun({
             status: "completed",
             clientRewardEligible: true,
-            room,
-            artifacts: runArtifacts,
-            cards: runCards,
-            cardUpgrades: runCardUpgrades,
-            cardRemovals: runCardRemovals,
+            room: activeRoom,
+            artifacts: activeArtifacts,
+            cards: activeCards,
+            cardUpgrades: activeCardUpgrades,
+            cardRemovals: activeCardRemovals,
             championSnapshot: battleChampion?.charObj || null,
             championBattleSnapshot: result?.battle?.fighters?.A || null,
             lastBattleId: result?.battle?.id || null,
-            depthsMap,
-            currentNodeId,
-            visitedNodeIds,
+            depthsMap: activeDepthsMap,
+            currentNodeId: activeNodeId,
+            visitedNodeIds: activeVisitedNodeIds,
             completedAt: true,
           }).then((updateResult) => {
             if (!updateResult) {
@@ -12428,17 +12374,17 @@ export default function DepthsPage(props) {
 
         updateDepthsRun({
           status: "roomCleared",
-          room,
-          artifacts: runArtifacts,
-          cards: runCards,
-          cardUpgrades: runCardUpgrades,
-          cardRemovals: runCardRemovals,
+          room: activeRoom,
+          artifacts: activeArtifacts,
+          cards: activeCards,
+          cardUpgrades: activeCardUpgrades,
+          cardRemovals: activeCardRemovals,
           championSnapshot: battleChampion?.charObj || null,
           championBattleSnapshot: result?.battle?.fighters?.A || null,
           lastBattleId: result?.battle?.id || null,
-          depthsMap,
-            currentNodeId,
-            visitedNodeIds,
+          depthsMap: activeDepthsMap,
+          currentNodeId: activeNodeId,
+          visitedNodeIds: activeVisitedNodeIds,
         }).then((result) => {
           if (!result) {
             setEntryPaymentError(
@@ -12448,10 +12394,12 @@ export default function DepthsPage(props) {
             );
             return;
           }
-          const clearedNode = getDepthsMapNode(depthsMap, currentNodeId);
-          nextRoom(battleChampion, runArtifacts, runCardUpgrades, runCards, runCardRemovals, {
-            currentNodeId,
-            visitedNodeIds,
+          const clearedNode = getDepthsMapNode(activeDepthsMap, activeNodeId);
+          nextRoom(battleChampion, activeArtifacts, activeCardUpgrades, activeCards, activeCardRemovals, {
+            room: activeRoom,
+            depthsMap: activeDepthsMap,
+            currentNodeId: activeNodeId,
+            visitedNodeIds: activeVisitedNodeIds,
             rewardType: clearedNode?.type === "elite" ? "upgrade" : "card",
           });
         });
@@ -12460,13 +12408,13 @@ export default function DepthsPage(props) {
         setRunChampion(battleChampion);
         const defeatedRunId = runDocRef.current;
         const defeatedRunToken = runTokenRef.current;
-        const defeatedChampionAssetId = selectedChampion?.assetId || battleChampion?.assetId;
-        const defeatedNode = getDepthsMapNode(depthsMap, currentNodeId);
+        const defeatedChampionAssetId = battleChampion?.assetId || selectedChampion?.assetId;
+        const defeatedNode = getDepthsMapNode(activeDepthsMap, activeNodeId);
         const defeatedChampionFighter = result?.battle?.fighters?.A || null;
         const defeatedAtBattleNode = defeatedNode?.type === "basic" || defeatedNode?.type === "elite";
         const completedEncounterCount = Math.max(
           0,
-          getDepthsCompletedBattleNodeCount(depthsMap, visitedNodeIds) - (defeatedAtBattleNode ? 1 : 0)
+          getDepthsCompletedBattleNodeCount(activeDepthsMap, activeVisitedNodeIds) - (defeatedAtBattleNode ? 1 : 0)
         );
 
         setCurrentMonsters([]);
@@ -12485,16 +12433,16 @@ export default function DepthsPage(props) {
           detail: "Run ended",
           defeated: true,
           ended: true,
-          room,
+          room: activeRoom,
           champion: battleChampion,
           championAssetId: defeatedChampionAssetId,
-          artifacts: runArtifacts,
-          cards: runCards,
-          cardUpgrades: runCardUpgrades,
-          cardRemovals: runCardRemovals,
-          depthsMap,
-          currentNodeId,
-          visitedNodeIds,
+          artifacts: activeArtifacts,
+          cards: activeCards,
+          cardUpgrades: activeCardUpgrades,
+          cardRemovals: activeCardRemovals,
+          depthsMap: activeDepthsMap,
+          currentNodeId: activeNodeId,
+          visitedNodeIds: activeVisitedNodeIds,
           completedEncounters: completedEncounterCount,
           finalNodeType: defeatedNode?.type || "basic",
           finalNodeLabel:
@@ -12507,17 +12455,17 @@ export default function DepthsPage(props) {
 
         updateDepthsRun({
           status: "defeated",
-          room,
-          artifacts: runArtifacts,
-          cards: runCards,
-          cardUpgrades: runCardUpgrades,
-          cardRemovals: runCardRemovals,
+          room: activeRoom,
+          artifacts: activeArtifacts,
+          cards: activeCards,
+          cardUpgrades: activeCardUpgrades,
+          cardRemovals: activeCardRemovals,
           championSnapshot: battleChampion?.charObj || null,
           championBattleSnapshot: result?.battle?.fighters?.A || null,
           lastBattleId: result?.battle?.id || null,
-          depthsMap,
-          currentNodeId,
-          visitedNodeIds,
+          depthsMap: activeDepthsMap,
+          currentNodeId: activeNodeId,
+          visitedNodeIds: activeVisitedNodeIds,
           endedAt: true,
         }).then((updateResult) => {
           if (!updateResult) {
@@ -12564,6 +12512,7 @@ export default function DepthsPage(props) {
 
   return (
     <Box sx={pageStyle}>
+      <Head><title>The Depths | DarkCoin Chronicles</title></Head>
       <Box
         aria-hidden
         sx={{
@@ -12835,6 +12784,7 @@ export default function DepthsPage(props) {
                 depthsXpLoading={depthsXpLoading}
                 depthsXpError={depthsXpError}
                 onClaimReward={claimDarkCoinReward}
+                onRetryReward={() => requestDarkCoinRewardGrant()}
               />
             ) : currentMonsters.length ? (
               <DepthsBattle

@@ -1,0 +1,11 @@
+{
+  "source": "ArenaTreasury.py",
+  "avmVersion": 9,
+  "schema": {
+    "localInts": 0,
+    "localBytes": 0,
+    "globalInts": 2,
+    "globalBytes": 1
+  },
+  "creationArgs": "oracle"
+}

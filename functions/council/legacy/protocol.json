@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "creator": "AL6F3TFPSZPF3BSVUFDNOLMEKUCJJAA7GZ5GF3DN3Q4IVJVNUFK76PQFNE",
+  "currencyId": 0,
+  "fee": "10000000",
+  "minOffering": "0",
+  "duration": 604800,
+  "quorumBps": 2000,
+  "workPeriod": 7776000,
+  "proposalFields": {"owner":32,"kind":8,"parent":8,"recipient":32,"amount":8,"offering":8,"created":8,"deadline":8,"yes":8,"no":8,"abstain":8,"state":8,"claimed":8,"digest":32,"selected":8,"workDeadline":8,"refund":8},
+  "voteSize": 72,
+  "maxMembers": 4096
+}

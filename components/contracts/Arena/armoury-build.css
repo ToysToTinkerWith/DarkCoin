@@ -1,0 +1,188 @@
+/* Keep the Armory theme local: the shared Arena renderers also appear elsewhere. */
+.armouryPageHeader { padding: 22px 24px; border-bottom: 1px solid #383838; color: #eee; background: #080808; }
+.armouryPageHeader strong { font: 400 24px Georgia, serif; }
+.armouryPageHeader p { color: #aaa; margin: 6px 0 0; font: 12px/1.5 Arial, sans-serif; }
+.armouryBuildPanel {
+  --armory-text: #efefef;
+  --armory-muted: #aaa;
+  --armory-border: #383838;
+  --armory-surface: #111;
+  box-sizing: border-box;
+  color: var(--armory-text);
+  font: 14px/1.6 Arial, Helvetica, sans-serif;
+  text-align: left;
+  letter-spacing: 0;
+}
+.armouryBuildPanel *, .armouryBuildPanel *::before, .armouryBuildPanel *::after { box-sizing: border-box; }
+.armouryBuildPanel.legacyChampionBuilder, .armouryBuildPanel.armouryCharacterPreview {
+  width: calc(100% - 36px); max-width: none; margin: 0 18px 40px; padding: 0;
+  background: #080808; border: 0; border-top: 1px solid #555; border-bottom: 1px solid var(--armory-border);
+}
+.armouryObjectActions { gap: 10px; flex-wrap: wrap; padding: 20px 18px; }
+.armouryObjectActions .armouryObjectToggle {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; min-width: 174px; padding: 10px 18px; border-radius: 4px;
+  border: 1px solid #555; background: linear-gradient(#1c1c1c, #090909); color: #ddd;
+  box-shadow: none; font: 14px Georgia, serif; letter-spacing: 0;
+}
+.armouryObjectToggle svg { width: 22px; height: 22px; flex-shrink: 0; }
+.armouryObjectToggle span { display: flex; align-items: center; gap: 12px; }
+.armouryObjectToggle small { font: 11px Arial, sans-serif; color: #a4a4a4; }
+.armouryObjectActions .armouryObjectToggle[aria-pressed=true] { background: #e6e6e6; border-color: #fff; color: #101010; }
+.armouryObjectToggle[aria-pressed=true] small { color: #454545; }
+.armouryObjectActions .armouryObjectToggle:hover:not(:disabled) { border-color: #fff; }
+.armouryObjectActions .armouryObjectToggle:focus-visible, .armouryBuildPanel :focus-visible { outline: 2px solid #eee; outline-offset: 3px; }
+.armouryBuildHeader { display: flex; align-items: center; gap: 18px; padding: 28px; border-bottom: 1px solid var(--armory-border); }
+.armouryBuildSeal { width: 44px; height: 44px; object-fit: contain; filter: grayscale(1); flex-shrink: 0; }
+.armouryBuildHeader > div { min-width: 0; flex: 1; }
+.armouryBuildHeader small { color: var(--armory-muted); font-size: 10px; letter-spacing: 0; }
+.armouryBuildHeader h2 { font: 400 28px/1.25 Georgia, serif; margin: 5px 0; overflow-wrap: anywhere; }
+.armouryBuildHeader p { color: var(--armory-muted); font-size: 12px; margin: 4px 0 0; }
+.armouryBuildIdentity { font-size: 11px; color: var(--armory-muted); white-space: nowrap; align-self: flex-start; }
+.armouryBuildPanel button, .armouryBuildPanel .MuiButton-root {
+  font: 13px/1.4 Arial, sans-serif; letter-spacing: 0; text-transform: none;
+  border-radius: 4px; border: 1px solid #555; background: linear-gradient(#1d1d1d, #101010);
+  color: #ececec; padding: 10px 14px; min-height: 40px; box-shadow: none; cursor: pointer;
+}
+.armouryBuildPanel button:hover:not(:disabled) { background: #272727; border-color: #aaa; }
+.armouryBuildPanel button:disabled { opacity: .4; cursor: not-allowed; color: #aaa; }
+.armouryBuildPanel .armouryPrimary { background: #e6e6e6; color: #111; border-color: #fff; min-height: 48px; padding: 12px 18px; }
+.armouryBuildPanel .armouryPrimary:hover:not(:disabled) { background: #fff; color: #000; }
+.armouryBuildPanel .armouryPrimary.Mui-disabled { color: #b8b8b8; background: #202020; border-color: #505050; opacity: 1; }
+.armouryBuildPanel .armouryPanelTabs {
+  display: flex; gap: 24px; flex-wrap: wrap; padding: 0 28px;
+  margin: 0; border-bottom: 1px solid var(--armory-border); overflow: visible;
+}
+.armouryBuildPanel .armouryPanelTabs button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 0;
+  padding: 17px 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0;
+  background: transparent; color: #aaa; white-space: normal; text-align: left; box-shadow: none;
+}
+.armouryPanelTabs .MuiButton-startIcon { margin: 0; }
+.armouryBuildPanel .armouryPanelTabs button[aria-pressed=true] { color: #fff; background: transparent; border-bottom-color: #eee; }
+.armouryBuildPanel .armouryPanelTabs button:hover:not(:disabled) { color: #fff; background: transparent; }
+.armouryPanelBody { padding: 24px 28px 28px; }
+.armouryBuildPanel .championNameEditor { max-width: 640px; width: 100%; margin: 0 0 24px; color: var(--armory-text); }
+.armouryBuildPanel .championNameEditor > div { justify-content: flex-start; flex-wrap: wrap; gap: 12px; }
+.armouryBuildPanel .championNameEditor h2 { font: 400 24px/1.3 Georgia, serif; }
+.armouryBuildPanel .championNameEditor input { border: 1px solid #606060; border-radius: 4px; color: #eee; background: #111; min-height: 44px; }
+.armouryBuildPanel .championNameEditor small { color: var(--armory-muted); font-size: 12px; }
+.armouryBuildHeader .championNameEditor { margin: 5px 0; }
+.armouryBuildHeader .championNameEditor h2 { font-size: 28px; }
+.armouryBuildPanel .championNameEditor button { display: inline-flex; align-items: center; gap: 6px; }
+.armouryBuildPanel .championNameEditor button svg { width: 16px; height: 16px; }
+.armouryBuildPanel .armouryIconButton { display: inline-grid; place-items: center; width: 36px; height: 36px; min-height: 36px; padding: 7px; flex-shrink: 0; }
+.armouryBuildPanel .armouryIconButton svg { width: 20px; height: 20px; }
+.armouryBuildIntro { display: grid; grid-template-columns: minmax(0, 500px) 1fr; gap: 24px; align-items: center; margin: 24px 0 32px; }
+.armouryBuildPanel .armouryNameField .MuiInputBase-root { background: #111; color: #eee; font: inherit; border-radius: 4px; }
+.armouryBuildPanel .armouryNameField .MuiOutlinedInput-notchedOutline { border-color: #606060; }
+.armouryBuildPanel .armouryNameField .Mui-focused .MuiOutlinedInput-notchedOutline { border-color: #ddd; }
+.armouryBuildPanel .armouryNameField .MuiInputLabel-root { color: #bbb; font-family: Arial, sans-serif; letter-spacing: 0; }
+.armouryBuildPanel .armouryNameField .MuiInputLabel-root.Mui-focused { color: #fff; }
+.armouryBuildCost { display: grid; justify-items: end; gap: 1px; }
+.armouryBuildCost span, .armouryBuildCost small { color: var(--armory-muted); font-size: 11px; }
+.armouryBuildCost strong { font-size: 18px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.armouryBuildFooter { display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid var(--armory-border); padding-top: 24px; margin-top: 28px; }
+.armouryBuildFooter p { max-width: 540px; margin: 0; color: var(--armory-muted); font-size: 12px; }
+.armouryBuildFooter button { flex-shrink: 0; max-width: 100%; }
+.armouryBuildPanel [role=status], .armouryBuildPanel [role=alert] { font-size: 13px; line-height: 1.6; padding: 12px 14px; background: #151515; border-left: 2px solid #888; overflow-wrap: anywhere; }
+.armouryBuildPanel [role=alert] { color: #f0b9b9; border-color: #ba7070; }
+.armouryGenerationFooter { display: block; }
+.armouryGenerationActions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; margin-bottom: 16px; }
+.armouryGenerationProgress { flex: 1 1 260px; min-width: 0; max-width: 560px; }
+.armouryGenerationProgress [role=status] { display: flex; justify-content: space-between; gap: 12px; padding: 0; border: 0; background: transparent; margin-bottom: 8px; }
+.armouryGenerationProgress strong { font-variant-numeric: tabular-nums; flex-shrink: 0; }
+.armouryGenerationProgress .MuiLinearProgress-root { height: 5px; background: #393939; }
+.armouryGenerationProgress .MuiLinearProgress-bar { background: #d6d6d6; }
+.armouryGenerationProgress p { margin-top: 8px; }
+.armouryBuildPanel .championModelStatus { padding: 24px; background: #101010ed; border: 0; }
+.legacyPlannerHeading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.legacyPlannerHeading h3 { font: 400 21px Georgia, serif; margin: 0; }
+.legacyPlannerHeading span { font-size: 12px; color: var(--armory-muted); }
+.legacyBuildPlanner .dc-move-selector-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.legacyBuildPlanner .legacyMove { min-width: 0; background: #101010 !important; border-color: #393939 !important; border-radius: 4px; box-shadow: none !important; }
+.legacyBuildPlanner .MuiTypography-root { letter-spacing: 0 !important; }
+.legacyBuildPlanner .legacyMoveHeading { font: 400 18px Georgia, serif; text-transform: none !important; }
+.legacyBuildPlanner .legacyChoice, .legacyBuildPlanner .legacyEffectChoice {
+  letter-spacing: 0 !important; box-shadow: none !important; transform: none !important;
+  border-radius: 3px !important; background: #161616 !important; border-color: #464646 !important;
+}
+.legacyBuildPlanner .legacyChoice { flex: 1; padding: 8px !important; font: 12px Arial, sans-serif !important; text-transform: none !important; }
+.legacyBuildPlanner .legacyEffectChoice { width: 100%; min-height: 84px !important; }
+.legacyBuildPlanner .legacyChoice[aria-pressed=true], .legacyBuildPlanner .legacyEffectChoice[aria-pressed=true] { border-color: #eee !important; background: #333 !important; }
+.legacyBuildPlanner .legacyChoice:hover:not(:disabled), .legacyBuildPlanner .legacyEffectChoice:hover:not(:disabled) { border-color: #aaa !important; }
+.legacyBuildPlanner .legacyAllocationGrid { gap: 28px !important; margin-top: 28px !important; }
+.legacyAllocationSection { min-width: 0; padding-top: 20px; border-top: 1px solid var(--armory-border); }
+.legacyAllocationSection > .MuiTypography-root { text-align: left !important; font: 400 20px Georgia, serif !important; text-transform: none !important; }
+.legacyBuildPlanner .legacyPointGrid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 10px !important; }
+.legacyBuildPlanner .legacyPointControl { max-width: none !important; padding: 12px 6px !important; background: #101010 !important; border: 0 !important; box-shadow: none !important; min-width: 0; }
+.legacyPointControl .MuiTypography-root { font-family: Arial, sans-serif !important; text-transform: none !important; }
+.legacyPointControl button { min-width: 30px; padding: 0; min-height: 32px !important; width: 32px !important; height: 32px !important; border-radius: 3px !important; }
+.armouryPreviewToolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 28px; border-bottom: 1px solid var(--armory-border); }
+.armouryPreviewToolbar p { font-size: 12px; color: var(--armory-muted); margin: 0; }
+.armouryPreviewToolbar a { display: inline-flex; align-items: center; gap: 8px; color: #ddd; font-size: 12px; white-space: nowrap; }
+.armouryBuildPanel .armouryPreviewModels { padding: 0; gap: 0; border-bottom: 1px solid var(--armory-border); }
+.armouryPreviewModels > .championStage { height: 520px; min-height: 0; border: 0; border-right: 1px solid var(--armory-border); }
+.armouryPreviewModels .championStage { background: #101010; }
+.armouryPreviewModels .championStage::after { display: none; }
+.armouryPreviewModels .championAttackPreview { border: 0; background: transparent; border-radius: 0; }
+.armouryPreviewModels .championAttackPreview > header { min-height: 80px; padding: 16px 24px; }
+.armouryPreviewModels .championAttackPreview > p, .armouryPreviewModels .championViewTools small { display: none; }
+.armouryPreviewModels .championAttackPreview .championAttackStage { height: 440px; border: 0; }
+.armouryPreviewModels .championViewport { inset: 42px 0 64px; }
+.armouryPreviewModels .championViewTools { bottom: 16px; }
+.armouryBuildPanel .championViewTools button { min-height: 34px; padding: 6px 12px; font-size: 11px; }
+.armouryBuildPanel .championStageLabel, .armouryBuildPanel .championAttackPreview small { color: #aaa; letter-spacing: 0; font-size: 10px; }
+.armouryBuildPanel .armouryPreviewDetails { padding: 0 28px 28px; }
+.armouryPreviewDetails .armouryPanelTabs { padding: 0; }
+.armouryBuildPanel .championMovement { border: 0; background: transparent; padding: 14px 0; gap: 36px; }
+.armouryBuildPanel .championQuickStats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 32px; }
+.armouryBuildPanel .championStatNote { color: #aaa; font-size: 12px; }
+.armouryBuildPanel .championGroupTitle { font-size: 21px; }
+.armouryBuildPanel .championStatLine { font-size: 12px; }
+.armouryBuildPanel .championStatExplanation summary { font-size: 11px; }
+.armouryBuildPanel .championAttackCard, .armouryBuildPanel .championTraitCard { background: #111; }
+.armouryBuildPanel .championDamageType, .armouryBuildPanel .championTraitCard small, .armouryBuildPanel .championPerk span { letter-spacing: 0; }
+@media (max-width: 1000px) {
+  .legacyBuildPlanner .dc-move-selector-grid { grid-template-columns: 1fr; }
+  .legacyBuildPlanner .legacyAllocationGrid { grid-template-columns: 1fr !important; }
+  .legacyBuildPlanner .legacyMove { padding: 18px !important; }
+  .armouryBuildFooter { flex-wrap: wrap; }
+}
+@media (max-width: 760px) {
+  .armouryBuildPanel.legacyChampionBuilder, .armouryBuildPanel.armouryCharacterPreview { width: calc(100% - 24px); margin: 0 12px 28px; }
+  .armouryBuildHeader { padding: 22px 16px; gap: 12px; flex-wrap: wrap; }
+  .armouryBuildHeader h2, .armouryBuildHeader .championNameEditor h2 { font-size: 24px; }
+  .armouryBuildSeal { width: 36px; height: 36px; }
+  .armouryBuildIdentity { width: 100%; margin-left: 48px; }
+  .armouryPanelBody { padding: 22px 16px; }
+  .armouryBuildPanel .armouryPanelTabs { padding: 0 16px; gap: 16px; }
+  .armouryBuildPanel .armouryPanelTabs button { font-size: 12px; }
+  .armouryBuildIntro { grid-template-columns: 1fr; gap: 16px; margin: 24px 0; }
+  .armouryBuildCost { grid-template-columns: 1fr auto; justify-items: start; align-items: center; }
+  .armouryBuildCost strong { text-align: right; }
+  .armouryBuildCost small { grid-column: 2; justify-self: end; }
+  .armouryBuildFooter button { width: 100%; }
+  .armouryBuildPanel .armouryPreviewModels { grid-template-columns: 1fr; }
+  .armouryPreviewModels > .championStage { height: 460px; border-right: 0; border-bottom: 1px solid var(--armory-border); }
+  .armouryPreviewModels .championAttackPreview .championAttackStage { height: 400px; }
+  .armouryBuildPanel .armouryPreviewDetails { padding: 0 16px 24px; }
+  .armouryPreviewDetails .armouryPanelTabs { padding: 0; gap: 16px; }
+  .armouryBuildPanel .championQuickStats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .armouryPreviewToolbar { padding: 16px; flex-wrap: wrap; }
+  .armouryObjectActions { padding: 16px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .armouryObjectActions .armouryObjectToggle { min-width: 0; padding: 12px 8px; font-size: 13px; gap: 6px; }
+  .armouryObjectToggle span { gap: 6px; flex-wrap: wrap; }
+}
+@media (max-width: 430px) {
+  .armouryBuildPanel .championQuickStats { grid-template-columns: 1fr; }
+  .legacyBuildPlanner .legacyPointGrid { grid-template-columns: 1fr !important; }
+  .legacyBuildPlanner .legacyPointControl { flex-direction: row !important; min-height: 72px !important; padding: 12px !important; }
+  .legacyPointControl > div:first-child { flex-direction: row !important; justify-content: flex-start !important; }
+  .legacyPointControl > div:last-child { width: auto !important; flex-shrink: 0; }
+  .legacyPointControl img { width: 24px !important; height: 24px !important; }
+  .armouryBuildPanel .armouryPanelTabs { gap: 12px; }
+  .armouryBuildPanel .armouryPanelTabs button { gap: 5px; font-size: 11px; }
+  .armouryBuildPanel .armouryPanelTabs svg { width: 16px; height: 16px; }
+  .armouryPreviewDetails .armouryPanelTabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+}

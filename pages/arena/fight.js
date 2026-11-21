@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
+import Head from "next/head"
 import algosdk from "algosdk"
 import {
   Grid,
@@ -135,7 +136,7 @@ function normalizeCharObject(session) {
 function getNftImageUrl(session) {
   const asset = session?.nft?.assets?.[0]
   const params = asset?.params || {}
-  const name = String(params.name || "")
+  const name = String(params.originalName || params.name || "")
 
   try {
     if (name.substring(0, 18) === "Dark Coin Champion" && params.reserve) {
@@ -608,7 +609,7 @@ function HeroPanel({
             marginBottom: 10,
           }}
         >
-          Dark Coin
+          DarkCoin Chronicles · Classic 2D
         </Typography>
 
         <Typography
@@ -998,49 +999,12 @@ const arenaChampionObjectsStillLoading = useMemo(() => {
       setChar(null)
       setSelectedFightAssetIds([])
 
-      await Promise.allSettled(champions.map((championAssetId) => sendFightStart(championAssetId)))
       await fetchData()
     } catch (error) {
       setArenaJoinWarning(error?.message || "Arena join failed.")
       await props.sendDiscordMessage(error, "Start Fight", activeAddress)
     } finally {
       setJoiningFightAssetIds([])
-    }
-  }
-
-  const sendFightStart = async (champ) => {
-    try {
-      const responseNft = await fetch("/api/getNft", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nftId: champ }),
-      })
-
-      const session = await responseNft.json()
-      const charObject = normalizeCharObject(session)
-      const nameChar = charObject?.name || "A Dark Coin Champion"
-      const url = getNftImageUrl(session)
-
-      const embeds = [
-        {
-          title: `${Number(10000).toLocaleString("en-US")} DC to whoever can take down ${nameChar}`,
-          color: 0,
-        },
-        {
-          title: nameChar,
-          url: `https://explorer.perawallet.app/asset/${champ}`,
-          image: { url: String(url || "") },
-          color: 16777215,
-        },
-      ]
-
-      await fetch(process.env.discordWebhook, {
-        method: "POST",
-        body: JSON.stringify({ username: "Dark Coin Arena", embeds }),
-        headers: { "Content-Type": "application/json" },
-      })
-    } catch (error) {
-      await props.sendDiscordMessage(error, "Send Battle", activeAddress)
     }
   }
 
@@ -1075,6 +1039,7 @@ const arenaChampionObjectsStillLoading = useMemo(() => {
       />
 
       <div style={{ position: "relative", zIndex: 1, maxWidth: 1640, margin: "0 auto" }}>
+        <Head><title>Fight | DarkCoin Chronicles</title></Head>
         <HeroPanel
           windowSize={windowSize}
           fights={fights}

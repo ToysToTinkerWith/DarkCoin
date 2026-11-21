@@ -1,120 +1,20 @@
+import React from 'react';
+import SectionLanding from '../../components/navigation/SectionLanding';
 
+const COUNCIL_DESTINATIONS=[
+  {key:'proposals',title:'Proposals',image:'/council/proposals.png',kicker:'Community decisions',
+    description:'Explore proposals, join their Discord discussions, and vote with your DAO NFTs.',
+    href:'/council/dao',action:'View proposals'},
+  {key:'propose',title:'Propose',image:'/council/propose.png',kicker:'Bring an idea',
+    description:'Share a proposal, attach images or videos, and put your next idea to the Council.',
+    href:'/council/ask',action:'New proposal'},
+  {key:'treasury',title:'Treasury',image:'/home/wallet.png',kicker:'Community resources',
+    description:'See the Council’s ALGO and assets, available funds, and resources for approved proposals.',
+    href:'/council/treasury',action:'View treasury'},
+];
 
-
-import { Grid, Typography, Button } from "@mui/material"
-
-import { motion } from "framer-motion"
-
-import { useRef } from "react";
-
-
-export default function Council(props) { 
-
-    const proposeRef = useRef(null);
-    const proposalsRef = useRef(null);
-    
-    const handleMouseEnterPropose = () => {
-        proposeRef.current.play();
-      };
-    
-      const handleMouseLeavePropose = () => {
-        proposeRef.current.pause();
-        proposeRef.current.currentTime = 0;
-      };
-    
-      const handleMouseEnterProposals = () => {
-        proposalsRef.current.play();
-      };
-    
-      const handleMouseLeaveProposals = () => {
-        proposalsRef.current.pause();
-        proposalsRef.current.currentTime = 0;
-      };
-
-    
-
-        return (
-            <div>
-                <Grid container style={{marginTop: 100}}>
-
-                    <Grid item xs={12} sm={6} >
-                        <Button style={{postion: "relative", display: "grid", margin: "auto"}} 
-                        onClick={() => window.location.href = "/council/voting"}
-                        >
-
-                        
-                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: "20vw", bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Item Voting </Typography>
-                            
-                        
-                            <img  
-                                src={"council/itemVoting.jpg"}
-                                style={{width: "100%", border: "3px solid white", maxWidth: 1000}}
-                            />      
-                            
-
-                        </Button>
-
-                    </Grid>
-
-                
-                    {/* <Grid item xs={12} sm={6} >
-                        <Button component={motion.div} animate={{opacity: [0,1,1,1,1,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
-                        onClick={() => window.location.href = "/council/propose"}
-                        >
-
-                        
-                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: "20vw", bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Propose </Typography>
-                            
-                        
-                            <video  
-                                ref={proposeRef}
-                                muted
-                                loop
-                                playsInline
-                                preload="metadata"
-                                onMouseEnter={handleMouseEnterPropose}
-                                onMouseLeave={handleMouseLeavePropose} 
-                                style={{width: "100%", border: "3px solid white", maxWidth: 1000}}>
-                                <source src={"council/propose.mp4"} type='video/mp4'  />
-                            </video>      
-                            
-
-                        </Button>
-
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                        <Button component={motion.div} animate={{opacity: [0,1,1,1,1,1]}} transition={{duration: 10}} style={{postion: "relative", display: "grid", margin: "auto"}} 
-                        onClick={() => window.location.href = "/council/proposals"}
-                        >
-
-                        
-                            <Typography color="primary" align="center" variant="h6" style={{position: "absolute", borderRadius: 15, backgroundColor: "#000000", left: "20vw", bottom: 20, fontFamily: "UncialAntiqua", color: "#FFFFFF", padding: 10}}> Proposals </Typography>
-                            
-                        
-                            <video  
-                                ref={proposalsRef}
-                                muted
-                                loop
-                                playsInline
-                                preload="metadata"
-                                onMouseEnter={handleMouseEnterProposals}
-                                onMouseLeave={handleMouseLeaveProposals} 
-                                style={{width: "100%", border: "3px solid white", maxWidth: 1000}}>
-                                <source src={"council/proposals.mp4"} type='video/mp4'  />
-                            </video>      
-                            
-
-                        </Button>
-
-                    </Grid> */}
-
-
-                    </Grid>
-              
-                  
-            
-            </div>
-        )
-    
+export default function Council(){
+  return <SectionLanding section="council" title="Council" subtitle="Community proposals, NFT voting, and a shared treasury."
+    description="Bring an idea to the Dark Coin Council, vote on proposals, and explore the community treasury."
+    background="/home/council.png" logo="/home/councilLogo.png" cards={COUNCIL_DESTINATIONS}/>;
 }

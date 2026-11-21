@@ -1,0 +1,2290 @@
+#pragma version 8
+intcblock 8 0 1 32 10000 224 152 232 240 288 208 216 128 184 192 200 248 256 264 272 176 280 168 144 1000000000000 1000 160 29300 250 296 4000
+bytecblock 0x433343 0x433350 0x433356
+txn RekeyTo
+global ZeroAddress
+==
+assert
+txn ApplicationID
+intc_1 // 0
+==
+bnz main_l110
+txn OnCompletion
+pushint 4 // UpdateApplication
+==
+bnz main_l109
+txn OnCompletion
+intc_1 // NoOp
+==
+assert
+txn NumAppArgs
+intc_1 // 0
+>
+assert
+txna ApplicationArgs 0
+pushbytes 0x627564676574 // "budget"
+==
+bnz main_l108
+txna ApplicationArgs 0
+pushbytes 0x696e697469616c697a65 // "initialize"
+==
+bnz main_l107
+bytec_0 // "C3C"
+box_len
+store 29
+store 28
+load 29
+assert
+bytec_0 // "C3C"
+intc_1 // 0
+intc_0 // 8
+box_extract
+btoi
+pushint 3 // 3
+==
+assert
+txna ApplicationArgs 0
+pushbytes 0x70726f706f7365 // "propose"
+==
+bnz main_l101
+txna ApplicationArgs 0
+pushbytes 0x766f7465 // "vote"
+==
+bnz main_l77
+txna ApplicationArgs 0
+pushbytes 0x66696e616c697a65 // "finalize"
+==
+bnz main_l73
+txna ApplicationArgs 0
+pushbytes 0x636c61696d // "claim"
+==
+bnz main_l72
+txna ApplicationArgs 0
+pushbytes 0x65786563757465 // "execute"
+==
+bnz main_l12
+txna ApplicationArgs 0
+pushbytes 0x7061757365 // "pause"
+==
+bnz main_l11
+err
+main_l11:
+txn Sender
+global CreatorAddress
+==
+assert
+txna ApplicationArgs 1
+btoi
+intc_2 // 1
+<=
+assert
+bytec_0 // "C3C"
+pushint 24 // 24
+txna ApplicationArgs 1
+btoi
+itob
+box_replace
+intc_2 // 1
+return
+main_l12:
+txn Sender
+bytec_0 // "C3C"
+intc 6 // 152
+intc_3 // 32
+box_extract
+==
+assert
+bytec_0 // "C3C"
+pushint 24 // 24
+intc_0 // 8
+box_extract
+btoi
+intc_1 // 0
+==
+assert
+txn NumAppArgs
+pushint 4 // 4
+==
+assert
+txna ApplicationArgs 1
+len
+intc_0 // 8
+==
+assert
+txna ApplicationArgs 2
+len
+intc_0 // 8
+==
+assert
+bytec_1 // "C3P"
+txna ApplicationArgs 1
+btoi
+itob
+concat
+store 0
+load 0
+intc_1 // 0
+intc_2 // 1
+box_extract
+pop
+load 0
+intc 6 // 152
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+==
+assert
+txna ApplicationArgs 2
+btoi
+store 15
+load 15
+load 0
+intc 20 // 176
+intc_0 // 8
+box_extract
+btoi
+<
+assert
+txna ApplicationArgs 3
+len
+load 0
+intc 20 // 176
+intc_0 // 8
+box_extract
+btoi
+pushint 112 // 112
+*
+==
+assert
+txna ApplicationArgs 3
+sha256
+load 0
+pushint 64 // 64
+intc_3 // 32
+box_extract
+==
+assert
+load 0
+intc 22 // 168
+intc_0 // 8
+box_extract
+btoi
+pushint 2 // 2
+load 15
+exp
+intc_2 // 1
+-
+==
+assert
+txna ApplicationArgs 3
+load 15
+pushint 112 // 112
+*
+pushint 112 // 112
+extract3
+store 3
+load 3
+extract 0 8
+btoi
+store 16
+load 3
+extract 8 8
+btoi
+store 17
+load 3
+extract 16 8
+btoi
+store 18
+load 3
+extract 24 8
+btoi
+store 19
+load 3
+extract 64 32
+store 4
+load 16
+intc_1 // 0
+==
+bnz main_l71
+load 16
+intc_2 // 1
+==
+bnz main_l70
+load 16
+pushint 2 // 2
+==
+bnz main_l55
+load 16
+pushint 3 // 3
+==
+bnz main_l27
+load 16
+pushint 4 // 4
+==
+bnz main_l18
+err
+main_l18:
+load 3
+extract 96 8
+btoi
+pushint 2 // 2
+<=
+assert
+load 3
+extract 32 32
+global ZeroAddress
+!=
+assert
+load 3
+extract 96 8
+btoi
+pushint 2 // 2
+!=
+load 15
+load 0
+intc 20 // 176
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+-
+==
+||
+assert
+load 3
+extract 96 8
+btoi
+intc_1 // 0
+==
+bnz main_l26
+load 3
+extract 96 8
+btoi
+intc_2 // 1
+==
+bnz main_l25
+load 3
+extract 96 8
+btoi
+pushint 2 // 2
+==
+bnz main_l22
+err
+main_l22:
+bytec_0 // "C3C"
+intc 6 // 152
+load 3
+extract 32 32
+box_replace
+main_l23:
+bytec_0 // "C3C"
+intc_3 // 32
+bytec_0 // "C3C"
+intc_3 // 32
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
++
+itob
+box_replace
+main_l24:
+load 0
+intc 22 // 168
+load 0
+intc 22 // 168
+intc_0 // 8
+box_extract
+btoi
+load 15
+intc_2 // 1
+setbit
+itob
+box_replace
+intc_2 // 1
+return
+main_l25:
+bytec_0 // "C3C"
+pushint 120 // 120
+load 3
+extract 32 32
+box_replace
+b main_l23
+main_l26:
+bytec_0 // "C3C"
+pushint 88 // 88
+load 3
+extract 32 32
+box_replace
+b main_l23
+main_l27:
+load 3
+extract 96 8
+btoi
+store 26
+load 3
+extract 104 8
+btoi
+store 27
+load 26
+pushint 13 // 13
+<
+assert
+load 26
+intc_1 // 0
+==
+bnz main_l54
+load 26
+intc_2 // 1
+==
+bnz main_l53
+load 26
+pushint 2 // 2
+==
+bnz main_l52
+load 26
+pushint 3 // 3
+==
+bnz main_l51
+load 26
+pushint 4 // 4
+==
+bnz main_l50
+load 26
+pushint 5 // 5
+==
+bnz main_l49
+load 26
+pushint 6 // 6
+==
+bnz main_l48
+load 26
+pushint 7 // 7
+==
+bnz main_l47
+load 26
+intc_0 // 8
+==
+bnz main_l46
+load 26
+pushint 9 // 9
+==
+bnz main_l45
+load 26
+pushint 10 // 10
+==
+bnz main_l44
+load 26
+pushint 11 // 11
+==
+bnz main_l43
+load 26
+pushint 12 // 12
+==
+bnz main_l41
+err
+main_l41:
+bytec_0 // "C3C"
+intc 21 // 280
+load 27
+itob
+box_replace
+main_l42:
+bytec_0 // "C3C"
+intc 13 // 184
+intc_0 // 8
+box_extract
+btoi
+intc 24 // 1000000000000
+<=
+assert
+bytec_0 // "C3C"
+intc 14 // 192
+intc_0 // 8
+box_extract
+btoi
+pushint 1000000000 // 1000000000
+<=
+assert
+bytec_0 // "C3C"
+intc 15 // 200
+intc_0 // 8
+box_extract
+btoi
+intc 24 // 1000000000000
+<=
+assert
+bytec_0 // "C3C"
+intc 5 // 224
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+>=
+assert
+bytec_0 // "C3C"
+intc 5 // 224
+intc_0 // 8
+box_extract
+btoi
+bytec_0 // "C3C"
+pushint 40 // 40
+intc_0 // 8
+box_extract
+btoi
+<=
+assert
+bytec_0 // "C3C"
+intc 7 // 232
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+>=
+assert
+bytec_0 // "C3C"
+intc 7 // 232
+intc_0 // 8
+box_extract
+btoi
+intc 4 // 10000
+<=
+assert
+bytec_0 // "C3C"
+intc 8 // 240
+intc_0 // 8
+box_extract
+btoi
+bytec_0 // "C3C"
+intc 16 // 248
+intc_0 // 8
+box_extract
+btoi
++
+intc 4 // 10000
+<=
+assert
+bytec_0 // "C3C"
+intc 10 // 208
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+>=
+assert
+bytec_0 // "C3C"
+intc 11 // 216
+intc_0 // 8
+box_extract
+btoi
+bytec_0 // "C3C"
+intc 10 // 208
+intc_0 // 8
+box_extract
+btoi
+>=
+assert
+bytec_0 // "C3C"
+intc 21 // 280
+intc_0 // 8
+box_extract
+btoi
+intc 25 // 1000
+<=
+assert
+bytec_0 // "C3C"
+intc 17 // 256
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+>=
+bytec_0 // "C3C"
+intc 17 // 256
+intc_0 // 8
+box_extract
+btoi
+pushint 90 // 90
+<=
+&&
+assert
+bytec_0 // "C3C"
+intc 18 // 264
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+>=
+bytec_0 // "C3C"
+intc 18 // 264
+intc_0 // 8
+box_extract
+btoi
+pushint 90 // 90
+<=
+&&
+assert
+bytec_0 // "C3C"
+intc 19 // 272
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+>=
+bytec_0 // "C3C"
+intc 19 // 272
+intc_0 // 8
+box_extract
+btoi
+pushint 90 // 90
+<=
+&&
+assert
+bytec_0 // "C3C"
+intc_3 // 32
+bytec_0 // "C3C"
+intc_3 // 32
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
++
+itob
+box_replace
+b main_l24
+main_l43:
+bytec_0 // "C3C"
+intc 19 // 272
+load 27
+itob
+box_replace
+b main_l42
+main_l44:
+bytec_0 // "C3C"
+intc 18 // 264
+load 27
+itob
+box_replace
+b main_l42
+main_l45:
+bytec_0 // "C3C"
+intc 17 // 256
+load 27
+itob
+box_replace
+b main_l42
+main_l46:
+bytec_0 // "C3C"
+intc 16 // 248
+load 27
+itob
+box_replace
+b main_l42
+main_l47:
+bytec_0 // "C3C"
+intc 8 // 240
+load 27
+itob
+box_replace
+b main_l42
+main_l48:
+bytec_0 // "C3C"
+intc 7 // 232
+load 27
+itob
+box_replace
+b main_l42
+main_l49:
+bytec_0 // "C3C"
+intc 5 // 224
+load 27
+itob
+box_replace
+b main_l42
+main_l50:
+bytec_0 // "C3C"
+intc 11 // 216
+load 27
+itob
+box_replace
+b main_l42
+main_l51:
+bytec_0 // "C3C"
+intc 10 // 208
+load 27
+itob
+box_replace
+b main_l42
+main_l52:
+bytec_0 // "C3C"
+intc 15 // 200
+load 27
+itob
+box_replace
+b main_l42
+main_l53:
+bytec_0 // "C3C"
+intc 14 // 192
+load 27
+itob
+box_replace
+b main_l42
+main_l54:
+bytec_0 // "C3C"
+intc 13 // 184
+load 27
+itob
+box_replace
+b main_l42
+main_l55:
+load 4
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+pushbytes 0x61737365745f315f6964 // "asset_1_id"
+app_local_get_ex
+store 35
+store 34
+load 4
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+pushbytes 0x61737365745f325f6964 // "asset_2_id"
+app_local_get_ex
+store 37
+store 36
+load 4
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+pushbytes 0x61737365745f315f7265736572766573 // "asset_1_reserves"
+app_local_get_ex
+store 39
+store 38
+load 4
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+pushbytes 0x61737365745f325f7265736572766573 // "asset_2_reserves"
+app_local_get_ex
+store 41
+store 40
+load 4
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+pushbytes 0x746f74616c5f6665655f7368617265 // "total_fee_share"
+app_local_get_ex
+store 43
+store 42
+load 35
+load 37
+&&
+load 39
+&&
+load 41
+&&
+load 43
+&&
+assert
+load 34
+store 20
+load 36
+store 21
+load 17
+load 20
+==
+load 19
+load 21
+==
+&&
+load 17
+load 21
+==
+load 19
+load 20
+==
+&&
+||
+assert
+load 42
+intc 4 // 10000
+<
+assert
+load 17
+load 20
+==
+bnz main_l69
+load 40
+main_l57:
+store 22
+load 17
+load 20
+==
+bnz main_l68
+load 38
+main_l59:
+store 23
+load 22
+intc_1 // 0
+>
+assert
+load 23
+intc_1 // 0
+>
+assert
+load 18
+load 18
+load 42
+mulw
+intc_1 // 0
+intc 4 // 10000
+divmodw
+pop
+pop
+swap
+!
+assert
+-
+store 24
+load 23
+load 22
+load 23
+mulw
+intc_1 // 0
+load 22
+load 24
++
+divmodw
+pop
+pop
+swap
+!
+assert
+-
+intc_2 // 1
+-
+store 25
+load 25
+intc 4 // 10000
+bytec_0 // "C3C"
+intc 21 // 280
+intc_0 // 8
+box_extract
+btoi
+-
+mulw
+intc_1 // 0
+intc 4 // 10000
+divmodw
+pop
+pop
+swap
+!
+assert
+store 25
+load 25
+intc_1 // 0
+>
+assert
+load 19
+intc_1 // 0
+>
+bnz main_l67
+main_l60:
+itxn_begin
+load 17
+intc_1 // 0
+==
+bnz main_l66
+pushint 4 // axfer
+main_l62:
+itxn_field TypeEnum
+intc_1 // 0
+itxn_field Fee
+load 17
+intc_1 // 0
+==
+bnz main_l65
+load 17
+itxn_field XferAsset
+load 4
+itxn_field AssetReceiver
+load 18
+itxn_field AssetAmount
+main_l64:
+itxn_next
+pushint 6 // appl
+itxn_field TypeEnum
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+itxn_field ApplicationID
+intc_1 // NoOp
+itxn_field OnCompletion
+pushbytes 0x73776170 // "swap"
+itxn_field ApplicationArgs
+pushbytes 0x66697865642d696e707574 // "fixed-input"
+itxn_field ApplicationArgs
+load 25
+itob
+itxn_field ApplicationArgs
+load 20
+itxn_field Assets
+load 21
+itxn_field Assets
+load 4
+itxn_field Accounts
+intc_1 // 0
+itxn_field Fee
+itxn_submit
+callsub solvent_1
+b main_l24
+main_l65:
+load 4
+itxn_field Receiver
+load 18
+itxn_field Amount
+b main_l64
+main_l66:
+intc_2 // pay
+b main_l62
+main_l67:
+load 19
+callsub opt_3
+b main_l60
+main_l68:
+load 40
+b main_l59
+main_l69:
+load 38
+b main_l57
+main_l70:
+load 17
+intc_1 // 0
+>
+assert
+load 17
+callsub opt_3
+b main_l24
+main_l71:
+load 17
+load 3
+extract 32 32
+load 18
+callsub transfer_2
+b main_l24
+main_l72:
+txn NumAppArgs
+pushint 3 // 3
+==
+assert
+txna ApplicationArgs 1
+len
+intc_0 // 8
+==
+assert
+txna ApplicationArgs 2
+len
+intc_0 // 8
+==
+assert
+bytec_1 // "C3P"
+txna ApplicationArgs 1
+btoi
+itob
+concat
+store 0
+load 0
+intc_1 // 0
+intc_2 // 1
+box_extract
+pop
+load 0
+intc 6 // 152
+intc_0 // 8
+box_extract
+btoi
+intc_1 // 0
+!=
+assert
+bytec_2 // "C3V"
+txna ApplicationArgs 1
+concat
+txna ApplicationArgs 2
+concat
+store 1
+load 1
+box_get
+store 33
+store 32
+load 33
+assert
+load 32
+extract 0 32
+txn Sender
+==
+assert
+load 1
+box_del
+assert
+load 0
+intc 26 // 160
+load 0
+intc 26 // 160
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
++
+itob
+box_replace
+txn Sender
+intc 27 // 29300
+callsub pay_0
+callsub solvent_1
+intc_2 // 1
+return
+main_l73:
+bytec_1 // "C3P"
+txna ApplicationArgs 1
+btoi
+itob
+concat
+store 0
+load 0
+intc_1 // 0
+intc_2 // 1
+box_extract
+pop
+load 0
+intc 6 // 152
+intc_0 // 8
+box_extract
+btoi
+intc_1 // 0
+==
+assert
+global LatestTimestamp
+load 0
+intc 23 // 144
+intc_0 // 8
+box_extract
+btoi
+>=
+assert
+load 0
+pushint 112 // 112
+intc_0 // 8
+box_extract
+btoi
+load 0
+pushint 120 // 120
+intc_0 // 8
+box_extract
+btoi
++
+load 0
+intc 12 // 128
+intc_0 // 8
+box_extract
+btoi
++
+store 14
+load 0
+intc 6 // 152
+load 14
+load 0
+intc 10 // 208
+intc_0 // 8
+box_extract
+btoi
+>=
+load 0
+pushint 112 // 112
+intc_0 // 8
+box_extract
+btoi
+load 0
+pushint 120 // 120
+intc_0 // 8
+box_extract
+btoi
++
+intc_1 // 0
+>
+&&
+load 0
+pushint 112 // 112
+intc_0 // 8
+box_extract
+btoi
+intc 4 // 10000
+*
+load 0
+pushint 112 // 112
+intc_0 // 8
+box_extract
+btoi
+load 0
+pushint 120 // 120
+intc_0 // 8
+box_extract
+btoi
++
+load 0
+intc 11 // 216
+intc_0 // 8
+box_extract
+btoi
+*
+>=
+&&
+bnz main_l76
+pushint 2 // 2
+main_l75:
+itob
+box_replace
+bytec_0 // "C3C"
+pushint 16 // 16
+bytec_0 // "C3C"
+pushint 16 // 16
+intc_0 // 8
+box_extract
+btoi
+load 0
+intc 5 // 224
+intc_0 // 8
+box_extract
+btoi
+load 0
+intc 8 // 240
+intc_0 // 8
+box_extract
+btoi
+*
+load 0
+intc 7 // 232
+intc_0 // 8
+box_extract
+btoi
+-
+-
+itob
+box_replace
+intc_2 // 1
+return
+main_l76:
+intc_2 // 1
+b main_l75
+main_l77:
+global GroupSize
+pushint 4 // 4
+==
+assert
+txn GroupIndex
+pushint 3 // 3
+==
+assert
+txn NumAppArgs
+pushint 6 // 6
+==
+assert
+txna ApplicationArgs 1
+len
+intc_0 // 8
+==
+assert
+txna ApplicationArgs 2
+len
+intc_0 // 8
+==
+assert
+txna ApplicationArgs 3
+len
+intc_0 // 8
+==
+assert
+txna ApplicationArgs 4
+len
+intc_0 // 8
+==
+assert
+bytec_1 // "C3P"
+txna ApplicationArgs 1
+btoi
+itob
+concat
+store 0
+load 0
+intc_1 // 0
+intc_2 // 1
+box_extract
+pop
+load 0
+intc 6 // 152
+intc_0 // 8
+box_extract
+btoi
+intc_1 // 0
+==
+assert
+global LatestTimestamp
+load 0
+intc 23 // 144
+intc_0 // 8
+box_extract
+btoi
+<
+assert
+txna ApplicationArgs 2
+btoi
+store 7
+txna ApplicationArgs 3
+btoi
+store 8
+load 8
+intc_2 // 1
+>=
+assert
+load 8
+pushint 3 // 3
+<=
+assert
+txn Sender
+load 7
+asset_holding_get AssetBalance
+store 31
+store 30
+load 31
+assert
+load 30
+intc_2 // 1
+==
+assert
+txna ApplicationArgs 4
+btoi
+store 6
+load 6
+bytec_0 // "C3C"
+pushint 40 // 40
+intc_0 // 8
+box_extract
+btoi
+<
+assert
+txna ApplicationArgs 5
+len
+bytec_0 // "C3C"
+pushint 48 // 48
+intc_0 // 8
+box_extract
+btoi
+intc_3 // 32
+*
+==
+assert
+pushbytes 0x444344414f31 // "DCDAO1"
+load 7
+itob
+concat
+sha256
+store 2
+intc_1 // 0
+store 5
+main_l78:
+load 5
+bytec_0 // "C3C"
+pushint 48 // 48
+intc_0 // 8
+box_extract
+btoi
+<
+bnz main_l97
+load 2
+bytec_0 // "C3C"
+pushint 56 // 56
+intc_3 // 32
+box_extract
+==
+assert
+bytec_2 // "C3V"
+txna ApplicationArgs 1
+concat
+load 7
+itob
+concat
+store 1
+load 1
+box_get
+store 33
+store 32
+load 33
+bnz main_l89
+intc_1 // 0
+gtxns TypeEnum
+intc_2 // pay
+==
+intc_1 // 0
+gtxns Sender
+txn Sender
+==
+&&
+intc_1 // 0
+gtxns Receiver
+global CurrentApplicationAddress
+==
+&&
+intc_1 // 0
+gtxns Amount
+intc 27 // 29300
+==
+&&
+intc_1 // 0
+gtxns RekeyTo
+global ZeroAddress
+==
+&&
+intc_1 // 0
+gtxns CloseRemainderTo
+global ZeroAddress
+==
+&&
+assert
+load 1
+pushint 48 // 48
+box_create
+assert
+load 0
+intc 5 // 224
+intc_0 // 8
+box_extract
+btoi
+store 12
+load 0
+pushint 112 // 112
+intc_0 // 8
+box_extract
+btoi
+load 0
+pushint 120 // 120
+intc_0 // 8
+box_extract
+btoi
++
+load 0
+intc 12 // 128
+intc_0 // 8
+box_extract
+btoi
++
+load 0
+intc 8 // 240
+intc_0 // 8
+box_extract
+btoi
+<
+assert
+load 1
+txn Sender
+load 8
+itob
+concat
+load 12
+itob
+concat
+box_put
+load 0
+intc 7 // 232
+load 0
+intc 7 // 232
+intc_0 // 8
+box_extract
+btoi
+load 12
++
+itob
+box_replace
+bytec_0 // "C3C"
+pushint 16 // 16
+bytec_0 // "C3C"
+pushint 16 // 16
+intc_0 // 8
+box_extract
+btoi
+load 12
+-
+itob
+box_replace
+txn Sender
+load 12
+callsub pay_0
+callsub solvent_1
+main_l81:
+load 8
+intc_2 // 1
+==
+bnz main_l88
+load 8
+pushint 2 // 2
+==
+bnz main_l87
+load 8
+pushint 3 // 3
+==
+bnz main_l85
+err
+main_l85:
+load 0
+intc 12 // 128
+load 0
+intc 12 // 128
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
++
+itob
+box_replace
+main_l86:
+intc_2 // 1
+return
+main_l87:
+load 0
+pushint 120 // 120
+load 0
+pushint 120 // 120
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
++
+itob
+box_replace
+b main_l86
+main_l88:
+load 0
+pushint 112 // 112
+load 0
+pushint 112 // 112
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
++
+itob
+box_replace
+b main_l86
+main_l89:
+intc_1 // 0
+gtxns TypeEnum
+intc_2 // pay
+==
+intc_1 // 0
+gtxns Sender
+txn Sender
+==
+&&
+intc_1 // 0
+gtxns Receiver
+global CurrentApplicationAddress
+==
+&&
+intc_1 // 0
+gtxns Amount
+intc_1 // 0
+==
+&&
+intc_1 // 0
+gtxns RekeyTo
+global ZeroAddress
+==
+&&
+intc_1 // 0
+gtxns CloseRemainderTo
+global ZeroAddress
+==
+&&
+assert
+load 32
+extract 32 8
+btoi
+store 9
+load 9
+intc_2 // 1
+==
+bnz main_l96
+load 9
+pushint 2 // 2
+==
+bnz main_l95
+load 9
+pushint 3 // 3
+==
+bnz main_l93
+err
+main_l93:
+load 0
+intc 12 // 128
+load 0
+intc 12 // 128
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+-
+itob
+box_replace
+main_l94:
+load 1
+intc_3 // 32
+load 8
+itob
+box_replace
+b main_l81
+main_l95:
+load 0
+pushint 120 // 120
+load 0
+pushint 120 // 120
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+-
+itob
+box_replace
+b main_l94
+main_l96:
+load 0
+pushint 112 // 112
+load 0
+pushint 112 // 112
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+-
+itob
+box_replace
+b main_l94
+main_l97:
+load 6
+pushint 2 // 2
+%
+intc_1 // 0
+==
+bnz main_l100
+txna ApplicationArgs 5
+load 5
+intc_3 // 32
+*
+intc_3 // 32
+extract3
+load 2
+concat
+main_l99:
+sha256
+store 2
+load 6
+pushint 2 // 2
+/
+store 6
+load 5
+intc_2 // 1
++
+store 5
+b main_l78
+main_l100:
+load 2
+txna ApplicationArgs 5
+load 5
+intc_3 // 32
+*
+intc_3 // 32
+extract3
+concat
+b main_l99
+main_l101:
+bytec_0 // "C3C"
+pushint 24 // 24
+intc_0 // 8
+box_extract
+btoi
+intc_1 // 0
+==
+assert
+global GroupSize
+pushint 6 // 6
+==
+assert
+txn GroupIndex
+pushint 5 // 5
+==
+assert
+txn NumAppArgs
+pushint 9 // 9
+==
+assert
+txna ApplicationArgs 1
+btoi
+bytec_0 // "C3C"
+intc_0 // 8
+intc_0 // 8
+box_extract
+btoi
+==
+assert
+txna ApplicationArgs 2
+len
+intc_3 // 32
+==
+assert
+txna ApplicationArgs 3
+len
+pushint 112 // 112
+%
+intc_1 // 0
+==
+assert
+txna ApplicationArgs 3
+len
+pushint 896 // 896
+<=
+assert
+txna ApplicationArgs 4
+btoi
+intc 4 // 10000
+<=
+assert
+txna ApplicationArgs 5
+btoi
+pushint 5 // 5
+<=
+assert
+global LatestTimestamp
+txna ApplicationArgs 6
+btoi
+<=
+assert
+txna ApplicationArgs 6
+btoi
+global LatestTimestamp
+pushint 3600 // 3600
++
+<=
+assert
+txna ApplicationArgs 7
+btoi
+bytec_0 // "C3C"
+intc_3 // 32
+intc_0 // 8
+box_extract
+btoi
+==
+assert
+bytec_0 // "C3C"
+intc 13 // 184
+intc_0 // 8
+box_extract
+btoi
+bytec_0 // "C3C"
+intc 14 // 192
+intc_0 // 8
+box_extract
+btoi
+txna ApplicationArgs 4
+btoi
+*
++
+bytec_0 // "C3C"
+intc 15 // 200
+intc_0 // 8
+box_extract
+btoi
+txna ApplicationArgs 5
+btoi
+*
++
+store 10
+pushbytes 0x4443434f554e43494c33 // "DCCOUNCIL3"
+global CurrentApplicationID
+itob
+concat
+txna ApplicationArgs 2
+concat
+txna ApplicationArgs 3
+sha256
+concat
+txn Sender
+concat
+load 10
+itob
+concat
+txna ApplicationArgs 4
+concat
+txna ApplicationArgs 5
+concat
+txna ApplicationArgs 6
+concat
+txna ApplicationArgs 7
+concat
+txna ApplicationArgs 8
+bytec_0 // "C3C"
+pushint 120 // 120
+intc_3 // 32
+box_extract
+ed25519verify_bare
+assert
+intc_1 // 0
+gtxns TypeEnum
+intc_2 // pay
+==
+intc_1 // 0
+gtxns Sender
+txn Sender
+==
+&&
+intc_1 // 0
+gtxns Receiver
+global CurrentApplicationAddress
+==
+&&
+intc_1 // 0
+gtxns Amount
+load 10
+==
+&&
+intc_1 // 0
+gtxns RekeyTo
+global ZeroAddress
+==
+&&
+intc_1 // 0
+gtxns CloseRemainderTo
+global ZeroAddress
+==
+&&
+assert
+intc_2 // 1
+gtxns TypeEnum
+intc_2 // pay
+==
+intc_2 // 1
+gtxns Sender
+txn Sender
+==
+&&
+intc_2 // 1
+gtxns Receiver
+global CurrentApplicationAddress
+==
+&&
+intc_2 // 1
+gtxns Amount
+pushint 106100 // 106100
+==
+&&
+intc_2 // 1
+gtxns RekeyTo
+global ZeroAddress
+==
+&&
+intc_2 // 1
+gtxns CloseRemainderTo
+global ZeroAddress
+==
+&&
+assert
+bytec_1 // "C3P"
+bytec_0 // "C3C"
+intc_0 // 8
+intc_0 // 8
+box_extract
+btoi
+itob
+concat
+store 0
+load 0
+intc 16 // 248
+box_create
+assert
+load 0
+intc_1 // 0
+txn Sender
+box_replace
+load 0
+intc_3 // 32
+txna ApplicationArgs 2
+box_replace
+load 0
+pushint 64 // 64
+txna ApplicationArgs 3
+sha256
+box_replace
+txna ApplicationArgs 4
+btoi
+txna ApplicationArgs 5
+btoi
+intc 28 // 250
+*
++
+store 13
+load 13
+bytec_0 // "C3C"
+intc 10 // 208
+intc_0 // 8
+box_extract
+btoi
+<=
+bnz main_l106
+load 13
+bytec_0 // "C3C"
+intc 11 // 216
+intc_0 // 8
+box_extract
+btoi
+<=
+bnz main_l105
+bytec_0 // "C3C"
+intc 19 // 272
+intc_0 // 8
+box_extract
+btoi
+main_l104:
+pushint 86400 // 86400
+*
+store 13
+load 10
+bytec_0 // "C3C"
+intc 8 // 240
+intc_0 // 8
+box_extract
+btoi
+mulw
+intc_1 // 0
+intc 4 // 10000
+divmodw
+pop
+pop
+swap
+!
+assert
+store 11
+load 10
+bytec_0 // "C3C"
+intc 16 // 248
+intc_0 // 8
+box_extract
+btoi
+mulw
+intc_1 // 0
+intc 4 // 10000
+divmodw
+pop
+pop
+swap
+!
+assert
+store 12
+load 0
+pushint 96 // 96
+load 10
+itob
+box_replace
+load 0
+pushint 104 // 104
+load 12
+itob
+box_replace
+load 0
+intc 5 // 224
+load 12
+bytec_0 // "C3C"
+pushint 40 // 40
+intc_0 // 8
+box_extract
+btoi
+/
+itob
+box_replace
+load 0
+intc 8 // 240
+bytec_0 // "C3C"
+pushint 40 // 40
+intc_0 // 8
+box_extract
+btoi
+itob
+box_replace
+load 0
+pushint 136 // 136
+global LatestTimestamp
+itob
+box_replace
+load 0
+intc 23 // 144
+global LatestTimestamp
+load 13
++
+itob
+box_replace
+load 0
+intc 13 // 184
+bytec_0 // "C3C"
+intc_3 // 32
+intc_0 // 8
+box_extract
+btoi
+itob
+box_replace
+load 0
+intc 14 // 192
+txna ApplicationArgs 4
+btoi
+itob
+box_replace
+load 0
+intc 15 // 200
+txna ApplicationArgs 5
+btoi
+itob
+box_replace
+load 0
+intc 20 // 176
+txna ApplicationArgs 3
+len
+pushint 112 // 112
+/
+itob
+box_replace
+load 0
+intc 10 // 208
+bytec_0 // "C3C"
+intc 5 // 224
+intc_0 // 8
+box_extract
+btoi
+itob
+box_replace
+load 0
+intc 11 // 216
+bytec_0 // "C3C"
+intc 7 // 232
+intc_0 // 8
+box_extract
+btoi
+itob
+box_replace
+bytec_0 // "C3C"
+intc_0 // 8
+bytec_0 // "C3C"
+intc_0 // 8
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
++
+itob
+box_replace
+bytec_0 // "C3C"
+pushint 16 // 16
+bytec_0 // "C3C"
+pushint 16 // 16
+intc_0 // 8
+box_extract
+btoi
+load 0
+intc 5 // 224
+intc_0 // 8
+box_extract
+btoi
+load 0
+intc 8 // 240
+intc_0 // 8
+box_extract
+btoi
+*
++
+itob
+box_replace
+bytec_0 // "C3C"
+pushint 88 // 88
+intc_3 // 32
+box_extract
+load 11
+callsub pay_0
+callsub solvent_1
+intc_2 // 1
+return
+main_l105:
+bytec_0 // "C3C"
+intc 18 // 264
+intc_0 // 8
+box_extract
+btoi
+b main_l104
+main_l106:
+bytec_0 // "C3C"
+intc 17 // 256
+intc_0 // 8
+box_extract
+btoi
+b main_l104
+main_l107:
+txn Sender
+global CreatorAddress
+==
+assert
+txn NumAppArgs
+pushint 2 // 2
+==
+assert
+txna ApplicationArgs 1
+len
+intc 29 // 296
+==
+assert
+bytec_0 // "C3C"
+intc 29 // 296
+box_create
+assert
+bytec_0 // "C3C"
+txna ApplicationArgs 1
+box_put
+bytec_0 // "C3C"
+intc_1 // 0
+intc_0 // 8
+box_extract
+btoi
+pushint 3 // 3
+==
+assert
+bytec_0 // "C3C"
+intc_0 // 8
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+==
+assert
+bytec_0 // "C3C"
+pushint 16 // 16
+intc_0 // 8
+box_extract
+btoi
+intc_1 // 0
+==
+assert
+bytec_0 // "C3C"
+intc_3 // 32
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+==
+assert
+bytec_0 // "C3C"
+pushint 24 // 24
+intc_0 // 8
+box_extract
+btoi
+intc_2 // 1
+<=
+assert
+bytec_0 // "C3C"
+pushint 40 // 40
+intc_0 // 8
+box_extract
+btoi
+pushint 50 // 50
+>=
+assert
+bytec_0 // "C3C"
+pushint 40 // 40
+intc_0 // 8
+box_extract
+btoi
+pushint 4096 // 4096
+<=
+assert
+bytec_0 // "C3C"
+pushint 48 // 48
+intc_0 // 8
+box_extract
+btoi
+pushint 12 // 12
+<=
+assert
+bytec_0 // "C3C"
+pushint 40 // 40
+intc_0 // 8
+box_extract
+btoi
+pushint 2 // 2
+bytec_0 // "C3C"
+pushint 48 // 48
+intc_0 // 8
+box_extract
+btoi
+exp
+<=
+assert
+bytec_0 // "C3C"
+pushint 56 // 56
+intc_3 // 32
+box_extract
+global ZeroAddress
+!=
+assert
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+pushint 1002541853 // 1002541853
+==
+bytec_0 // "C3C"
+intc 9 // 288
+intc_0 // 8
+box_extract
+btoi
+pushint 148607000 // 148607000
+==
+||
+assert
+bytec_0 // "C3C"
+pushint 88 // 88
+intc_3 // 32
+box_extract
+global ZeroAddress
+!=
+assert
+bytec_0 // "C3C"
+pushint 120 // 120
+intc_3 // 32
+box_extract
+global ZeroAddress
+!=
+assert
+bytec_0 // "C3C"
+intc 6 // 152
+intc_3 // 32
+box_extract
+global ZeroAddress
+!=
+assert
+bytec_0 // "C3C"
+intc 13 // 184
+intc_0 // 8
+box_extract
+btoi
+pushint 10000000 // 10000000
+==
+assert
+bytec_0 // "C3C"
+intc 14 // 192
+intc_0 // 8
+box_extract
+btoi
+pushint 20000 // 20000
+==
+assert
+bytec_0 // "C3C"
+intc 15 // 200
+intc_0 // 8
+box_extract
+btoi
+pushint 2000000 // 2000000
+==
+assert
+bytec_0 // "C3C"
+intc 10 // 208
+intc_0 // 8
+box_extract
+btoi
+intc 28 // 250
+==
+assert
+bytec_0 // "C3C"
+intc 11 // 216
+intc_0 // 8
+box_extract
+btoi
+intc 25 // 1000
+==
+assert
+bytec_0 // "C3C"
+intc 5 // 224
+intc_0 // 8
+box_extract
+btoi
+pushint 50 // 50
+==
+assert
+bytec_0 // "C3C"
+intc 7 // 232
+intc_0 // 8
+box_extract
+btoi
+pushint 6000 // 6000
+==
+assert
+bytec_0 // "C3C"
+intc 8 // 240
+intc_0 // 8
+box_extract
+btoi
+intc 30 // 4000
+==
+assert
+bytec_0 // "C3C"
+intc 16 // 248
+intc_0 // 8
+box_extract
+btoi
+intc 30 // 4000
+==
+assert
+bytec_0 // "C3C"
+intc 17 // 256
+intc_0 // 8
+box_extract
+btoi
+pushint 7 // 7
+==
+assert
+bytec_0 // "C3C"
+intc 18 // 264
+intc_0 // 8
+box_extract
+btoi
+pushint 14 // 14
+==
+assert
+bytec_0 // "C3C"
+intc 19 // 272
+intc_0 // 8
+box_extract
+btoi
+pushint 30 // 30
+==
+assert
+bytec_0 // "C3C"
+intc 21 // 280
+intc_0 // 8
+box_extract
+btoi
+pushint 50 // 50
+==
+assert
+callsub solvent_1
+intc_2 // 1
+return
+main_l108:
+intc_2 // 1
+return
+main_l109:
+txn Sender
+global CreatorAddress
+==
+return
+main_l110:
+intc_2 // 1
+return
+
+// pay
+pay_0:
+proto 2 0
+frame_dig -1
+intc_1 // 0
+>
+bz pay_0_l2
+itxn_begin
+intc_2 // pay
+itxn_field TypeEnum
+frame_dig -2
+itxn_field Receiver
+frame_dig -1
+itxn_field Amount
+intc_1 // 0
+itxn_field Fee
+itxn_submit
+pay_0_l2:
+retsub
+
+// solvent
+solvent_1:
+proto 0 0
+global CurrentApplicationAddress
+balance
+global CurrentApplicationAddress
+min_balance
+bytec_0 // "C3C"
+pushint 16 // 16
+intc_0 // 8
+box_extract
+btoi
++
+>=
+assert
+retsub
+
+// transfer
+transfer_2:
+proto 3 0
+frame_dig -3
+intc_1 // 0
+==
+bnz transfer_2_l2
+itxn_begin
+pushint 4 // axfer
+itxn_field TypeEnum
+frame_dig -3
+itxn_field XferAsset
+frame_dig -2
+itxn_field AssetReceiver
+frame_dig -1
+itxn_field AssetAmount
+intc_1 // 0
+itxn_field Fee
+itxn_submit
+b transfer_2_l3
+transfer_2_l2:
+frame_dig -2
+frame_dig -1
+callsub pay_0
+transfer_2_l3:
+callsub solvent_1
+retsub
+
+// opt
+opt_3:
+proto 1 0
+global CurrentApplicationAddress
+frame_dig -1
+asset_holding_get AssetBalance
+store 45
+store 44
+load 45
+!
+bz opt_3_l2
+frame_dig -1
+global CurrentApplicationAddress
+intc_1 // 0
+callsub transfer_2
+opt_3_l2:
+retsub

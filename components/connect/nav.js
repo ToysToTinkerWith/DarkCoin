@@ -11,20 +11,20 @@ const NAV_ITEMS = [
     icon: "/home/arenaLogo.png",
   },
   {
-    key: "council",
-    label: "COUNCIL",
-    href: "/council",
-    icon: "/home/councilLogo.png",
-  },
-  {
     key: "market",
     label: "MARKET",
     href: "/market",
     icon: "/home/marketLogo.png",
   },
+  ...(process.env.NEXT_PUBLIC_COUNCIL_ENABLED === 'true' ? [{
+    key: "council",
+    label: "COUNCIL",
+    href: "/council",
+    icon: "/home/councilLogo.png",
+  }] : []),
 ];
 
-export default function DarkCoinNavBar() {
+export default function DarkCoinNavBar({walletControl}) {
   const router = useRouter();
 
   const isActiveNavItem = (href) => {
@@ -46,13 +46,13 @@ export default function DarkCoinNavBar() {
             className="navLogoSlot"
           >
             <Link href="/" legacyBehavior>
-              <a className="navLogo" aria-label="Dark Coin home">
-                <img src="/invDC.svg" alt="Dark Coin" className="navLogoImg" />
+              <a className="navLogo" aria-label="DarkCoin home">
+                <img src="/invDC.svg" alt="" className="navLogoImg" /><span className="navWordmark">DarkCoin</span>
               </a>
             </Link>
           </motion.div>
 
-          {/* Nav items — right side */}
+          {/* Section links */}
           <div className="navRight">
             {NAV_ITEMS.map((item, index) => {
               const isActive = isActiveNavItem(item.href);
@@ -85,6 +85,7 @@ export default function DarkCoinNavBar() {
             })}
           </div>
 
+          <div className="navWallet">{walletControl}</div>
         </nav>
       </header>
 
@@ -109,9 +110,10 @@ export default function DarkCoinNavBar() {
           max-width: 1440px;
           margin: 0 auto;
           padding: 0 36px;
-          display: flex;
+          display: grid;
+          grid-template-columns: 1fr auto auto;
           align-items: center;
-          justify-content: space-between;
+          gap: 32px;
           background:
             linear-gradient(
               to bottom,
@@ -146,7 +148,7 @@ export default function DarkCoinNavBar() {
         }
 
         /* ── Logo ── */
-        .navLogoSlot {
+        :global(.navLogoSlot) {
           flex: 0 0 auto;
           display: flex;
           align-items: center;
@@ -183,9 +185,9 @@ export default function DarkCoinNavBar() {
           display: flex;
           align-items: center;
           justify-content: flex-end;
-          gap: clamp(22px, 4vw, 64px);
+          gap: clamp(16px, 2.4vw, 36px);
           height: var(--nav-height);
-          padding-right: 48px;
+          padding-right: 0;
         }
 
         /* ── Nav buttons ── */
@@ -296,71 +298,35 @@ export default function DarkCoinNavBar() {
           transform: translateY(1px);
         }
 
-        @media (max-width: 980px) {
-          .dcNavWrap {
-            --nav-height: 78px;
-          }
-
-          .dcNav {
-            padding: 0 18px;
-          }
-
-          .navRight {
-            gap: 24px;
-            padding-right: 24px;
-          }
-
-          .navButton {
-            font-size: 11px;
-            gap: 8px;
-          }
-
-          .navIconShell {
-            width: 24px;
-            height: 24px;
-          }
-
-          .navIcon {
-            width: 21px;
-            height: 21px;
-          }
+        .navLogo { gap: 11px; color: #f2efe7; }
+        .navWordmark { font-size: 25px; font-weight: 400; letter-spacing: .025em; }
+        .navWallet { display:flex; justify-content:flex-end; align-items:center; }
+        .navLogo:focus-visible, .navButton:focus-visible { outline:2px solid #f2efe7; outline-offset:3px; }
+        @media(max-width:1050px) {
+          .dcNav { padding:0 20px; gap:22px; }
+          .navRight { gap:20px; }
+          .navButton { font-size:11px; gap:7px; letter-spacing:.12em; }
+          .navIconShell { width:24px; height:24px; }
+          .navIcon { width:22px; height:22px; }
         }
-
-        @media (max-width: 680px) {
-          .dcNavWrap {
-            --nav-height: 70px;
-          }
-
-          .dcNav {
-            height: var(--nav-height);
-            padding: 0 14px;
-          }
-
-          .navLogoImg {
-            width: 32px;
-            height: 32px;
-          }
-
-          .navRight {
-            gap: 8px;
-            padding-right: 0;
-          }
-
-          .navButton {
-            min-height: var(--nav-height);
-            flex-direction: column;
-            gap: 5px;
-            font-size: 9px;
-            letter-spacing: 0.12em;
-          }
-
-          .navButton::after {
-            bottom: 8px;
-          }
-
-          .navButtonActive::after {
-            width: 78%;
-          }
+        @media(max-width:760px) {
+          .dcNavWrap { --nav-height:114px; }
+          .dcNav { grid-template-columns:1fr auto; grid-template-rows:64px 50px; grid-template-areas:"brand wallet" "links links"; gap:0 12px; padding:0 16px; }
+          :global(.navLogoSlot) { grid-area:brand; height:64px; }
+          .navLogo { height:64px; padding:0; gap:8px; }
+          .navLogoImg { width:30px; height:30px; }
+          .navWordmark { font-size:21px; }
+          .navWallet { grid-area:wallet; }
+          .navRight { grid-area:links; height:50px; justify-content:center; gap:38px; padding:0; border-top:1px solid #ffffff12; }
+          .navButton { min-height:46px; gap:7px; font-size:10px; }
+          .navButton::after { bottom:3px; }
+          .navIconShell { width:21px; height:21px; }
+          .navIcon { width:20px; height:20px; }
+        }
+        @media(max-width:360px) {
+          .dcNav { padding:0 12px; }
+          .navRight { gap:24px; }
+          .navWordmark { font-size:20px; }
         }
       `}</style>
     </>

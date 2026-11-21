@@ -4,15 +4,30 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "council:status": "node scripts/council-activation.cjs status",
+    "council:prepare": "node scripts/prepare-council.cjs mainnet",
+    "test:council": "node --test tests/council.test.cjs tests/council-chain.test.cjs tests/council-manual.test.cjs tests/council-activation.test.cjs tests/council-backend.test.cjs tests/council-media.test.cjs tests/council-discord.test.cjs",
+    "test:council-avm": "pwsh -NoProfile -File scripts/test-council-avm-cloud.ps1",
+    "council:report": "node scripts/council-report.cjs",
     "dev": "next dev",
     "build": "next build",
     "copy-next": "node scripts/copy-next-to-functions.js",
+    "build:arena-server": "node scripts/build-arena-server.cjs",
+    "build:arena-realtime": "node scripts/build-arena-realtime.cjs",
+    "build:arena-economy": "python contracts/ArenaTreasury.py && node scripts/build-arena-economy.cjs",
+    "test:arena-economy": "node --test tests/arena-economy.test.cjs",
+    "test:arena-realtime": "node --test tests/arena-realtime.test.cjs tests/arena-network-recovery.test.cjs",
+    "test:arena-network": "node scripts/build-arena-realtime.cjs && node scripts/test-arena-reconnect-browser.cjs && node scripts/test-arena-realtime-browser.cjs",
+    "test:arena": "node --test tests/arena-combat.test.cjs tests/arena-beast.test.cjs tests/playground.test.cjs tests/arena-preview.test.cjs",
     "deploy:firebase": "firebase deploy --only functions,hosting,firestore:rules",
     "deploy:fight-jobs": "powershell -ExecutionPolicy Bypass -File scripts/deploy-fight-cloud-run-jobs.ps1",
     "grant:fight-jobs": "powershell -ExecutionPolicy Bypass -File scripts/grant-fight-job-scheduler-iam.ps1",
     "start": "next start",
     "out": "next build && next export",
-    "deploy": "npm run build && npm run copy-next && npm run deploy:firebase"
+    "deploy": "npm run build:arena-server && npm run build:arena-economy && npm run build && npm run copy-next && npm run deploy:firebase",
+    "deploy:arena-dev": "pwsh -NoProfile -File scripts/deploy-arena-dev.ps1",
+    "test:arena-dev-entry": "node scripts/test-arena-dev-entry.cjs",
+    "test:arena-dev-cloud": "node scripts/test-arena-realtime-cloud.cjs --dev --soak"
   },
   "dependencies": {
     "@agoralabs-sh/avm-web-provider": "^1.7.0",
@@ -37,6 +52,7 @@
     "framer-motion": "^4.1.17",
     "got": "^12.5.3",
     "gsap": "^3.12.4",
+    "hash-wasm": "4.13.0",
     "jimp": "^0.22.10",
     "lute-connect": "^1.6.3",
     "micro": "^9.3.4",
@@ -46,16 +62,22 @@
     "nextjs-cors": "^2.1.2",
     "openai": "^4.103.0",
     "path": "^0.12.7",
+    "qrcode-generator": "1.5.2",
     "react": "^18.2.0",
     "react-csv": "^2.2.2",
     "react-dom": "^18.2.0",
     "recharts": "^2.7.2",
-    "stream": "^0.0.2"
+    "stream": "^0.0.2",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
     "acorn": "^8.16.0",
+    "esbuild": "0.25.10",
+    "gltf-validator": "2.0.0-dev.3.10",
+    "jsqr": "1.4.0",
     "linkify-it": "^5.0.1",
-    "markdown-it": "^14.1.1"
+    "markdown-it": "^14.1.1",
+    "playwright": "1.63.0"
   }
 }

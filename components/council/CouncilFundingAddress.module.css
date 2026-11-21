@@ -1,0 +1,30 @@
+.funding{display:grid;grid-template-columns:minmax(0,1fr) 135px;align-items:center;gap:16px;flex:0 0 416px;width:416px;max-width:100%;padding:16px;border:1px solid #c5b87b38;border-radius:9px;background:linear-gradient(135deg,#1c241b,#121915);text-align:left}
+.details{display:flex;flex-direction:column;gap:8px;min-width:0}
+.title{font-size:15px;font-weight:550;color:#f1eddf;line-height:1.35}
+.network{display:flex;align-items:center;gap:6px;font-size:10px;color:#a7b3a3;line-height:1.4}
+.network i{width:5px;height:5px;flex-shrink:0;border-radius:50%;background:#94cfad}
+.address{display:block;color:#d6dcce;font:10px/1.6 Consolas,"Courier New",monospace;overflow-wrap:anywhere;user-select:all;letter-spacing:.1px}
+.actions{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.copy,.wallet{display:inline-flex;gap:5px;align-items:center;min-height:29px;font-size:10px;line-height:1.4}
+.copy{padding:4px 7px;color:#e7d59d;border:1px solid #c5b87b38;border-radius:4px;background:#1e291b}
+.wallet{color:#c7cec1!important;text-decoration:none;white-space:nowrap}
+.copy:hover{background:#2a3524}.wallet:hover{color:#f0dda9!important}
+.help{font-size:10px;color:#a7b3a3;line-height:1.5}
+.qrButton{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;width:135px;padding:0 0 6px;border:0;border-radius:6px;overflow:hidden;color:#354036;background:#fff;cursor:pointer}
+.qr{display:block;width:135px;height:135px;flex-shrink:0;background:#fff}
+.qrButton>span{font:10px/1.3 Inter,"Segoe UI",Arial,sans-serif;letter-spacing:.2px}
+.qrButton:hover{box-shadow:0 0 0 3px #e2c88755}
+.status:empty{display:none}.status{font-size:10px;line-height:1.5;color:#e2c887}
+.dialog{position:fixed;inset:0;max-width:min(420px,calc(100vw - 30px));width:420px;margin:auto;padding:22px;border:1px solid #c5b87b60;border-radius:12px;background:#121915;color:#f1eddf;box-shadow:0 24px 100px #0009;max-height:calc(100vh - 32px);overflow:auto;text-align:center}
+.dialog::backdrop{background:#000c;backdrop-filter:blur(4px)}
+.dialogTop{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:19px;text-align:left}
+.close{display:grid;place-items:center;width:32px;height:32px;padding:4px;background:transparent;color:#d6dcce;border:1px solid #c5b87b30;border-radius:5px}
+.dialogNetwork{display:block;margin:8px 0 18px;font-size:12px;color:#a7b3a3;text-align:left}
+.largeQR{display:block;width:min(100%,292px);height:auto;margin:0 auto 18px;border-radius:5px;background:#fff}
+.dialogAddress{display:block;margin:0 auto 14px;color:#d6dcce;font:12px/1.6 Consolas,"Courier New",monospace;max-width:330px;overflow-wrap:anywhere;user-select:all}
+.dialogHelp{display:block;font-size:12px;line-height:1.8;color:#a7b3a3;max-width:320px;margin:0 auto 18px}
+.dialogCopy{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:42px;padding:10px 16px;border:1px solid #c5b87b55;border-radius:5px;color:#e7d59d;background:#1e291b;font-size:12px}
+.close:hover,.dialogCopy:hover{background:#2a3524}
+@media(max-width:900px){.funding{flex-basis:380px;width:380px;padding:14px;gap:12px}.actions{gap:8px}.copy,.wallet{font-size:10px}}
+@media(max-width:720px){.funding{flex-basis:100%;width:100%}.address{font-size:11px}.title{font-size:15px}.network,.help{font-size:11px}.copy,.wallet{font-size:11px;min-height:31px}.dialog{padding:19px}}
+@media(max-width:360px){.funding{padding:12px;gap:10px}.actions{gap:4px}.address{font-size:10px}.copy,.wallet{font-size:10px}.help{font-size:10px}}

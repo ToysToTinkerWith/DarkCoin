@@ -2,6 +2,18 @@
 
 Dark Coin is a community built upon the Algorand Blockchain.
 
+This repository contains the Next.js site, Firebase and Cloud Run source, and the runtime assets for the 3D Arena. The production site is at [dark-coin.com](https://dark-coin.com).
+
+## Run locally
+
+Use Node.js 24. Run `npm ci`, copy `.env.example` to `.env.local`, and fill in the public Firebase web app configuration for your development project. Then run `npm run dev` or `npm run build`.
+
+Server integrations read their credentials from the runtime environment or Secret Manager. Use `functions/.env.example` and `functions-arena-dev/.env.example` as configuration templates. Keep credentials and signing material outside Git.
+
+Legacy jobs that sign in to Firebase need `NEXT_PUBLIC_FIREBASE_API_KEY`, `FIREBASE_AUTH_EMAIL`, and `FIREBASE_AUTH_PASSWORD` (or the existing `EMAILPASS` setting). Before deploying the Firestore rules, grant the `darkCoinServerWriter` custom claim to the intended legacy writer account through the Firebase Admin SDK. The new rules deny those writes until the account presents the claim in its Firebase ID token.
+
+To generate the Arena runtime bundles, run `npm run build:arena-server`, `node scripts/build-arena-economy.cjs`, and `npm run build:arena-realtime`. Run `npm ci --prefix arena-server` to install the WebSocket worker dependencies locally. Run `npm run test:arena-realtime` for the protocol and reconnect tests.
+
 For questions about Dark Coin, please visit our Discord Channel to learn about the past, present, and future of the project.
 
 https://discord.com/invite/GWB89qusjQ

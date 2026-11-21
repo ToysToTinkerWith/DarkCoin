@@ -318,12 +318,6 @@ export default function Raffle(props) {
 
             props.setMessage("Ticket Purchased.")
 
-            let ticketAssetInfo = await indexerClient.lookupAssetByID(Number(ticketId)).do();
-
-            let ticket = {assetName: ticketAssetInfo.asset.params.name, assetUnit: ticketAssetInfo.asset.params["unit-name"], assetAmount: Number(ticketPrice), assetId: Number(ticketId)}
-
-            updateDiscordJoin(addr, ticket, ((raffles[0].endRound - currentRound) * blockTime / 60 / 60 / 24).toFixed(2))
-
             const ticketTxns = await indexerClient.searchForTransactions().applicationID(props.contracts.raffle).do();
 
             let tickets = []
@@ -353,44 +347,6 @@ export default function Raffle(props) {
             setTickets(tickets)
     
     
-        }
-
-        const updateDiscordJoin = async (addr, ticket, length) => {
-
-            let embeds = []
-      
-            embeds.push({
-                "title": "Ticket purchased.",
-                "url": "https://dark-coin.com/tools/raffle/" + addr,
-                "color": 0
-            })
-      
-            embeds.push({
-                "title": ticketAmount + " Tickets",
-                "description": "Ticket Cost: " + ticket.assetAmount + " " + ticket.assetName + "\n" + "(" + ticket.assetId + ")",
-                "color": 0
-            })
-
-            embeds.push({
-                "title": "Raffle Closes in " +  length + " days",
-                "color": 0
-            })
-      
-      
-            const response = await fetch(process.env.newRaffleWebhook, {
-                method: "POST",
-                body: JSON.stringify({
-                    username: "Ticket Buy",
-                    embeds: embeds
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-      
-      
-      
-            
         }
 
         const rewardRaffle = async (entrys, addr, rewards, ticket) => {
@@ -461,49 +417,9 @@ export default function Raffle(props) {
 
             props.setMessage("Raffle complete")
 
-            updateDiscordReward(winningAddr, rewards, id)
 
 
 
-        }
-
-        const updateDiscordReward = async (winningAddr, rewards, txnId) => {
-
-            let embeds = []
-      
-            embeds.push({
-                "title": "Raffle completed. " + winningAddr + " has won:",
-                "color": 0
-            })
-      
-            rewards.forEach((reward) => {
-                embeds.push({
-                    "description": reward.assetAmount + " " + reward.assetUnit + "\n" + "(" + reward.assetId + ")",
-                    "color": 16777215
-                })
-            })
-
-            embeds.push({
-                "title": "Reward Txn",
-                "url": "https://allo.info/tx/" + txnId,
-                "color": 0
-            })
-      
-      
-            const response = await fetch(process.env.raffleWinnersWebhook, {
-                method: "POST",
-                body: JSON.stringify({
-                    username: "Raffle Reward",
-                    embeds: embeds
-                }),
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-      
-      
-      
-            
         }
 
     return (

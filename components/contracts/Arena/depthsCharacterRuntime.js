@@ -634,8 +634,9 @@ export async function loadDepthsChampionRuntime({ assetId, baseCharObj, contract
   let gainedEffects = cloneEmptyGainedEffects();
   let backgroundImageUrl = "";
 
-  if (metaSnap.exists()) {
-    equippedMeta = metaSnap.data() || null;
+  const generatedProperties=baseCharObj?.generationSchemaVersion===2?baseCharObj.generationEquippedProperties:null;
+  if (generatedProperties || metaSnap.exists()) {
+    equippedMeta = generatedProperties?{properties:generatedProperties}:metaSnap.data() || null;
     equippedTraits = await buildEquippedTraitsFromMeta(client, equippedMeta);
     gainedEffects = buildGainedEffectsFromEquippedTraits(equippedTraits);
     backgroundImageUrl = await fetchBackgroundImageUrl(equippedMeta?.properties?.Background || "");

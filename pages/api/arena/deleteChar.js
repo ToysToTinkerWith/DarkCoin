@@ -55,10 +55,10 @@ async function deleteChar(req, res) {
     }
 
     // Sign in to Firebase so Firestore rules allow reads/writes
-    const email = "abergquist96@gmail.com"
-    const password = process.env.EMAILPASS
-    if (!password) {
-      return res.status(500).json({ error: "Server misconfigured: EMAILPASS is missing" })
+    const email = process.env.FIREBASE_AUTH_EMAIL?.trim()
+    const password = process.env.FIREBASE_AUTH_PASSWORD || process.env.EMAILPASS
+    if (!email || !password) {
+      return res.status(503).json({ error: "Firebase server login is not configured" })
     }
 
     const { user } = await signInWithEmailAndPassword(auth, email, password)

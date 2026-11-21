@@ -1569,8 +1569,9 @@ export default function Character(props) {
       let builtTraits = [];
       let metaGainedEffects = cloneEmptyGainedEffects();
 
-      if (metaSnap.exists()) {
-        equippedMetaDoc = metaSnap.data() || null;
+      const generatedProperties=session.charObject?.charObj?.generationSchemaVersion===2?session.charObject.charObj.generationEquippedProperties:null;
+      if (generatedProperties || metaSnap.exists()) {
+        equippedMetaDoc = generatedProperties?{properties:generatedProperties}:metaSnap.data() || null;
         builtTraits = await buildEquippedTraitsFromMeta(client, equippedMetaDoc);
         metaGainedEffects = buildGainedEffectsFromEquippedTraits(builtTraits);
 

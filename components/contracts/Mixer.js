@@ -58,10 +58,6 @@ export default class Mixer extends React.Component {
           });
 
 
-          const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-      
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         (async () => {
@@ -142,10 +138,6 @@ export default class Mixer extends React.Component {
 
         let shuffledReceivers = this.shuffle(receivers)
 
-        const token = {
-          'X-API-Key': process.env.indexerKey
-      }
-
       const client = new algosdk.Algodv2('', 'https://mainnet-api.algonode.cloud', 443)
 
         let params = await client.getTransactionParams().do();
@@ -220,10 +212,6 @@ export default class Mixer extends React.Component {
 
       async getReceivers() {
 
-const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-      
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         let appState = await indexerClient.lookupApplications(this.state.contract).do();
@@ -309,10 +297,6 @@ const token = {
         let queued500
         
 
-const token = {
-            'X-API-Key': process.env.indexerKey
-        }
-      
         const indexerClient = new algosdk.Indexer('', 'https://mainnet-idx.algonode.cloud', 443)
 
         let response = await indexerClient.lookupApplications(this.state.contract).do();

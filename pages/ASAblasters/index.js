@@ -415,7 +415,6 @@ export default function ASAblasters(props) {
   
         
     
-        await sendRewardMessage(session.res)
       
   
     }
@@ -424,46 +423,6 @@ export default function ASAblasters(props) {
       }
 
   }
-
-  const sendRewardMessage = async (txnId) => {
-       
-    let embeds = []
-
-      embeds.push({
-          "title": activeAccount.address + " Scored: " + score["totalScore"],
-          "color": 0
-      })
-
-      {Object.keys(score).map((asset, index) => {
-        if (asset != "totalScore") {
-          embeds.push({
-            "title": asset,
-            "description": score[asset] + " hits",
-            "color": 16777215
-          })
-        }
-        
-       })}
-
-       embeds.push({
-        "title": "Reward Txn",
-        "url": "https://allo.info/tx/" + txnId,
-        "color": 16777215
-      })
-
-      const response = await fetch(process.env.rewardWebhook, {
-          method: "POST",
-          body: JSON.stringify({
-              username: "ASAblasters Reward",
-              embeds: embeds
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-  }
-
 
   let sortedAssets = []
 

@@ -1,0 +1,179 @@
+[
+  {
+    "id": "crescent_moon_earring",
+    "name": "Crescent Moon Earring",
+    "parts": 16,
+    "vertices": 14148,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "dragon_fangs_earring",
+    "name": "Dragon Fangs Earring",
+    "parts": 22,
+    "vertices": 19952,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "fusion_pearl_earring",
+    "name": "Fusion Pearl Earring",
+    "parts": 14,
+    "vertices": 16448,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "tentacle_earring",
+    "name": "Tentacle Earring",
+    "parts": 30,
+    "vertices": 29436,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "hoop_earring",
+    "name": "Hoop Earring",
+    "parts": 2,
+    "vertices": 2240,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "golden_feathers",
+    "name": "Golden Feathers",
+    "parts": 2,
+    "vertices": 28056,
+    "attachment": "both_ears",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0,
+    "ear_sockets_blender_m": [
+      [
+        -0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ],
+      [
+        0.09470995515584946,
+        0.011614507995545864,
+        1.6262495517730713
+      ]
+    ]
+  },
+  {
+    "id": "battle_wound",
+    "name": "Battle Wound",
+    "parts": 1,
+    "vertices": 16583,
+    "attachment": "neck_skin",
+    "ear_socket_blender_m": [
+      -0.08937631547451019,
+      -0.007442106492817402,
+      1.6362056732177734
+    ],
+    "maximum_surface_offset_m": 0.0009245118075236678
+  },
+  {
+    "id": "crescent_birthmark",
+    "name": "Crescent-Birthmark",
+    "parts": 1,
+    "vertices": 32184,
+    "attachment": "neck_skin",
+    "ear_socket_blender_m": [
+      -0.09470995515584946,
+      0.011614507995545864,
+      1.6262495517730713
+    ],
+    "maximum_surface_offset_m": 0.000349498472486157,
+    "source_scale": 4
+  }
+]

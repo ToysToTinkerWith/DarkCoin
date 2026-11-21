@@ -180,11 +180,16 @@ async function generateMove(req, res) {
     return new Blob([arrayBuffer], { type: response.headers.get('content-type') || 'image/png' });
   }
 
+  const email = process.env.FIREBASE_AUTH_EMAIL?.trim();
+  const password = process.env.FIREBASE_AUTH_PASSWORD || process.env.EMAILPASS;
+  if (!email || !password) {
+      return res.status(503).json({ error: 'Firebase server login is not configured' });
+  }
+
   return new Promise(async (resolve) => {
     try {
       /* ===== Auth & fetch char object ===== */
-      const email    = 'abergquist96@gmail.com';
-      const password = process.env.EMAILPASS;
+
       const { user } = await signInWithEmailAndPassword(auth, email, password);
       await user.getIdToken();
 

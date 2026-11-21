@@ -26,11 +26,28 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    match /{document=**} {
-      allow read: if true;
+    match /{collection}/{document=**} {
+      // Server-only room state includes RNG and session/ownership proofs.
+      // A broad allow elsewhere would override a narrower deny.
+        allow read: if collection != 'arenaPrivate' && collection != 'legacyGenerationJobs' && collection != 'councilExecutions' && collection != 'councilUploadLimits' && collection != 'councilQuoteLimits' && collection != 'councilMediaUploads' && collection != 'councilDiscordState' && collection != 'councilDiscordOutbox' && collection != 'councilDiscordReceipts' && collection != 'councilDiscordProposals';
+      // This Boolean claim is granted explicitly by a project administrator.
       allow write: if
+        collection != 'arenaPrivate' &&
+        collection != 'legacyGenerationJobs' &&
+          collection != 'councilExecutions' &&
+          collection != 'councilManifests' &&
+          collection != 'councilImages' &&
+          collection != 'councilUploadLimits' &&
+          collection != 'councilQuoteLimits' &&
+          collection != 'councilFinalizations' &&
+          collection != 'councilProgress' &&
+          collection != 'councilMediaUploads' &&
+          collection != 'councilDiscordState' &&
+          collection != 'councilDiscordOutbox' &&
+          collection != 'councilDiscordReceipts' &&
+          collection != 'councilDiscordProposals' &&
         request.auth != null &&
-        request.auth.token.email == 'abergquist96@gmail.com';
+        request.auth.token.get('darkCoinServerWriter', false) == true;
     }
   }
 }

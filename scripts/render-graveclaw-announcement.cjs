@@ -1,0 +1,27 @@
+// Reproducible Discord cards rendered from actual arena geometry and animations.
+const fs=require('node:fs'),path=require('node:path'),http=require('node:http');
+const {chromium}=require('playwright');
+const esbuild=require('esbuild');
+const root=path.resolve(__dirname,'../public'),out=path.resolve(__dirname,'../tmp/graveclaw-announcement-art');
+const cards={
+ warning:{title:'The grave<br>is stirring.',label:'GRAVECLAW · PREPARATION',subtitle:'Gather your champions. His arrival draws near.',color:'#ddbb7d',description:'A ghostly Graveclaw looms over his sealed crypt as champions prepare for his arrival.'},
+ spawn:{title:'Graveclaw<br>has risen.',label:'GRAVECLAW · BATTLE BEGINS',subtitle:'The crypt is open. The fight has begun.',color:'#ef8d72',description:'Graveclaw stands above his open crypt with his claws raised, ready to fight.'},
+ defeat:{title:'Graveclaw<br>defeated.',label:'CHAMPIONS VICTORIOUS',subtitle:'The beast falls. Claim your earned loot.',color:'#e1c786',description:'The defeated Graveclaw lies fallen beside a glowing Dark Coin loot marker in the arena.'},
+ victory:{title:'Back to<br>the grave.',label:'GRAVECLAW VICTORIOUS',subtitle:'The champions have fallen. He retreats below.',color:'#aac5e5',description:'Seen from behind, Graveclaw descends into his open crypt after defeating the champions.'},
+};
+const html=`<!doctype html><html><head><meta charset="utf-8"><style>*{box-sizing:border-box}body{margin:0;background:#10171f;color:#f4ecdf;font-family:Arial,sans-serif;width:1200px;height:675px;overflow:hidden}#scene{position:absolute;inset:0}.shade{position:absolute;inset:0;background:linear-gradient(90deg,#080d13f5 0%,#080d13df 22%,#080d1366 47%,transparent 69%),linear-gradient(0deg,#080d13c9,transparent 27%)}.brand{position:absolute;top:39px;left:48px;display:flex;gap:15px;align-items:center;font-size:14px;letter-spacing:3px;font-weight:700}.brand img{width:34px;height:34px}.copy{position:absolute;left:48px;top:195px;width:535px}#label{font-size:12px;letter-spacing:2.7px;font-weight:700;color:var(--accent)}h1{font-size:65px;line-height:1.03;letter-spacing:-2.5px;margin:22px 0 24px;font-weight:800;text-shadow:0 3px 25px #0009}#subtitle{font-size:17px;line-height:1.5;color:#c9ced4;max-width:380px}.rule{height:3px;width:52px;background:var(--accent);margin-bottom:22px}footer{position:absolute;left:48px;bottom:35px;font-size:12px;letter-spacing:1.1px;color:#98a3b2}footer span{color:#d4c5a6;margin-right:14px}.edge{position:absolute;inset:16px;border:1px solid #c7a96e20;pointer-events:none}</style></head><body><div id="scene"></div><div class="shade"></div><div class="edge"></div><div class="brand"><img src="/WhiteCoinLogo.svg">DARK COIN ARENA</div><div class="copy"><div class="rule"></div><div id="label"></div><h1 id="title"></h1><div id="subtitle"></div></div><footer><span>BUILD. BATTLE. BECOME.</span>dark-coin.com/arena/playtest</footer><script type="module" src="/art-scene.js"></script></body></html>`;
+(async()=>{
+ fs.mkdirSync(out,{recursive:true});
+ esbuild.buildSync({entryPoints:[path.resolve(__dirname,'graveclaw-announcement-scene.js')],bundle:true,platform:'browser',format:'esm',target:'chrome120',outfile:path.join(out,'art-scene.js'),legalComments:'none'});
+ const server=http.createServer((req,res)=>{const url=new URL(req.url,'http://localhost');if(url.pathname==='/'){res.setHeader('Content-Type','text/html');return res.end(html);}const file=url.pathname==='/art-scene.js'?path.join(out,'art-scene.js'):path.resolve(root,'.'+decodeURIComponent(url.pathname));if(!(file.startsWith(root+path.sep)||file===path.join(out,'art-scene.js'))||!fs.existsSync(file)||!fs.statSync(file).isFile()){res.writeHead(404);return res.end();}res.setHeader('Content-Type',file.endsWith('.js')?'application/javascript':file.endsWith('.glb')?'model/gltf-binary':file.endsWith('.svg')?'image/svg+xml':'image/png');fs.createReadStream(file).pipe(res);});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));let browser;
+ try{
+  browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});const page=await browser.newPage({viewport:{width:1200,height:675},deviceScaleFactor:1});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(`http://127.0.0.1:${server.address().port}/`);await page.waitForFunction(()=>window.artReady);
+  const events={};for(const [kind,card] of Object.entries(cards)){
+   await page.evaluate(async({kind,card})=>{document.documentElement.style.setProperty('--accent',card.color);document.getElementById('title').innerHTML=card.title;document.getElementById('label').textContent=card.label;document.getElementById('subtitle').textContent=card.subtitle;await window.renderEvent(kind);},{kind,card});
+   const filename=`graveclaw-${kind}.png`,bytes=await page.screenshot();fs.writeFileSync(path.join(root,'arena/playground/assets/beasts',filename),bytes);events[kind]={filename,contentType:'image/png',description:card.description,base64:bytes.toString('base64')};console.log(`${kind}: ${bytes.length} bytes`);
+  }
+  if(errors.length)throw Error(errors.join('\n'));fs.writeFileSync(path.resolve(__dirname,'../lib/arena/graveclaw-announcement-art.json'),JSON.stringify({events})+'\n');
+  console.log('Rendered four event-specific cards from the game model.');
+ }finally{await browser?.close();await new Promise(r=>server.close(r));}
+})().catch(e=>{console.error(e);process.exitCode=1});

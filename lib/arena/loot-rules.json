@@ -1,0 +1,23 @@
+{
+  "version": 3,
+  "monsters": {
+    "graveclaw": { "nftChanceBps": 100, "tokenPercentageDivisor": 4 },
+    "cindermaw": { "nftChanceBps": 500, "tokenPercentageDivisor": 1 }
+  },
+  "tokenDefaults": {
+    "weight": 1,
+    "mode": "percentage",
+    "tiers": [
+      { "bps": 10, "chanceBps": 6000 },
+      { "bps": 50, "chanceBps": 2500 },
+      { "bps": 100, "chanceBps": 1000 },
+      { "bps": 500, "chanceBps": 400 },
+      { "bps": 1000, "chanceBps": 100 }
+    ],
+    "minTokens": "1",
+    "minAtomic": "1",
+    "maxAtomic": "0",
+    "encounterCapBps": 10000
+  },
+  "assets": {}
+}

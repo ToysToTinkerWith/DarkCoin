@@ -1,0 +1,22 @@
+import {EffectText} from '../../EffectKeywords';
+import React from 'react';
+import StatIcon from './StatIcon';
+import {statMeter,statDisplay} from './preview-data';
+import {STAT_DEFINITIONS,DAMAGE_PALETTE} from '../../contracts/Arena/arenaBalanceV1';
+const slotNames={head:'Head',armour:'Armour',weapon:'Weapon',magic:'Magic',skin:'Skin',extra:'Extra',background:'Background'};
+
+export function Stat({name,value,contributions=[],definition,showBase=true}){
+ const d=definition||STAT_DEFINITIONS[name],bar=statMeter(name,value,d),colour=['maxMana','manaRegen'].includes(name)?'#83adff':DAMAGE_PALETTE[name.replace('Resistance','')];
+ return <div className="championStat" style={colour?{'--stat-colour':colour}:undefined}>
+  <div className="championStatLine"><StatIcon name={name}/><span>{d.label}</span><strong>{statDisplay(name,value,d)}</strong></div>
+  <div className="championStatTrack" role="meter" aria-label={d.label} aria-valuemin={bar.min} aria-valuemax={bar.max} aria-valuenow={value} aria-valuetext={`${statDisplay(name,value,d)} ${d.unit==='rating'?'rating':''}.${showBase?' Base '+statDisplay(name,d.base,d)+'.':''}`}><i style={{left:bar.left+'%',width:bar.width+'%'}}/>{showBase&&<b style={{left:bar.base+'%'}}/>}</div>
+  {contributions.length>0&&<div className="championStatContributions">{contributions.map(c=><small key={c.slot}>{c.name} <b>{c.value>0?'+':''}{statDisplay(name,c.value)}</b></small>)}</div>}
+  {showBase&&<details className="championStatExplanation"><summary>Base {statDisplay(name,d.base,d)} <span>Details ⓘ</span></summary><p><EffectText>{d.effect}</EffectText></p></details>}
+ </div>;
+}
+export function AttackCard({trait,magic,timing,attackSeconds}){
+ if(!trait)return null;
+ const healing=!!trait.healRoll,range=trait.projectile?.maxRangeM??trait.area?.distanceM??trait.reachM;
+ return <div className="championAttackCard" data-selected-spell={magic?trait.id:undefined} style={{'--stat-colour':trait.color||DAMAGE_PALETTE[trait.damageType]}}><div className="championAttackHeading"><StatIcon name={healing?'maxHealth':magic?'magic':'weapon'}/><div><small>{magic?(trait.isTrait?'E · SELECTED SPELL':'Q · SELECTED SPELL'):'LEFT CLICK · ATTACK'}</small><h4>{trait.name}</h4></div><span className="championDamageType">{healing?'Healing':trait.damageType}</span></div><div className="championAttackNumbers"><span><b>{magic?(trait.healRoll||trait.damageRoll):trait.damageRolls.join(' / ')}</b>{healing?'Healing dice':'Raw damage dice'}{!magic&&trait.damageRolls.length>1?' · one roll per hit':''}</span><span><b>{(magic?timing.castSeconds:attackSeconds).toFixed(2)}s</b>{magic?'Cast time':'Attack cycle'}</span><span><b>{range==null?'Self':`${range}m`}</b>{healing?'Target':trait.area?'Distance ahead':magic||trait.projectile?'Range':'Reach'}</span>{!magic&&<span><b>{trait.staminaCost}</b>Stamina per attack</span>}{(magic||trait.manaCost>0)&&<span><b>{trait.manaCost||0}</b>Mana per {magic?'cast':'attack'}</span>}{magic&&<><span><b>{timing.cooldownSeconds.toFixed(1)}s</b>Cooldown after cast</span>{trait.projectile&&<span><b>{trait.projectile.widthM}m</b>Projectile width</span>}{trait.area&&<span><b>{trait.area.radiusM}m</b>Area radius</span>}</>}</div>{magic&&<p className="championStatNote"><EffectText>{trait.description}</EffectText></p>}</div>;
+}
+export function TraitAbilities({data}){return <><p className="championStatNote">Every equipped trait contributes its own ability. Temporary bonuses activate only when their listed conditions are met.</p>{Object.entries(slotNames).map(([slot,label])=>{const trait=data.selected[slot];return <section className="championTraitCard" key={slot}><header>{trait&&trait.id!=='unarmed'?<img className="championTraitImage" src={`/arena/playground/traits/${trait.category.toLowerCase()}-${trait.id}.webp`} alt={`${trait.name} original trait artwork`} loading="lazy" width="64" height="64"/>:<StatIcon name={slot}/>}<div><small>{label}</small><h3>{trait?.name||'Not equipped'}</h3></div></header>{trait?.abilities?.length?trait.abilities.map(ability=><div className="championPerk" key={ability.id}><div><strong><EffectText>{ability.name}</EffectText></strong><span>{ability.trigger==='always'?'Passive':ability.trigger==='conditional'?'Conditional':slot==='magic'?'Cast · E':ability.handler==='weaponOnHit'||ability.trigger==='confirmedHit'?'On hit':'Triggered'}</span></div><p><EffectText>{ability.description}</EffectText></p></div>):<p className="championStatNote">{slot==='weapon'?'Unarmed attacks remain available.':'No trait bonus in this slot.'}</p>}</section>;})}</>;}

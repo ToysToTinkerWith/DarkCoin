@@ -24,7 +24,11 @@ if (!fs.existsSync(functionsDir)) {
 assertInside(rootDir, targetDir)
 
 fs.rmSync(targetDir, { recursive: true, force: true })
-fs.cpSync(sourceDir, targetDir, { recursive: true })
-fs.rmSync(path.join(targetDir, "cache"), { recursive: true, force: true })
+// Build caches can be several GB and are not needed by the serving runtime.
+// Exclude them while copying, rather than filling the disk and deleting afterward.
+fs.cpSync(sourceDir, targetDir, {
+  recursive: true,
+  filter: source => path.relative(sourceDir, source).split(path.sep)[0] !== "cache",
+})
 
 console.log(`Copied ${sourceDir} to ${targetDir}`)
